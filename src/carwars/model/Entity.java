@@ -46,11 +46,11 @@ public class Entity {
 		return this.y;
 	}
 	
-	public int setX(int x) {
+	protected int setX(int x) {
 		return (this.x = x);
 	}
 	
-	public int setY(int y) {
+	protected int setY(int y) {
 		return (this.y = y);
 	}
 	

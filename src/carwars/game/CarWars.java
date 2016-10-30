@@ -3,6 +3,7 @@ package carwars.game;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
 public class CarWars extends BasicGame {
@@ -20,7 +21,7 @@ public class CarWars extends BasicGame {
 	@Override
 	public void update(GameContainer container, int delta) throws SlickException {
 		// TODO Auto-generated method stub
-
+		Input input = container.getInput();
 	}
 	
 	@Override
