@@ -29,6 +29,7 @@ public class Entity {
 		} catch (SlickException e) {
 			//TODO show window that shows image not found
 			e.printStackTrace();
+			System.err.println("Sprite file not found: " + sprite_file);
 			this.sprite = null;
 		}
 		this.x = x;
