@@ -5,14 +5,23 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class Config {
-	static public final int SPRITE_SIZE = 20;
+	static public final int TERR_SIZE = 20;
+	
+	static public final int CAR_WIDTH = 40;
+	static public final int CAR_HEIGHT = 30;
+	
 	static public final int GAME_WIDTH = 800;
 	static public final int GAME_HEIGHT = 600;
-	static public final int TER_WIDTH = GAME_WIDTH/SPRITE_SIZE;
-	static public final int TER_HEIGHT = GAME_HEIGHT/SPRITE_SIZE;
+	
+	static public final int MAP_WIDTH = GAME_WIDTH/TERR_SIZE;
+	static public final int MAP_HEIGHT = GAME_HEIGHT/TERR_SIZE;
+	
+	static public final int GRAVITY = 1;
+	static public final int GRAVITY_SPEED = 100;
+	
 	
 	public static int[][] loadTerrain() {
-		int[][] terrain = new int[TER_HEIGHT][TER_WIDTH];
+		int[][] terrain = new int[MAP_HEIGHT][MAP_WIDTH];
 		try{
 			BufferedReader br = new BufferedReader(new FileReader("resource/terrain.txt"));
 			String line;

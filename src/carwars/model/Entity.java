@@ -4,9 +4,6 @@ import java.util.ArrayList;
 
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.geom.Rectangle;
-
-import carwars.util.Config;
 
 public class Entity {
 	public static final ArrayList<Entity> entities = new ArrayList<>();
@@ -32,6 +29,7 @@ public class Entity {
 			System.err.println("Sprite file not found: " + sprite_file);
 			this.sprite = null;
 		}
+		
 		this.x = x;
 		this.y = y;
 		
@@ -52,10 +50,6 @@ public class Entity {
 	
 	protected int setY(int y) {
 		return (this.y = y);
-	}
-	
-	public Rectangle hitBox() {
-		return new Rectangle(Config.SPRITE_SIZE, Config.SPRITE_SIZE, x, y);
 	}
 	
 	public Image getSprite() {
