@@ -113,7 +113,7 @@ public class Player extends Entity{
 	
 	public void moveRight(int delta){
 		this.front = RIGHT;
-		if(!Player.intersectsTerrain(this.rightHitBox())) {
+		if(!Player.intersectsTerrain(this.rightHitBox()) && this.getX() <= Config.GAME_WIDTH - Config.CAR_WIDTH) {
 			this.setX(this.getX()+1);
 		}
 		
@@ -124,7 +124,7 @@ public class Player extends Entity{
 	
 	public void moveLeft(int delta){
 		this.front = LEFT;
-		if(!Player.intersectsTerrain(this.leftHitBox())){
+		if(!Player.intersectsTerrain(this.leftHitBox()) && this.getX() >= 0){
 			this.setX(this.getX()-1);
 		}
 		

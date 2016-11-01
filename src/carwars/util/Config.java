@@ -35,11 +35,13 @@ public class Config {
 				
 				i++;
 			}
+			
+			br.close();
 		}catch(IOException e) {
 			System.err.println("File not found.");
 			System.exit(1);
-		} finally {
-			return terrain;
 		}
+		
+		return terrain;
 	}
 }

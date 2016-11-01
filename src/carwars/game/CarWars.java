@@ -1,5 +1,7 @@
 package carwars.game;
 
+import java.util.Random;
+
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -27,7 +29,7 @@ public class CarWars extends BasicGame {
 		terrain = new SpriteSheet("resource/land-rescale.png", 
 				Config.TERR_SIZE, Config.TERR_SIZE);
 		
-		p = new Player("Player 1", "resource/car-40.png", 50, 50);
+		p = new Player("Player 1", "resource/car-40.png", 50, 0);
 		
 		for(int i=0, mapI=0; i<Config.MAP_HEIGHT; i++, mapI+=Config.TERR_SIZE) {
 			for(int j=0, mapJ=0; j<Config.MAP_WIDTH; j++, mapJ+=Config.TERR_SIZE) {
@@ -37,6 +39,25 @@ public class CarWars extends BasicGame {
 				}
 			}
 		}
+		
+		//waits for the terrain to load before the player falls. 
+		//Not a clean solution but temporarily works
+		new Thread() {
+			@Override
+			public void run() {
+				try{
+					Thread.sleep(10);
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+				
+				if(new Random().nextBoolean()) {
+					p.moveLeft(1);
+				} else {
+					p.moveRight(1);
+				}
+			}
+		}.start();
 	}
 	
 	@Override
@@ -58,7 +79,11 @@ public class CarWars extends BasicGame {
 		}
 		terrain.endUse();
 		
-		p.getSprite().draw(p.getX(), p.getY());
+		if(p.getFront() == Player.RIGHT) {
+			p.getSprite().draw(p.getX(), p.getY());
+		} else {
+			p.getSprite().getFlippedCopy(true, false).draw(p.getX(), p.getY());
+		}
 		
 		g.setBackground(Color.lightGray);
 	}

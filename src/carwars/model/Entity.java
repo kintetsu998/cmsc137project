@@ -28,6 +28,9 @@ public class Entity {
 			e.printStackTrace();
 			System.err.println("Sprite file not found: " + sprite_file);
 			this.sprite = null;
+		} catch (Exception e ) {
+			e.printStackTrace();
+			System.out.println(this.x + " " + this.y);
 		}
 		
 		this.x = x;
