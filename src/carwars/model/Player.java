@@ -16,8 +16,8 @@ public class Player extends Entity{
 	
 	private String name;
 	private Socket tcpSocket;
-	private int front;
 	
+	private int front;
 	private boolean falling;
 	
 	/** CONSTRUCTOR **/
@@ -111,25 +111,17 @@ public class Player extends Entity{
 		}
 	}
 	
-	public void moveRight(int delta){
+	public void moveRight(){
 		this.front = RIGHT;
 		if(!Player.intersectsTerrain(this.rightHitBox()) && this.getX() <= Config.GAME_WIDTH - Config.CAR_WIDTH) {
 			this.setX(this.getX()+1);
 		}
-		
-		if(!Player.intersectsTerrain(this.hitBox())) {
-			this.fall(delta);
-		}
 	}
 	
-	public void moveLeft(int delta){
+	public void moveLeft(){
 		this.front = LEFT;
 		if(!Player.intersectsTerrain(this.leftHitBox()) && this.getX() >= 0){
 			this.setX(this.getX()-1);
-		}
-		
-		if(!Player.intersectsTerrain(this.hitBox())) {
-			this.fall(delta);
 		}
 	}
 	
@@ -138,36 +130,40 @@ public class Player extends Entity{
 		
 		while(true) {
 			boolean intersects = Player.intersectsTerrain(this.hitBox());
+			float vertSpeed = 0;
 			
 			if(intersects || this.getY() >= Config.GAME_HEIGHT-Config.CAR_HEIGHT){
 				this.falling = false;
 				while(Player.intersectsTerrain(this.hitBox())) {
-					this.setY(this.getY()-1);
+					this.setY(this.getY()-1f);
 				}
-				this.setY(this.getY()+1);
+				this.setY(this.getY()+1f);
 				break;
 			}
 			else {
 				this.falling = true;
+				vertSpeed = (vertSpeed < Config.TERMINAL_SPEED)? vertSpeed + Config.GRAVITY: vertSpeed;
 				if(this.getY() <= Config.GAME_HEIGHT-Config.CAR_HEIGHT)
-					this.setY(this.getY() + (Config.GRAVITY * delta));
+					this.setY(this.getY() + (vertSpeed*delta));
+			}
+
+			try{
+				Thread.sleep(20);
+			} catch(Exception e) {
+				e.printStackTrace();
 			}
 		}
 	}
 	
-	public Rectangle hitBox() {
-		return new Rectangle(this.getX(), this.getY(), Config.CAR_WIDTH, Config.CAR_HEIGHT);
-	}
-	
-	public Rectangle leftHitBox() {
+	private Rectangle leftHitBox() {
 		return new Rectangle(this.getX(), this.getY(), 1, Config.CAR_HEIGHT-1);
 	}
 	
-	public Rectangle rightHitBox() {
+	private Rectangle rightHitBox() {
 		return new Rectangle(this.getX()+Config.CAR_WIDTH-1, this.getY(), 1, Config.CAR_HEIGHT-1);
 	}
 	
-	private static boolean intersectsTerrain(Rectangle r) {
+	public static boolean intersectsTerrain(Rectangle r) {
 		boolean intersects = false;
 		for(Terrain e : Terrain.terrains) {
 			intersects = r.intersects(e.hitBox());

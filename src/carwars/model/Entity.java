@@ -4,13 +4,16 @@ import java.util.ArrayList;
 
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Rectangle;
+
+import carwars.util.Config;
 
 public class Entity {
 	public static final ArrayList<Entity> entities = new ArrayList<>();
 	
 	private Image sprite;
-	private int x;
-	private int y;
+	private float x;
+	private float y;
 	
 	public Entity(Image sprite, int x, int y) {
 		this.sprite = sprite;
@@ -39,23 +42,30 @@ public class Entity {
 		entities.add(this);
 	}
 	
-	public int getX() {
+	public float getX() {
 		return this.x;
 	}
 	
-	public int getY() {
+	public float getY() {
 		return this.y;
 	}
 	
-	protected int setX(int x) {
+	protected float setX(float x) {
 		return (this.x = x);
 	}
 	
-	protected int setY(int y) {
+	protected float setY(float y) {
 		return (this.y = y);
 	}
 	
 	public Image getSprite() {
 		return this.sprite;
+	}
+	
+	public Rectangle hitBox() {
+		if(this instanceof Player)
+			return new Rectangle(this.getX(), this.getY(), Config.CAR_WIDTH, Config.CAR_HEIGHT);
+		else
+			return new Rectangle(this.getX(), this.getY(), Config.TERR_SIZE, Config.TERR_SIZE);
 	}
 }

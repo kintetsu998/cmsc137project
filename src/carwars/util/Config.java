@@ -16,9 +16,9 @@ public class Config {
 	static public final int MAP_WIDTH = GAME_WIDTH/TERR_SIZE;
 	static public final int MAP_HEIGHT = GAME_HEIGHT/TERR_SIZE;
 	
-	static public final int GRAVITY = 1;
-	static public final int GRAVITY_SPEED = 100;
-	
+	static public final float GRAVITY = 0.75f;
+	static public final int GRAVITY_SPEED = 20;
+	static public final int TERMINAL_SPEED = 7;
 	
 	public static int[][] loadTerrain() {
 		int[][] terrain = new int[MAP_HEIGHT][MAP_WIDTH];

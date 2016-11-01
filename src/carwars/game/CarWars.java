@@ -1,7 +1,5 @@
 package carwars.game;
 
-import java.util.Random;
-
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -39,35 +37,26 @@ public class CarWars extends BasicGame {
 				}
 			}
 		}
-		
-		//waits for the terrain to load before the player falls. 
-		//Not a clean solution but temporarily works
-		new Thread() {
-			@Override
-			public void run() {
-				try{
-					Thread.sleep(10);
-				} catch(Exception e) {
-					e.printStackTrace();
-				}
-				
-				if(new Random().nextBoolean()) {
-					p.moveLeft(1);
-				} else {
-					p.moveRight(1);
-				}
-			}
-		}.start();
 	}
 	
 	@Override
 	public void update(GameContainer container, int delta) throws SlickException {
 		Input input = container.getInput();
 		
+		if(!Player.intersectsTerrain(p.hitBox())) {
+			if(!p.isFalling()) {
+				new Thread() {
+					public void run() {
+						p.fall(delta);
+					}
+				}.start();
+			}
+		}
+		
 		if(input.isKeyDown(Input.KEY_LEFT) && !p.isFalling()) {
-			p.moveLeft(delta);
+			p.moveLeft();
 		} else if(input.isKeyDown(Input.KEY_RIGHT) && !p.isFalling()) {
-			p.moveRight(delta);
+			p.moveRight();
 		}
 	}
 	
