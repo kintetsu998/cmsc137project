@@ -43,8 +43,6 @@ public class CarWars extends BasicGame {
 				}
 			}
 		}
-		
-		p.moveLeft();
 	}
 	
 	@Override
@@ -60,10 +58,16 @@ public class CarWars extends BasicGame {
 			}
 		}
 		
-		if(input.isKeyDown(Input.KEY_LEFT) && !p.isFalling()) {
+		if(input.isKeyDown(Input.KEY_LEFT) && !p.isFalling() && p.isTurn()) {
 			p.moveLeft();
-		} else if(input.isKeyDown(Input.KEY_RIGHT) && !p.isFalling()) {
+		} else if(input.isKeyDown(Input.KEY_RIGHT) && !p.isFalling() && p.isTurn()) {
 			p.moveRight();
+		} else if(input.isKeyDown(Input.KEY_UP)) {
+			p.incAngle();
+		} else if(input.isKeyDown(Input.KEY_DOWN)) {
+			p.decAngle();
+		} else if(input.isKeyDown(Input.KEY_SPACE)) {
+			p.incForce();
 		}
 	}
 	
@@ -91,13 +95,17 @@ public class CarWars extends BasicGame {
 
 	
 	private void renderPlayer(Player p, Graphics g) {
-		marker.rotate(p.getAngle());
+		Image markerCopy;
 		if(p.getFront() == Player.RIGHT) {
 			p.getSprite().draw(p.getX(), p.getY());
-			marker.draw(p.getX()+Player.CAR_WIDTH/4, p.getY()-Player.CAR_HEIGHT/2);
+			markerCopy = marker.copy();
+			markerCopy.rotate(-1 * p.getAngle());
+			markerCopy.draw(p.getX()-Player.CAR_WIDTH*2/3, p.getY() + Player.CAR_HEIGHT/4);
 		} else {
 			p.getSprite().getFlippedCopy(true, false).draw(p.getX(), p.getY());
-			marker.getFlippedCopy(true,false).draw(p.getX()-Player.CAR_WIDTH, p.getY()-Player.CAR_HEIGHT/2);
+			markerCopy = marker.getFlippedCopy(true,false);
+			markerCopy.rotate(p.getAngle());
+			markerCopy.draw(p.getX()-Player.CAR_WIDTH, p.getY() + Player.CAR_HEIGHT/4);
 		}
 		
 		g.setColor(Color.black);
@@ -106,9 +114,23 @@ public class CarWars extends BasicGame {
 		
 		g.setColor(Color.green);
 		g.fillRect(p.getX(), p.getY() + Player.CAR_HEIGHT, remainingHP(p), 5);
+		
+		g.setColor(Color.orange);
+		g.fillRect(p.getX(), p.getY() + Player.CAR_HEIGHT + 7, remainingForce(p), 5);
+		
+		g.setColor(Color.white);
+		g.fillRect(p.getX(), p.getY() + Player.CAR_HEIGHT + 14, remainingMov(p), 5);
 	}
 	
 	private float remainingHP(Player p) {
-		return (p.getHP()/Player.MAX_HP)*Player.CAR_WIDTH;
+		return ((float) p.getHP()/Player.MAX_HP)*Player.CAR_WIDTH;
+	}
+	
+	private float remainingMov(Player p) {
+		return ((float) p.getMovement()/Player.CAR_MAX_DIST)*Player.CAR_WIDTH;
+	}
+	
+	private float remainingForce(Player p) {
+		return ((float) p.getForce()/Player.MAX_FORCE)*Player.CAR_WIDTH;
 	}
 }
