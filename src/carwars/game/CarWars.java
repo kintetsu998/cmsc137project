@@ -21,6 +21,7 @@ public class CarWars extends BasicGame {
 	public SpriteSheet terrain;
 	public Player p;
 	public Image marker;
+	public TrueTypeFont ttf;
 	
 	public CarWars(String title) {
 		super(title);
@@ -31,6 +32,9 @@ public class CarWars extends BasicGame {
 		terrainMap = Terrain.loadTerrain();
 		terrain = new SpriteSheet("resource/land-rescale.png", 
 				Terrain.TERR_SIZE, Terrain.TERR_SIZE);
+		
+		Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
+		ttf = new TrueTypeFont(font, true);
 		
 		p = new Player("Player 1", "resource/car-40.png", 50, 0);
 		marker = new Image("resource/angle-rescale.png");
@@ -43,24 +47,21 @@ public class CarWars extends BasicGame {
 				}
 			}
 		}
+		
+		new Thread() {
+			public void run() {
+				p.fall();
+			}
+		}.start();
 	}
 	
 	@Override
 	public void update(GameContainer container, int delta) throws SlickException {
 		Input input = container.getInput();
-		if(!Player.intersectsTerrain(p.hitBox())) {
-			if(!p.isFalling()) {
-				new Thread() {
-					public void run() {
-						p.fall();
-					}
-				}.start();
-			}
-		}
 		
-		if(input.isKeyDown(Input.KEY_LEFT) && !p.isFalling() && p.isTurn()) {
+		if(input.isKeyDown(Input.KEY_LEFT) && p.isTurn()) {
 			p.moveLeft();
-		} else if(input.isKeyDown(Input.KEY_RIGHT) && !p.isFalling() && p.isTurn()) {
+		} else if(input.isKeyDown(Input.KEY_RIGHT) && p.isTurn()) {
 			p.moveRight();
 		} else if(input.isKeyDown(Input.KEY_UP)) {
 			p.incAngle();
@@ -79,8 +80,6 @@ public class CarWars extends BasicGame {
 	}
 	
 	private void setFont(Graphics g) {
-		Font font = new Font(Font.MONOSPACED, Font.PLAIN, 10);
-		TrueTypeFont ttf = new TrueTypeFont(font, true);
 		g.setFont(ttf);
 	}
 	
@@ -111,6 +110,7 @@ public class CarWars extends BasicGame {
 			markerCopy.draw(p.getX()-Player.CAR_WIDTH, p.getY() + Player.CAR_HEIGHT/4);
 			g.drawString(Integer.toString(p.getAngle()), p.getX()-Player.CAR_WIDTH/5, p.getY());
 		}
+		
 		g.drawString(p.getName(), p.getX(), p.getY() - 15);
 		g.fillRect(p.getX()-1, p.getY() + Player.CAR_HEIGHT-1, Player.CAR_WIDTH+2, 7);
 		

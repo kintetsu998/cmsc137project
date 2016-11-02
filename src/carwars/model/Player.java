@@ -174,11 +174,9 @@ public class Player extends Entity{
 					this.setY(this.getY()-1f);
 				}
 				this.setY(this.getY()+1f);
-				break;
 			} else if(this.getY() >= Config.GAME_HEIGHT-CAR_HEIGHT) {
 				this.damage(100);
 				this.end();
-				break;
 			} else {
 				this.falling = true;
 				vertSpeed = (vertSpeed < Config.TERMINAL_SPEED)? vertSpeed + Config.GRAVITY: vertSpeed;
