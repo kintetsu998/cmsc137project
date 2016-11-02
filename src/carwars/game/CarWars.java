@@ -123,14 +123,18 @@ public class CarWars extends BasicGame {
 	}
 	
 	private float remainingHP(Player p) {
-		return ((float) p.getHP()/Player.MAX_HP)*Player.CAR_WIDTH;
+		return getBarWidth(p.getHP(), Player.MAX_HP, Player.CAR_WIDTH);
 	}
 	
 	private float remainingMov(Player p) {
-		return ((float) p.getMovement()/Player.CAR_MAX_DIST)*Player.CAR_WIDTH;
+		return getBarWidth(p.getMovement(), Player.CAR_MAX_DIST, Player.CAR_WIDTH);
 	}
 	
 	private float remainingForce(Player p) {
-		return ((float) p.getForce()/Player.MAX_FORCE)*Player.CAR_WIDTH;
+		return getBarWidth(p.getForce(), Player.MAX_FORCE, Player.CAR_WIDTH);
+	}
+	
+	private float getBarWidth(int rem, int max, int width) {
+		return ((float) rem/max)*width;
 	}
 }
