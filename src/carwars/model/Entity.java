@@ -6,8 +6,6 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Rectangle;
 
-import carwars.util.Config;
-
 public class Entity {
 	public static final ArrayList<Entity> entities = new ArrayList<>();
 	
@@ -64,8 +62,8 @@ public class Entity {
 	
 	public Rectangle hitBox() {
 		if(this instanceof Player)
-			return new Rectangle(this.getX(), this.getY(), Config.CAR_WIDTH, Config.CAR_HEIGHT);
+			return new Rectangle(this.getX(), this.getY(), Player.CAR_WIDTH, Player.CAR_HEIGHT);
 		else
-			return new Rectangle(this.getX(), this.getY(), Config.TERR_SIZE, Config.TERR_SIZE);
+			return new Rectangle(this.getX(), this.getY(), Terrain.TERR_SIZE, Terrain.TERR_SIZE);
 	}
 }
