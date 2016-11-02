@@ -1,6 +1,8 @@
 package carwars.game;
 
-import java.awt.Font;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
@@ -16,14 +18,16 @@ import carwars.model.Player;
 import carwars.model.Terrain;
 import carwars.util.Config;
 
-public class CarWars extends BasicGame {
+public class CarWars extends BasicGame{
 	public int[][] terrainMap;
 	public SpriteSheet terrain;
 	public Player p;
 	public Image marker;
+	private String username;
 	
-	public CarWars(String title) {
+	public CarWars(String title, String username) {
 		super(title);
+		this.username = username;
 	}
 
 	@Override
@@ -32,7 +36,7 @@ public class CarWars extends BasicGame {
 		terrain = new SpriteSheet("resource/land-rescale.png", 
 				Terrain.TERR_SIZE, Terrain.TERR_SIZE);
 		
-		p = new Player("Player 1", "resource/car-40.png", 50, 0);
+		p = new Player(this.username, "resource/car-40.png", 50, 0);
 		marker = new Image("resource/angle-rescale.png");
 		
 		for(int i=0, mapI=0; i<Config.MAP_HEIGHT; i++, mapI+=Terrain.TERR_SIZE) {
