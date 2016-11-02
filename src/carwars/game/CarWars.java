@@ -96,19 +96,21 @@ public class CarWars extends BasicGame {
 	
 	private void renderPlayer(Player p, Graphics g) {
 		Image markerCopy;
+		
+		g.setColor(Color.black);
 		if(p.getFront() == Player.RIGHT) {
 			p.getSprite().draw(p.getX(), p.getY());
 			markerCopy = marker.copy();
 			markerCopy.rotate(-1 * p.getAngle());
 			markerCopy.draw(p.getX()-Player.CAR_WIDTH*2/3, p.getY() + Player.CAR_HEIGHT/4);
+			g.drawString(Integer.toString(p.getAngle()), p.getX() + Player.CAR_WIDTH, p.getY());
 		} else {
 			p.getSprite().getFlippedCopy(true, false).draw(p.getX(), p.getY());
 			markerCopy = marker.getFlippedCopy(true,false);
 			markerCopy.rotate(p.getAngle());
 			markerCopy.draw(p.getX()-Player.CAR_WIDTH, p.getY() + Player.CAR_HEIGHT/4);
+			g.drawString(Integer.toString(p.getAngle()), p.getX()-Player.CAR_WIDTH/5, p.getY());
 		}
-		
-		g.setColor(Color.black);
 		g.drawString(p.getName(), p.getX(), p.getY() - 15);
 		g.fillRect(p.getX()-1, p.getY() + Player.CAR_HEIGHT-1, Player.CAR_WIDTH+2, 7);
 		
