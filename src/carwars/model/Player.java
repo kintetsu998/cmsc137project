@@ -168,15 +168,18 @@ public class Player extends Entity{
 			boolean intersects = Player.intersectsTerrain(this.hitBox());
 			float vertSpeed = 0;
 			
-			if(intersects || this.getY() >= Config.GAME_HEIGHT-CAR_HEIGHT){
+			if(intersects){
 				this.falling = false;
 				while(Player.intersectsTerrain(this.hitBox())) {
 					this.setY(this.getY()-1f);
 				}
 				this.setY(this.getY()+1f);
 				break;
-			}
-			else {
+			} else if(this.getY() >= Config.GAME_HEIGHT-CAR_HEIGHT) {
+				this.damage(100);
+				this.end();
+				break;
+			} else {
 				this.falling = true;
 				vertSpeed = (vertSpeed < Config.TERMINAL_SPEED)? vertSpeed + Config.GRAVITY: vertSpeed;
 				if(this.getY() <= Config.GAME_HEIGHT-CAR_HEIGHT)
@@ -223,15 +226,16 @@ public class Player extends Entity{
 	
 	public void start() {
 		this.movement = CAR_MAX_DIST;
+		this.force = 0;
 		this.turn = true;
-	}
-	
-	public void incForce() {
-		this.force = (this.force < MAX_FORCE)? this.force + 1: this.force;
 	}
 	
 	public void end() {
 		this.turn = false;
+	}
+	
+	public void incForce() {
+		this.force = (this.force < MAX_FORCE)? this.force + 1: this.force;
 	}
 	
 	/** GETTERS **/

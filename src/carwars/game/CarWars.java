@@ -134,7 +134,7 @@ public class CarWars extends BasicGame {
 		return getBarWidth(p.getForce(), Player.MAX_FORCE, Player.CAR_WIDTH);
 	}
 	
-	private float getBarWidth(int rem, int max, int width) {
+	private float getBarWidth(float rem, float max, float width) {
 		return ((float) rem/max)*width;
 	}
 }
