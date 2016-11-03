@@ -63,13 +63,23 @@ public class CarWars extends BasicGame {
 			p.moveLeft();
 		} else if(input.isKeyDown(Input.KEY_RIGHT) && p.isTurn()) {
 			p.moveRight();
-		} else if(input.isKeyDown(Input.KEY_UP)) {
+		} /*else if(input.isKeyDown(Input.KEY_UP)) {
 			p.incAngle();
 		} else if(input.isKeyDown(Input.KEY_DOWN)) {
 			p.decAngle();
 		} else if(input.isKeyDown(Input.KEY_SPACE)) {
 			p.incForce();
-		}
+		}*/
+		
+		p.setAngle(getPlayerAngle(p, input.getMouseX(), input.getMouseY()));
+	}
+	
+	private float getPlayerAngle(Player p, int x, int y) {
+		int xdist = (int) (p.getX() - x) * -1;
+		int ydist = (int) p.getY() - y;
+		float angle = (float) Math.toDegrees(Math.atan((float) ydist/xdist));
+		
+		return angle;
 	}
 	
 	@Override
@@ -102,13 +112,13 @@ public class CarWars extends BasicGame {
 			markerCopy = marker.copy();
 			markerCopy.rotate(-1 * p.getAngle());
 			markerCopy.draw(p.getX()-Player.CAR_WIDTH*2/3, p.getY() + Player.CAR_HEIGHT/4);
-			g.drawString(Integer.toString(p.getAngle()), p.getX() + Player.CAR_WIDTH, p.getY());
+			g.drawString(Float.toString(p.getAngle()), p.getX() + Player.CAR_WIDTH, p.getY());
 		} else {
 			p.getSprite().getFlippedCopy(true, false).draw(p.getX(), p.getY());
 			markerCopy = marker.getFlippedCopy(true,false);
 			markerCopy.rotate(p.getAngle());
 			markerCopy.draw(p.getX()-Player.CAR_WIDTH, p.getY() + Player.CAR_HEIGHT/4);
-			g.drawString(Integer.toString(p.getAngle()), p.getX()-Player.CAR_WIDTH/5, p.getY());
+			g.drawString(Float.toString(p.getAngle()), p.getX()-Player.CAR_WIDTH/5, p.getY());
 		}
 		
 		g.drawString(p.getName(), p.getX(), p.getY() - 15);
