@@ -137,6 +137,6 @@ public class CarWars extends BasicGame {
 	}
 	
 	private float getBarWidth(float rem, float max, float width) {
-		return ((float) rem/max)*width;
+		return Math.max(((float) rem/max)*width, 0);
 	}
 }

@@ -164,7 +164,7 @@ public class Player extends Entity{
 	public void fall() {
 		this.falling = true;
 		
-		while(true) {
+		while(!this.isDead()) {
 			boolean intersects = Player.intersectsTerrain(this.hitBox());
 			float vertSpeed = 0;
 			
@@ -175,7 +175,7 @@ public class Player extends Entity{
 				}
 				this.setY(this.getY()+1f);
 			} else if(this.getY() >= Config.GAME_HEIGHT-CAR_HEIGHT) {
-				this.damage(100);
+				this.damage(MAX_HP);
 				this.end();
 			} else {
 				this.falling = true;
