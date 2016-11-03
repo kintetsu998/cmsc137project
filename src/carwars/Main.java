@@ -1,14 +1,13 @@
 package carwars;
-import carwars.chat.*;
-
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.SlickException;
 
+import carwars.chat.PlayerLogin;
 import carwars.game.CarWars;
 
 public class Main {
 	public static void main(String[] args) {
-		PlayerLogin pLog = new PlayerLogin("localhost", 1500);
+		new PlayerLogin("localhost", 1500);
 	}
 	
 	public static void launchApp(String username){
