@@ -13,13 +13,11 @@ public class Terrain extends Entity {
 	public static final ArrayList<Terrain> terrains = new ArrayList<>();
 	static public final int TERR_SIZE = 20;
 	
-	public Terrain(Image sprite, int x, int y) {
-		super(sprite, x, y);
-		terrains.add(this);
-	}
+	private Image sprite;
 	
-	public Terrain(String sprite, int x, int y) {
-		super(sprite, x, y);
+	public Terrain(Image sprite, int x, int y) {
+		super(x, y);
+		this.sprite = sprite;
 		terrains.add(this);
 	}
 	
@@ -46,5 +44,9 @@ public class Terrain extends Entity {
 		}
 		
 		return terrain;
+	}
+	
+	public Image getSprite() {
+		return this.sprite;
 	}
 }
