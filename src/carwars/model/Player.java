@@ -35,8 +35,8 @@ public class Player extends Entity{
 	private int angle;
 	private int movement;
 	private int force;
+	private int score;
 	
-	private boolean falling;
 	private boolean turn;
 	
 	/** CONSTRUCTOR **/
@@ -50,8 +50,8 @@ public class Player extends Entity{
 		this.angle = MIN_ANGLE;
 		this.movement = CAR_MAX_DIST;
 		this.force = 0;
+		this.score = 0;
 		
-		this.falling = false;
 		this.turn = true;
 		
 		players.add(this);
@@ -67,8 +67,8 @@ public class Player extends Entity{
 		this.angle = MIN_ANGLE;
 		this.movement = CAR_MAX_DIST;
 		this.force = 0;
+		this.score = 0;
 		
-		this.falling = false;
 		this.turn = true;
 		
 		
@@ -85,8 +85,8 @@ public class Player extends Entity{
 		this.angle = MIN_ANGLE;
 		this.movement = CAR_MAX_DIST;
 		this.force = 0;
+		this.score = 0;
 		
-		this.falling = false;
 		this.turn = true;
 		
 		players.add(this);
@@ -102,8 +102,8 @@ public class Player extends Entity{
 		this.angle = MIN_ANGLE;
 		this.movement = CAR_MAX_DIST;
 		this.force = 0;
+		this.score = 0;
 		
-		this.falling = false;
 		this.turn = true;
 		
 		players.add(this);
@@ -162,14 +162,12 @@ public class Player extends Entity{
 	}
 	
 	public void fall() {
-		this.falling = true;
 		
 		while(!this.isDead()) {
 			boolean intersects = Player.intersectsTerrain(this.hitBox());
 			float vertSpeed = 0;
 			
 			if(intersects){
-				this.falling = false;
 				while(Player.intersectsTerrain(this.hitBox())) {
 					this.setY(this.getY()-1f);
 				}
@@ -178,7 +176,6 @@ public class Player extends Entity{
 				this.damage(MAX_HP);
 				this.end();
 			} else {
-				this.falling = true;
 				vertSpeed = (vertSpeed < Config.TERMINAL_SPEED)? vertSpeed + Config.GRAVITY: vertSpeed;
 				if(this.getY() <= Config.GAME_HEIGHT-CAR_HEIGHT)
 					this.setY(this.getY() + vertSpeed);
@@ -265,19 +262,15 @@ public class Player extends Entity{
 		return this.force;
 	}
 	
-	public void setFalling(boolean flag) {
-		this.falling = flag;
-	}
-	
-	public boolean isFalling() {
-		return falling;
-	}
-	
 	public boolean isDead() {
 		return this.hp <= 0;
 	}
 	
 	public boolean isTurn() {
 		return this.turn;
+	}
+	
+	public int getScore() {
+		return this.score;
 	}
 }
