@@ -11,6 +11,7 @@ public class Main {
 			AppGameContainer app = new AppGameContainer(new CarWars("Car Wars"));
 			app.setDisplayMode(800, 600, false); //create 800x600 frame
 			app.setTargetFrameRate(60); //cap FPS to 60
+			//app.setShowFPS(false);
 			app.setAlwaysRender(true);
 			app.start();
 		} catch (SlickException e) {
