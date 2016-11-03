@@ -23,23 +23,36 @@ public class Player extends Entity{
 	static public final int MAX_ANGLE = 90;
 	static public final int MIN_ANGLE = 0;
 	
+	static public final int MAX_FORCE = 100;
+	
+	static public final int CAR_MAX_DIST = 150;
+	
 	private String name;
 	private Socket tcpSocket;
 	
 	private int front;
 	private int hp;
 	private int angle;
-	private boolean falling;
+	private int movement;
+	private int force;
+	private int score;
+	
+	private boolean turn;
 	
 	/** CONSTRUCTOR **/
 	public Player(String name, String sprite_file, int x, int y, String ip, int port) {
 		super(sprite_file, x, y);
 		this.name = name;
 		this.connectTo(ip,  port);
+		
 		this.front = RIGHT;
-		this.falling = false;
 		this.hp = MAX_HP;
 		this.angle = MIN_ANGLE;
+		this.movement = CAR_MAX_DIST;
+		this.force = 0;
+		this.score = 0;
+		
+		this.turn = true;
 		
 		players.add(this);
 	}
@@ -48,10 +61,16 @@ public class Player extends Entity{
 		super(sprite_file, x, y);
 		this.name = name;
 		this.connectTo(ip,  port);
+		
 		this.front = RIGHT;
-		this.falling = false;
 		this.hp = MAX_HP;
 		this.angle = MIN_ANGLE;
+		this.movement = CAR_MAX_DIST;
+		this.force = 0;
+		this.score = 0;
+		
+		this.turn = true;
+		
 		
 		players.add(this);
 	}
@@ -60,10 +79,15 @@ public class Player extends Entity{
 		super(sprite_file, x, y);
 		this.name = name;
 		this.tcpSocket = s;
+		
 		this.front = RIGHT;
-		this.falling = false;
 		this.hp = MAX_HP;
 		this.angle = MIN_ANGLE;
+		this.movement = CAR_MAX_DIST;
+		this.force = 0;
+		this.score = 0;
+		
+		this.turn = true;
 		
 		players.add(this);
 	}
@@ -72,10 +96,15 @@ public class Player extends Entity{
 		super(sprite_file, x, y);
 		this.name = name;
 		this.tcpSocket = s;
+		
 		this.front = RIGHT;
-		this.falling = false;
 		this.hp = MAX_HP;
 		this.angle = MIN_ANGLE;
+		this.movement = CAR_MAX_DIST;
+		this.force = 0;
+		this.score = 0;
+		
+		this.turn = true;
 		
 		players.add(this);
 	}
@@ -116,35 +145,37 @@ public class Player extends Entity{
 	
 	public void moveRight(){
 		this.front = RIGHT;
-		if(!Player.intersectsTerrain(this.rightHitBox()) && this.getX() <= Config.GAME_WIDTH - CAR_WIDTH) {
+		if(!Player.intersectsTerrain(this.rightHitBox()) && this.getX() <= Config.GAME_WIDTH - CAR_WIDTH
+				&& this.movement > 0) {
 			this.setX(this.getX()+CAR_SPEED);
+			this.movement -= CAR_SPEED;
 		}
 	}
 	
 	public void moveLeft(){
 		this.front = LEFT;
-		if(!Player.intersectsTerrain(this.leftHitBox()) && this.getX() >= 0){
+		if(!Player.intersectsTerrain(this.leftHitBox()) && this.getX() >= 0
+				&& this.movement > 0){
 			this.setX(this.getX()-CAR_SPEED);
+			this.movement -= CAR_SPEED;
 		}
 	}
 	
 	public void fall() {
-		this.falling = true;
 		
-		while(true) {
+		while(!this.isDead()) {
 			boolean intersects = Player.intersectsTerrain(this.hitBox());
 			float vertSpeed = 0;
 			
-			if(intersects || this.getY() >= Config.GAME_HEIGHT-CAR_HEIGHT){
-				this.falling = false;
+			if(intersects){
 				while(Player.intersectsTerrain(this.hitBox())) {
 					this.setY(this.getY()-1f);
 				}
 				this.setY(this.getY()+1f);
-				break;
-			}
-			else {
-				this.falling = true;
+			} else if(this.getY() >= Config.GAME_HEIGHT-CAR_HEIGHT) {
+				this.damage(MAX_HP);
+				this.end();
+			} else {
 				vertSpeed = (vertSpeed < Config.TERMINAL_SPEED)? vertSpeed + Config.GRAVITY: vertSpeed;
 				if(this.getY() <= Config.GAME_HEIGHT-CAR_HEIGHT)
 					this.setY(this.getY() + vertSpeed);
@@ -180,6 +211,28 @@ public class Player extends Entity{
 		this.hp -= dmg;
 	}
 	
+	public void incAngle() {
+		this.angle = (this.angle < Player.MAX_ANGLE)? this.angle + 1: this.angle;
+	}
+	
+	public void decAngle() {
+		this.angle = (this.angle > Player.MIN_ANGLE)? this.angle - 1: this.angle;
+	}
+	
+	public void start() {
+		this.movement = CAR_MAX_DIST;
+		this.force = 0;
+		this.turn = true;
+	}
+	
+	public void end() {
+		this.turn = false;
+	}
+	
+	public void incForce() {
+		this.force = (this.force < MAX_FORCE)? this.force + 1: this.force;
+	}
+	
 	/** GETTERS **/
 	public String getName() {
 		return this.name;
@@ -201,15 +254,23 @@ public class Player extends Entity{
 		return this.angle;
 	}
 	
-	public void setFalling(boolean flag) {
-		this.falling = flag;
+	public int getMovement() {
+		return this.movement;
 	}
 	
-	public boolean isFalling() {
-		return falling;
+	public int getForce() {
+		return this.force;
 	}
 	
 	public boolean isDead() {
 		return this.hp <= 0;
+	}
+	
+	public boolean isTurn() {
+		return this.turn;
+	}
+	
+	public int getScore() {
+		return this.score;
 	}
 }
