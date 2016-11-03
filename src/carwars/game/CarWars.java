@@ -2,6 +2,7 @@ package carwars.game;
 
 import java.awt.Font;
 
+import org.newdawn.slick.Animation;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -36,7 +37,9 @@ public class CarWars extends BasicGame {
 		Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
 		ttf = new TrueTypeFont(font, true);
 		
-		p = new Player("Player 1", "resource/car-40.png", 50, 0);
+		SpriteSheet p1Sheet = new SpriteSheet("resource/car1-sprites.png", 40, 30);
+		
+		p = new Player("Player 1", new Animation(p1Sheet, Config.ANIM_SPEED), 50, 0);
 		marker = new Image("resource/angle-rescale.png");
 		
 		for(int i=0, mapI=0; i<Config.MAP_HEIGHT; i++, mapI+=Terrain.TERR_SIZE) {
@@ -58,6 +61,8 @@ public class CarWars extends BasicGame {
 	@Override
 	public void update(GameContainer container, int delta) throws SlickException {
 		Input input = container.getInput();
+		
+		p.getSpriteAnim().update(delta);
 		
 		if(input.isKeyDown(Input.KEY_LEFT) && p.isTurn()) {
 			p.moveLeft();
@@ -98,13 +103,13 @@ public class CarWars extends BasicGame {
 		
 		g.setColor(Color.black);
 		if(p.getFront() == Player.RIGHT) {
-			p.getSprite().draw(p.getX(), p.getY());
+			p.getSpriteAnim().draw(p.getX(), p.getY());
 			markerCopy = marker.copy();
 			markerCopy.rotate(-1 * p.getAngle());
 			markerCopy.draw(p.getX()-Player.CAR_WIDTH*2/3, p.getY() + Player.CAR_HEIGHT/4);
 			g.drawString(Integer.toString(p.getAngle()), p.getX() + Player.CAR_WIDTH, p.getY());
 		} else {
-			p.getSprite().getFlippedCopy(true, false).draw(p.getX(), p.getY());
+			p.getSpriteAnim().getCurrentFrame().getFlippedCopy(true, false).draw(p.getX(), p.getY());
 			markerCopy = marker.getFlippedCopy(true,false);
 			markerCopy.rotate(p.getAngle());
 			markerCopy.draw(p.getX()-Player.CAR_WIDTH, p.getY() + Player.CAR_HEIGHT/4);

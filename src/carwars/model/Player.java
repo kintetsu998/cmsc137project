@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import org.newdawn.slick.Image;
+import org.newdawn.slick.Animation;
 import org.newdawn.slick.geom.Rectangle;
 
 import carwars.util.Config;
@@ -16,7 +16,7 @@ public class Player extends Entity{
 	
 	static public final int CAR_WIDTH = 40;
 	static public final int CAR_HEIGHT = 30;
-	static public final int CAR_SPEED = 3;
+	static public final int CAR_SPEED = 2;
 	
 	static public final int MAX_HP = 100;
 	
@@ -29,6 +29,7 @@ public class Player extends Entity{
 	
 	private String name;
 	private Socket tcpSocket;
+	private Animation spriteAnim;
 	
 	private int front;
 	private int hp;
@@ -39,28 +40,12 @@ public class Player extends Entity{
 	
 	private boolean turn;
 	
-	/** CONSTRUCTOR **/
-	public Player(String name, String sprite_file, int x, int y, String ip, int port) {
-		super(sprite_file, x, y);
+	/** CONSTRUCTOR **/	
+	public Player(String name, Animation sprite_file, int x, int y, String ip, int port) {
+		super(x, y);
 		this.name = name;
 		this.connectTo(ip,  port);
-		
-		this.front = RIGHT;
-		this.hp = MAX_HP;
-		this.angle = MIN_ANGLE;
-		this.movement = CAR_MAX_DIST;
-		this.force = 0;
-		this.score = 0;
-		
-		this.turn = true;
-		
-		players.add(this);
-	}
-	
-	public Player(String name, Image sprite_file, int x, int y, String ip, int port) {
-		super(sprite_file, x, y);
-		this.name = name;
-		this.connectTo(ip,  port);
+		this.spriteAnim = sprite_file;
 		
 		this.front = RIGHT;
 		this.hp = MAX_HP;
@@ -75,10 +60,11 @@ public class Player extends Entity{
 		players.add(this);
 	}
 	
-	public Player(String name, String sprite_file, int x, int y, Socket s) {
-		super(sprite_file, x, y);
+	public Player(String name, Animation sprite_file, int x, int y, Socket s) {
+		super(x, y);
 		this.name = name;
 		this.tcpSocket = s;
+		this.spriteAnim = sprite_file;
 		
 		this.front = RIGHT;
 		this.hp = MAX_HP;
@@ -92,45 +78,16 @@ public class Player extends Entity{
 		players.add(this);
 	}
 	
-	public Player(String name, Image sprite_file, int x, int y, Socket s) {
-		super(sprite_file, x, y);
-		this.name = name;
-		this.tcpSocket = s;
-		
-		this.front = RIGHT;
-		this.hp = MAX_HP;
-		this.angle = MIN_ANGLE;
-		this.movement = CAR_MAX_DIST;
-		this.force = 0;
-		this.score = 0;
-		
-		this.turn = true;
-		
-		players.add(this);
-	}
-	
-	public Player(String name, Image sprite, int x, int y) {
+	public Player(String name, Animation sprite, int x, int y) {
 		this(name, sprite, x, y, null);
 	}
 	
-	public Player(String name, Image sprite) {
+	public Player(String name, Animation sprite) {
 		this(name, sprite, 0, 0, null);
 	}
 	
-	public Player(String name, String sprite_file, int x, int y) {
-		this(name, sprite_file, x, y, null);
-	}
-	
-	public Player(String name, String sprite_file) {
-		this(name, sprite_file, 0, 0, null);
-	}
-	
-	public Player(String name, Image sprite, String ip, int port) {
+	public Player(String name, Animation sprite, String ip, int port) {
 		this(name, sprite, 0, 0, ip, port);
-	}
-	
-	public Player(String name, String sprite_file, String ip, int port) {
-		this(name, sprite_file, 0, 0, ip, port);
 	}
 	
 	/** METHODS **/
@@ -272,5 +229,9 @@ public class Player extends Entity{
 	
 	public int getScore() {
 		return this.score;
+	}
+	
+	public Animation getSpriteAnim() {
+		return this.spriteAnim;
 	}
 }

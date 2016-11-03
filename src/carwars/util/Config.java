@@ -13,4 +13,6 @@ public class Config {
 	static public final float GRAVITY = 6.5f;
 	static public final int GRAVITY_SPEED = 20;
 	static public final int TERMINAL_SPEED = 7;
+	
+	static public final int ANIM_SPEED = 250;
 }
