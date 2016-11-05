@@ -1,4 +1,4 @@
- package carwars.chat;
+package carwars.chat;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -36,6 +36,22 @@ public class PlayerLogin extends JFrame implements ActionListener {
 
         tfHost = new JTextField(host);
         tfPort = new JTextField("" + port);
+        tfHost.addMouseListener(new MouseAdapter(){
+            public void mouseClicked(MouseEvent e){
+                if(tfHost.getText().equals("Invalid host")){
+                    tfHost.setText("");
+                    tfHost.setForeground(Color.BLACK);
+                }
+            }
+        });
+        tfPort.addMouseListener(new MouseAdapter(){
+            public void mouseClicked(MouseEvent e){
+                if(tfPort.getText().equals("Invalid port")){
+                    tfPort.setText("");
+                    tfPort.setForeground(Color.BLACK);
+                }
+            }
+        });
 
         inputToConnect.add(new JLabel("Server Address:  "));
         inputToConnect.add(tfHost);
@@ -45,6 +61,14 @@ public class PlayerLogin extends JFrame implements ActionListener {
         label = new JLabel("Username: ");
         inputToConnect.add(label);
         tfUsername = new JTextField("Type username");
+        tfUsername.addMouseListener(new MouseAdapter(){
+            public void mouseClicked(MouseEvent e){
+                if(tfUsername.getText().equals("Invalid username")){
+                    tfUsername.setText("");
+                    tfUsername.setForeground(Color.BLACK);
+                }
+            }
+        });
         inputToConnect.add(tfUsername);
 
         mainPanel.add(inputToConnect, BorderLayout.CENTER);
@@ -81,17 +105,21 @@ public class PlayerLogin extends JFrame implements ActionListener {
                 tfUsername.setForeground(Color.RED);
             }
             else if(!validInput(t2)){
-                System.out.println(t2);
-                System.out.println("Invalid host");
+                tfHost.setText("Invalid host");
+                tfHost.setForeground(Color.RED);
             }
             else if(!validInput(t3)){
-                System.out.println(t3);
-                System.out.println("Invalid port");
+                tfPort.setText("Invalid port");
+                tfPort.setForeground(Color.RED);
             }
             else{
                 System.out.println("No null values");
             }
         }
+    }
+
+    public void mousePressed(MouseEvent e) {
+       Object o = e.getSource();
     }
 
     public static void main(String[] args){
