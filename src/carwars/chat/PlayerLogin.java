@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-// import carwars.Main;
+import carwars.Main;
 
 public class PlayerLogin extends JFrame implements ActionListener {
 
@@ -14,6 +14,7 @@ public class PlayerLogin extends JFrame implements ActionListener {
     private JTextField tfHost, tfPort, tfUsername;
     private JLabel label;
     private JButton logButton;
+    private String username;
 
     public PlayerLogin(String h, int p) {
 
@@ -38,7 +39,7 @@ public class PlayerLogin extends JFrame implements ActionListener {
         tfPort = new JTextField("" + port);
         tfHost.addMouseListener(new MouseAdapter(){
             public void mouseClicked(MouseEvent e){
-                if(tfHost.getText().equals("Invalid host")){
+                if(tfHost.getText().trim().equals("Invalid host")){
                     tfHost.setText("");
                     tfHost.setForeground(Color.BLACK);
                 }
@@ -46,7 +47,7 @@ public class PlayerLogin extends JFrame implements ActionListener {
         });
         tfPort.addMouseListener(new MouseAdapter(){
             public void mouseClicked(MouseEvent e){
-                if(tfPort.getText().equals("Invalid port")){
+                if(tfPort.getText().trim().equals("Invalid port")){
                     tfPort.setText("");
                     tfPort.setForeground(Color.BLACK);
                 }
@@ -63,7 +64,7 @@ public class PlayerLogin extends JFrame implements ActionListener {
         tfUsername = new JTextField("Type username");
         tfUsername.addMouseListener(new MouseAdapter(){
             public void mouseClicked(MouseEvent e){
-                if(tfUsername.getText().equals("Invalid username")){
+                if(tfUsername.getText().trim().equals("Invalid username")){
                     tfUsername.setText("");
                     tfUsername.setForeground(Color.BLACK);
                 }
@@ -124,9 +125,9 @@ public class PlayerLogin extends JFrame implements ActionListener {
         Object o = e.getSource();
 
         if(o == logButton) {
-            String t1 = tfUsername.getText();
-            String t2 = tfHost.getText();
-            String t3 = tfPort.getText();
+            String t1 = tfUsername.getText().trim();
+            String t2 = tfHost.getText().trim();
+            String t3 = tfPort.getText().trim();
 
             if(!isEmptyInput(t1)){
                 tfUsername.setText("Invalid username");
@@ -144,7 +145,7 @@ public class PlayerLogin extends JFrame implements ActionListener {
                 return;
             }
             else{
-            	
+
             	// validate port number
             	try{
                 	int p3 = Integer.parseInt(t3);
@@ -162,11 +163,14 @@ public class PlayerLogin extends JFrame implements ActionListener {
             			return;
             		}
             	}
+            	
+            	this.username = t1;
+            	
+            	// launch app
+            	this.dispose();
+            	Main.launchApp(this.username);
+            	
             }
         }
-    }
-
-    public static void main(String[] args){
-        new PlayerLogin("localhost", 8080);
     }
 }

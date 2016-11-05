@@ -39,17 +39,19 @@ public class GameSetup extends JPanel {
     private JTable table;
     private JFrame frame;
     
-    private int playersCount = 0;
+    private static int playersCount = 0;
     private DefaultTableModel tableModel;
     
-    public GameSetup() {
+    public GameSetup(String username) {
         super(new BorderLayout());
+        
         //Create and set up the window.
         frame = new JFrame(WINDOW_TITLE_GAME_SETUP);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setAlwaysOnTop(true);
         //Create and set up the content pane.
-        addComponents();
+        addComponents(username);
+        addPlayer(username);
         
         setOpaque(true);
         frame.setContentPane(this);
@@ -60,7 +62,7 @@ public class GameSetup extends JPanel {
         frame.setVisible(true);
     }
     
-    private void addComponents() {
+    private void addComponents(String username) {
     	String[] columnNames = { TABLE_COLUMN_HEADER_PLAYER_NUMBER, TABLE_COLUMN_HEADER_PLAYER_NAME, TABLE_COLUMN_HEADER_STATUS };
         String[][] tableData = {};
  
@@ -82,7 +84,7 @@ public class GameSetup extends JPanel {
 			public void actionPerformed(ActionEvent arg0) {
 				frame.dispose();
 				try {
-					AppGameContainer app = new AppGameContainer(new CarWars("Car Wars"));
+					AppGameContainer app = new AppGameContainer(new CarWars("Car Wars", username));
 					app.setDisplayMode(800, 600, false); //create 800x600 frame
 					app.setTargetFrameRate(60); //cap FPS to 60
 					//app.setShowFPS(false);
@@ -130,7 +132,8 @@ public class GameSetup extends JPanel {
     }
     
     public void addPlayer(String playerName) {
-    	tableModel.addRow(new Object[]{String.valueOf(++playersCount), playerName, STATUS_CONNECTED});
+    	System.out.println(playerName);
+    	tableModel.addRow(new Object[]{new Integer(++GameSetup.playersCount).toString(), playerName, GameSetup.STATUS_CONNECTED});
     	output.append(playerName+" is connected.\n");
     	output.setCaretPosition(output.getDocument().getLength());
     }

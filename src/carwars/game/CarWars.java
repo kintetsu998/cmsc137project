@@ -23,9 +23,11 @@ public class CarWars extends BasicGame {
 	public Player p;
 	public Image marker;
 	public TrueTypeFont ttf;
+	private String username;
 	
-	public CarWars(String title) {
+	public CarWars(String title, String username) {
 		super(title);
+		this.username = username;
 	}
 
 	@Override
@@ -39,7 +41,7 @@ public class CarWars extends BasicGame {
 		
 		SpriteSheet p1Sheet = new SpriteSheet("resource/car1-sprites.png", 40, 30);
 		
-		p = new Player("Player 1", new Animation(p1Sheet, Config.ANIM_SPEED), 50, 0);
+		p = new Player(this.username, new Animation(p1Sheet, Config.ANIM_SPEED), 50, 0);
 		marker = new Image("resource/angle-rescale.png");
 		
 		for(int i=0, mapI=0; i<Config.MAP_HEIGHT; i++, mapI+=Terrain.TERR_SIZE) {
