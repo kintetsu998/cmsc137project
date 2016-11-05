@@ -87,39 +87,83 @@ public class PlayerLogin extends JFrame implements ActionListener {
         setVisible(true);
     }
 
-    private boolean validInput(String txt){
+    private boolean isEmptyInput(String txt){
         if(txt.equals("")||txt.equals(null)) return false;
         return true;
+    }
+    
+    public static boolean validIP (String ip) {
+    /* reference: http://stackoverflow.com/questions/4581877/validating-ipv4-string-in-java */
+        try {
+            if ( ip == null || ip.isEmpty() ) {
+                return false;
+            }
+
+            String[] parts = ip.split( "\\." );
+            if ( parts.length != 4 ) {
+                return false;
+            }
+
+            for ( String s : parts ) {
+                int i = Integer.parseInt( s );
+                if ( (i < 0) || (i > 255) ) {
+                    return false;
+                }
+            }
+            if ( ip.endsWith(".") ) {
+                return false;
+            }
+
+            return true;
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
     }
 
     public void actionPerformed(ActionEvent e) {
         Object o = e.getSource();
-        // if it is the Logout button
+
         if(o == logButton) {
             String t1 = tfUsername.getText();
             String t2 = tfHost.getText();
             String t3 = tfPort.getText();
 
-            if(!validInput(t1)){
+            if(!isEmptyInput(t1)){
                 tfUsername.setText("Invalid username");
                 tfUsername.setForeground(Color.RED);
+                return;
             }
-            else if(!validInput(t2)){
+            else if(!isEmptyInput(t2)){
                 tfHost.setText("Invalid host");
                 tfHost.setForeground(Color.RED);
+                return;
             }
-            else if(!validInput(t3)){
+            else if(!isEmptyInput(t3)){
                 tfPort.setText("Invalid port");
                 tfPort.setForeground(Color.RED);
+                return;
             }
             else{
-                System.out.println("No null values");
+            	
+            	// validate port number
+            	try{
+                	int p3 = Integer.parseInt(t3);
+                }catch(NumberFormatException err){
+                	tfPort.setText("Invalid port");
+                    tfPort.setForeground(Color.RED);
+                	return;
+                }
+            	
+            	// validate IP address
+            	if(!t2.equals("localhost")){
+            		if(!validIP(t2)){
+            			tfHost.setText("Invalid host");
+                        tfHost.setForeground(Color.RED);
+            			return;
+            		}
+            	}
             }
         }
-    }
-
-    public void mousePressed(MouseEvent e) {
-       Object o = e.getSource();
     }
 
     public static void main(String[] args){
