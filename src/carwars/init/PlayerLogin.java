@@ -1,4 +1,4 @@
-package carwars.chat;
+package carwars.init;
 
 import java.awt.*;
 import java.awt.event.*;
