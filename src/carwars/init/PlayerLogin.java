@@ -5,6 +5,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import carwars.Main;
+import carwars.chat.Client;
 
 public class PlayerLogin extends JFrame implements ActionListener {
 
@@ -15,6 +16,7 @@ public class PlayerLogin extends JFrame implements ActionListener {
     private JLabel label;
     private JButton logButton;
     private String username;
+    private Client client;
 
     public PlayerLogin(String h, int p) {
 
