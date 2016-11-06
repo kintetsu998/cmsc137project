@@ -5,7 +5,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import carwars.Main;
-import carwars.chat.Client;
+import carwars.chat.*;
 
 public class PlayerLogin extends JFrame implements ActionListener {
 
@@ -23,7 +23,7 @@ public class PlayerLogin extends JFrame implements ActionListener {
         super("Car Wars - Login");
         port = p;
         host = h;
-
+        
         JPanel mainPanel = new JPanel(new GridLayout(3,1));
 
         /* For logo */
@@ -170,9 +170,26 @@ public class PlayerLogin extends JFrame implements ActionListener {
             	
             	// launch app
             	this.dispose();
-            	Main.launchApp(this.username);
-            	
+            	client = new Client(username, host, port, new ChatRoom(this));
+            	if(!client.connect()){
+                	System.out.println("CONNECT FAIL");
+                }
+            	Main.launchApp(this);
             }
         }
+    }
+    
+    // getters
+    public String getUsername(){
+    	return username;
+    }
+    public String getHost(){
+    	return host;
+    }
+    public int getPort(){
+    	return port;
+    }
+    public Client getClient(){
+    	return client;
     }
 }

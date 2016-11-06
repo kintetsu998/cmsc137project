@@ -22,6 +22,7 @@ import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.SlickException;
 
 import carwars.game.CarWars;
+import carwars.chat.*;
  
 public class GameSetup extends JPanel {
 	public final static String WINDOW_TITLE_GAME_SETUP = "Car Wars - Game Setup";
@@ -41,17 +42,20 @@ public class GameSetup extends JPanel {
     
     private static int playersCount = 0;
     private DefaultTableModel tableModel;
+    private PlayerLogin pl;
     
-    public GameSetup(String username) {
+    public GameSetup(PlayerLogin pl) {
         super(new BorderLayout());
+        
+        this.pl = pl;
         
         //Create and set up the window.
         frame = new JFrame(WINDOW_TITLE_GAME_SETUP);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setAlwaysOnTop(true);
         //Create and set up the content pane.
-        addComponents(username);
-        addPlayer(username);
+        addComponents(pl.getUsername());
+        addPlayer(pl.getUsername());
         
         setOpaque(true);
         frame.setContentPane(this);
@@ -90,6 +94,7 @@ public class GameSetup extends JPanel {
 					//app.setShowFPS(false);
 					app.setAlwaysRender(true);
 					app.start();
+					
 				} catch (SlickException e) {
 					e.printStackTrace();
 				}

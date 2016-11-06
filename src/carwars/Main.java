@@ -8,10 +8,10 @@ public class Main {
 		new PlayerLogin("127.0.0.1", 8080);
 	}
 
-	public static void launchApp(String username){
+	public static void launchApp(PlayerLogin pl){
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 	        public void run() {
-	        	new GameSetup(username);
+	        	new GameSetup(pl);
 	        }
 	    });
 	}

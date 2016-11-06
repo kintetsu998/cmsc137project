@@ -15,18 +15,17 @@ public class ChatRoom extends JFrame implements ActionListener {
     private String defaultHost;
     private Client defaultClient;
 
-    public ChatRoom(String host, int port, String username){//, Client client) {
+    public ChatRoom(PlayerLogin pl){//, Client client) {
 
-        super("Car Wars - " + username);
-        defaultPort = port;
-        defaultHost = host;
-        defaultClient = new Client(username, host, port, this);
-        defaultClient.connect();
+        super("Car Wars - " + pl.getUsername());
+        defaultPort = pl.getPort();
+        defaultHost = pl.getHost();
+        defaultClient = pl.getClient();
         
         JPanel northPanel = new JPanel(new GridLayout(3,1));
         JPanel serverAndPort = new JPanel(new GridLayout(1,5, 1, 3));
-        tfServer = new JTextField(host);
-        tfPort = new JTextField("" + port);
+        tfServer = new JTextField(defaultHost);
+        tfPort = new JTextField("" + defaultPort);
         tfServer.setEditable(false);
         tfPort.setEditable(false);
         tfPort.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -45,7 +44,7 @@ public class ChatRoom extends JFrame implements ActionListener {
         tfMsg.setForeground(Color.BLACK);
         tfMsg.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
-
+            	// FIXME
                 defaultClient.sendMessage(tfMsg.getText().trim());
                 tfMsg.setText("");
                 // JOptionPane.showMessageDialog(null , "You've Submitted the name " + nameInput.getText());
@@ -64,10 +63,6 @@ public class ChatRoom extends JFrame implements ActionListener {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(800, 400);
         setVisible(true);
-    }
-
-    public static void main(String[] args){
-        ChatRoom cr = new ChatRoom("127.0.0.1", 8080, "Leensey");
     }
 
     void append(String str) {
