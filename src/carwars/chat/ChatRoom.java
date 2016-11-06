@@ -42,15 +42,7 @@ public class ChatRoom extends JFrame implements ActionListener {
         tfMsg = new JTextField("");
         tfMsg.setBackground(Color.WHITE);
         tfMsg.setForeground(Color.BLACK);
-        tfMsg.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e){
-            	// FIXME
-                defaultClient.sendMessage(tfMsg.getText().trim());
-                tfMsg.setText("");
-                // JOptionPane.showMessageDialog(null , "You've Submitted the name " + nameInput.getText());
-
-            }
-        });
+        tfMsg.addActionListener(this);
         northPanel.add(tfMsg);
         add(northPanel, BorderLayout.NORTH);
 
@@ -67,16 +59,22 @@ public class ChatRoom extends JFrame implements ActionListener {
 
     void append(String str) {
         ta.append(str);
-        ta.setCaretPosition(ta.getText().length() - 1);
+        tfMsg.setText("");
     }
 
     public void actionPerformed(ActionEvent ev) {
         if(ev.getSource() == tfMsg) {
-            defaultClient.sendMessage(tfMsg.getText().trim());
-            tfMsg.setText("");
-            return;
+        	try{
+        		String message = new String(tfMsg.getText().trim());
+            	System.out.println(message);
+            	if(message.length()>0){
+            		defaultClient.sendMessage(message);
+            	}
+        	}catch(Exception ex){
+        		JOptionPane.showMessageDialog(null , ex);
+        		ex.printStackTrace();
+        	}
         }
-        
     }
 
 }

@@ -23,6 +23,7 @@ public class PlayerLogin extends JFrame implements ActionListener {
         super("Car Wars - Login");
         port = p;
         host = h;
+        client = new Client("", host, port, new ChatRoom(this));
         
         JPanel mainPanel = new JPanel(new GridLayout(3,1));
 
@@ -170,10 +171,12 @@ public class PlayerLogin extends JFrame implements ActionListener {
             	
             	// launch app
             	this.dispose();
-            	client = new Client(username, host, port, new ChatRoom(this));
+            	client.setName(username);
             	if(!client.connect()){
                 	System.out.println("CONNECT FAIL");
+                	return;
                 }
+            	client.connect();
             	Main.launchApp(this);
             }
         }

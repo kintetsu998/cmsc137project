@@ -1,8 +1,6 @@
 package carwars.chat;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 import carwars.init.PlayerLogin;
 
@@ -40,7 +38,7 @@ public class Client {
                 return false;
             }
 
-            out.writeUTF(this.name);
+//            out.writeUTF(this.name);
 
             // receive messages
             new Thread() {
@@ -81,6 +79,9 @@ public class Client {
 
     public String getName(){
         return this.name;
+    }
+    public void setName(String n){
+        name = n;
     }
 
     // public static void main(String[] args) {
