@@ -17,6 +17,8 @@ public class PlayerLogin extends JFrame implements ActionListener {
     private JButton logButton;
     private String username;
     private Client client;
+    private JLabel errLabel;
+    private boolean connected;
 
     public PlayerLogin(String h, int p) {
 
@@ -42,17 +44,15 @@ public class PlayerLogin extends JFrame implements ActionListener {
         tfPort = new JTextField("" + port);
         tfHost.addMouseListener(new MouseAdapter(){
             public void mouseClicked(MouseEvent e){
-                if(tfHost.getText().trim().equals("Invalid host")){
-                    tfHost.setText("");
-                    tfHost.setForeground(Color.BLACK);
+                if(!connected){
+                    errLabel.setText("");
                 }
             }
         });
         tfPort.addMouseListener(new MouseAdapter(){
-            public void mouseClicked(MouseEvent e){
-                if(tfPort.getText().trim().equals("Invalid port")){
-                    tfPort.setText("");
-                    tfPort.setForeground(Color.BLACK);
+        	public void mouseClicked(MouseEvent e){
+                if(!connected){
+                    errLabel.setText("");
                 }
             }
         });
@@ -66,10 +66,9 @@ public class PlayerLogin extends JFrame implements ActionListener {
         inputToConnect.add(label);
         tfUsername = new JTextField("Type username");
         tfUsername.addMouseListener(new MouseAdapter(){
-            public void mouseClicked(MouseEvent e){
-                if(tfUsername.getText().trim().equals("Invalid username")){
-                    tfUsername.setText("");
-                    tfUsername.setForeground(Color.BLACK);
+        	public void mouseClicked(MouseEvent e){
+                if(!connected){
+                    errLabel.setText("");
                 }
             }
         });
@@ -81,6 +80,8 @@ public class PlayerLogin extends JFrame implements ActionListener {
         logButton = new JButton("Login");
         logButton.addActionListener(this);
         b.add(logButton);
+        errLabel = new JLabel("");
+        b.add(errLabel);
 
         mainPanel.add(b);
 
@@ -133,18 +134,21 @@ public class PlayerLogin extends JFrame implements ActionListener {
             String t3 = tfPort.getText().trim();
 
             if(!isEmptyInput(t1)){
-                tfUsername.setText("Invalid username");
-                tfUsername.setForeground(Color.RED);
+                errLabel.setText("Invalid username");
+                errLabel.setForeground(Color.RED);
+                connected = false;
                 return;
             }
             else if(!isEmptyInput(t2)){
-                tfHost.setText("Invalid host");
-                tfHost.setForeground(Color.RED);
+                errLabel.setText("Invalid server address");
+                errLabel.setForeground(Color.RED);
+                connected = false;
                 return;
             }
             else if(!isEmptyInput(t3)){
-                tfPort.setText("Invalid port");
-                tfPort.setForeground(Color.RED);
+                errLabel.setText("Invalid port number");
+                errLabel.setForeground(Color.RED);
+                connected = false;
                 return;
             }
             else{
@@ -153,31 +157,38 @@ public class PlayerLogin extends JFrame implements ActionListener {
             	try{
                 	int p3 = Integer.parseInt(t3);
                 }catch(NumberFormatException err){
-                	tfPort.setText("Invalid port");
-                    tfPort.setForeground(Color.RED);
+                	errLabel.setText("Invalid port number");
+                	errLabel.setForeground(Color.RED);
+                	connected = false;
                 	return;
                 }
-            	
+
             	// validate IP address
             	if(!t2.equals("localhost")){
             		if(!validIP(t2)){
-            			tfHost.setText("Invalid host");
-                        tfHost.setForeground(Color.RED);
+            			errLabel.setText("Invalid server address");
+            			errLabel.setForeground(Color.RED);
+            			connected = false;
             			return;
             		}
             	}
             	
             	this.username = t1;
-            	
-            	// launch app
-            	this.dispose();
             	client.setName(username);
-            	if(!client.connect()){
-                	System.out.println("CONNECT FAIL");
+            	connected = client.connect();
+            	
+            	if(!connected){
+                	errLabel.setText("Server - connection refused");
+                	errLabel.setForeground(Color.RED);
+                	connected = false;
                 	return;
                 }
-            	client.connect();
-            	Main.launchApp(this);
+            	else{
+                	// launch app
+                	this.dispose();
+                	Main.launchApp(this);
+            	}
+
             }
         }
     }

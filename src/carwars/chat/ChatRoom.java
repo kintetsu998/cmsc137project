@@ -65,7 +65,7 @@ public class ChatRoom extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent ev) {
         if(ev.getSource() == tfMsg) {
         	try{
-        		String message = new String(tfMsg.getText().trim());
+        		String message = tfMsg.getText().trim();
             	System.out.println(message);
             	if(message.length()>0){
             		defaultClient.sendMessage(message);
