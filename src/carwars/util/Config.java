@@ -15,4 +15,6 @@ public class Config {
 	static public final int TERMINAL_SPEED = 7;
 	
 	static public final int ANIM_SPEED = 250;
+	
+	static public final boolean DEBUG = true;
 }

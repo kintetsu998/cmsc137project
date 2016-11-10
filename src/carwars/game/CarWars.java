@@ -24,10 +24,16 @@ public class CarWars extends BasicGame {
 	public Image marker;
 	public TrueTypeFont ttf;
 	private String username;
+	private boolean shooting;
 	
 	public CarWars(String title, String username) {
 		super(title);
 		this.username = username;
+	}
+	
+	public CarWars(String title) {
+		super(title);
+		this.username = "Player 1";
 	}
 
 	@Override
@@ -64,6 +70,8 @@ public class CarWars extends BasicGame {
 	public void update(GameContainer container, int delta) throws SlickException {
 		Input input = container.getInput();
 		
+		shooting = false;
+		
 		p.getSpriteAnim().update(delta);
 		
 		if(input.isKeyDown(Input.KEY_LEFT) && p.isTurn()) {
@@ -75,6 +83,7 @@ public class CarWars extends BasicGame {
 		} else if(input.isKeyDown(Input.KEY_DOWN)) {
 			p.decAngle();
 		} else if(input.isKeyDown(Input.KEY_SPACE)) {
+			shooting = true;
 			p.incForce();
 		}
 	}
@@ -124,11 +133,13 @@ public class CarWars extends BasicGame {
 		g.setColor(Color.green);
 		g.fillRect(p.getX(), p.getY() + Player.CAR_HEIGHT, remainingHP(p), 5);
 		
-		g.setColor(Color.orange);
-		g.fillRect(p.getX(), p.getY() + Player.CAR_HEIGHT + 7, remainingForce(p), 5);
-		
 		g.setColor(Color.white);
 		g.fillRect(p.getX(), p.getY() + Player.CAR_HEIGHT + 14, remainingMov(p), 5);
+		
+		if(shooting) {
+			g.setColor(Color.orange);
+			g.fillRect(p.getX(), p.getY() + Player.CAR_HEIGHT + 7, remainingForce(p), 5);
+		}
 	}
 	
 	private float remainingHP(Player p) {

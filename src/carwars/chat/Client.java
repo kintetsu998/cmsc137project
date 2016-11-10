@@ -1,10 +1,10 @@
 package carwars.chat;
 
-import java.io.*;
-
-import carwars.init.PlayerLogin;
-
-import java.net.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.ConnectException;
+import java.net.Socket;
 
 public class Client {
     
@@ -113,8 +113,8 @@ public class Client {
         gui.append(msg + "\n");      // append to the PlayerLogin JTextArea (or whatever)
     }
 
-    private static void help() {
+    /*private static void help() {
         System.out.println("Using the Client class:");
         System.out.println("java Client [ip address] [port number]");
-    }
+    }*/
 }

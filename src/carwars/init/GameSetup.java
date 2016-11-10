@@ -22,7 +22,6 @@ import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.SlickException;
 
 import carwars.game.CarWars;
-import carwars.chat.*;
  
 public class GameSetup extends JPanel {
 	public final static String WINDOW_TITLE_GAME_SETUP = "Car Wars - Game Setup";
@@ -91,7 +90,7 @@ public class GameSetup extends JPanel {
 					AppGameContainer app = new AppGameContainer(new CarWars("Car Wars", username));
 					app.setDisplayMode(800, 600, false); //create 800x600 frame
 					app.setTargetFrameRate(60); //cap FPS to 60
-					//app.setShowFPS(false);
+					app.setShowFPS(false);
 					app.setAlwaysRender(true);
 					app.start();
 					

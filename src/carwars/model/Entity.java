@@ -25,11 +25,11 @@ public class Entity {
 		return this.y;
 	}
 	
-	protected float setX(float x) {
+	public float setX(float x) {
 		return (this.x = x);
 	}
 	
-	protected float setY(float y) {
+	public float setY(float y) {
 		return (this.y = y);
 	}
 	

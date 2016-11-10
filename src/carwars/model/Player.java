@@ -1,6 +1,7 @@
 package carwars.model;
 
 import java.io.IOException;
+import java.net.MulticastSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -29,6 +30,7 @@ public class Player extends Entity{
 	
 	private String name;
 	private Socket tcpSocket;
+	private MulticastSocket udpSocket;
 	private Animation spriteAnim;
 	
 	private int front;
@@ -197,6 +199,10 @@ public class Player extends Entity{
 	
 	public Socket getTcpSocket() {
 		return this.tcpSocket;
+	}
+	
+	public MulticastSocket udpSocket() {
+		return this.udpSocket;
 	}
 	
 	public int getFront() {
