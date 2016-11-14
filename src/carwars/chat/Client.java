@@ -58,22 +58,30 @@ public class Client {
                         String reply;
                         while(!sock.isClosed()){
                             while((reply = in.readUTF()) == null){}
+                            
+                            //receives a code for a new client name
                             if(reply.startsWith("name: ") && !hasName) {
                             	String[] tok = reply.split(" ");
                             	
                             	Client.this.name = tok[1];
                             	hasName = true;
-                            } else if(reply.startsWith("join: ")) {
+                            } 
+                            //receives a code for someone joining the game
+                            else if(reply.startsWith("join: ")) {
                             	String[] tok = reply.split(" ");
                             	
                             	Client.this.pNames.add(tok[1]);
                             	gs.addPlayer(tok[1]);
-                            } else if(reply.startsWith("list: ") && !hasList) {
+                            }
+                            //receives a code for a list of current players in the room
+                            else if(reply.startsWith("list: ") && !hasList) {
                             	addPNames(reply.split(" "));
                             	hasList = true;
                             }
-                            
-                            display(reply);
+                            //else, no code detected. display the message on screen
+                            else {
+                            	display(reply);
+                            }
                         }
                     } catch(Exception e1) {
                         display("Exception in thread: " + e1);

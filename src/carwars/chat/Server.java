@@ -40,11 +40,19 @@ public class Server extends Thread {
 
 							out = new DataOutputStream(server.getOutputStream());
 							out.writeUTF("You are now connected as " + name);
+							
+							//sends a list of names for the newly joined player
 							out.writeUTF("list: " + sendNames(name));
+							
+							//sends the new name in case there are duplicates
 							out.writeUTF("name: " + name);
 							
+							//sends to all that someone will join the game
 							Server.this.sendToAll("join: " + name, server);
+							
+							//send to all that someone connected the game
 							Server.this.sendToAll(name + " connected!", server);
+							
 							while(true) {
 								message = in.readUTF();
 								Server.this.sendToAll(name + ": " + message, server);
