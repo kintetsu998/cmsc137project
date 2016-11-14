@@ -16,11 +16,15 @@ public class Client {
     private String server;
     private Socket sock;
     private ChatRoom gui;
+    private boolean hasName;
+    private boolean hasList;
 
     public Client(String name, String server, int port) {
         this.name = name;
         this.server = server;
         this.port = port;
+        this.hasName = false;
+        this.hasList = false;
     }
 
     public boolean connect() {
@@ -34,7 +38,7 @@ public class Client {
                 out = new DataOutputStream(sock.getOutputStream());
             }
             catch (IOException e1) {
-                display("Exception creating new I/O streams: " + e1);
+                System.out.println("Exception creating new I/O streams: " + e1);
                 return false;
             }
 
@@ -47,7 +51,13 @@ public class Client {
                         String reply;
                         while(!sock.isClosed()){
                             while((reply = in.readUTF()) == null){}
-                            display(reply);
+                            if(reply.startsWith("name: ") && !hasName) {
+                            	String[] tok = reply.split(" ");
+                            	Client.this.name = tok[1];
+                            	hasName = true;
+                            } else {
+                            	display(reply);
+                            }
                         }
                     } catch(Exception e1) {
                         display("Exception in thread: " + e1);

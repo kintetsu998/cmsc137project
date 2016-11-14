@@ -37,8 +37,10 @@ public class Server extends Thread {
 
 							sockets.put(name, server);
 
-							out = new DataOutputStream(server.getOutputStream());	
+							out = new DataOutputStream(server.getOutputStream());
 							out.writeUTF("You are now connected as " + name);
+							out.writeUTF("list: " + sendNames());
+							out.writeUTF("name: " + name);
 
 							System.out.println(name + " connected!");
 							Server.this.sendToAll(name + " connected!", server);
@@ -67,6 +69,16 @@ public class Server extends Thread {
 		}
 
 		System.out.println("Server closing...");
+	}
+	
+	private String sendNames() {
+		String str = "";
+		
+		for(String s : sockets.keySet()) {
+			str += s + " ";
+		}
+		
+		return str;
 	}
 
 	private String checkDuplicate(String name) {

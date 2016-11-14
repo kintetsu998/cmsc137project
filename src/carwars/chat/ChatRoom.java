@@ -27,7 +27,7 @@ public class ChatRoom extends JFrame implements ActionListener {
 
     public ChatRoom(Client client, int port, String host) {
 
-        super("Car Wars - " + client.getName());
+        super("Chat room");
         defaultPort = port;
         defaultHost = host;
         defaultClient = client;

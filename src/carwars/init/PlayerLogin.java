@@ -75,7 +75,7 @@ public class PlayerLogin extends JFrame implements ActionListener {
 
         label = new JLabel("Username: ");
         inputToConnect.add(label);
-        tfUsername = new JTextField("Type username");
+        tfUsername = new JTextField("Username");
         tfUsername.addMouseListener(new MouseAdapter(){
         	public void mouseClicked(MouseEvent e){
                 if(!connected){
@@ -158,6 +158,11 @@ public class PlayerLogin extends JFrame implements ActionListener {
             }
             else if(!isEmptyInput(t3)){
                 errLabel.setText("Invalid port number");
+                errLabel.setForeground(Color.RED);
+                connected = false;
+                return;
+            } else if(t1.contains(" ")) {
+            	errLabel.setText("Username should not contain spaces.");
                 errLabel.setForeground(Color.RED);
                 connected = false;
                 return;

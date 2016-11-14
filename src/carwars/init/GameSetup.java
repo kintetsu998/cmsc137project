@@ -41,12 +41,9 @@ public class GameSetup extends JPanel {
     
     private static int playersCount = 0;
     private DefaultTableModel tableModel;
-    private PlayerLogin pl;
     
     public GameSetup(PlayerLogin pl) {
         super(new BorderLayout());
-        
-        this.pl = pl;
         
         //Create and set up the window.
         frame = new JFrame(WINDOW_TITLE_GAME_SETUP);
