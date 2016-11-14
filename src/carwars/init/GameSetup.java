@@ -63,6 +63,8 @@ public class GameSetup extends JPanel {
         frame.setSize(400, 600);
         frame.setResizable(false);
         frame.setVisible(true);
+        
+        pl.getClient().getChatRoom().setVisible(true);
     }
     
     private void addComponents(String username) {

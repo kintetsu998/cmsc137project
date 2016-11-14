@@ -1,9 +1,19 @@
 package carwars.chat;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import carwars.init.PlayerLogin;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 public class ChatRoom extends JFrame implements ActionListener {
 
@@ -15,12 +25,12 @@ public class ChatRoom extends JFrame implements ActionListener {
     private String defaultHost;
     private Client defaultClient;
 
-    public ChatRoom(PlayerLogin pl){//, Client client) {
+    public ChatRoom(Client client, int port, String host) {
 
-        super("Car Wars - " + pl.getUsername());
-        defaultPort = pl.getPort();
-        defaultHost = pl.getHost();
-        defaultClient = pl.getClient();
+        super("Car Wars - " + client.getName());
+        defaultPort = port;
+        defaultHost = host;
+        defaultClient = client;
         
         JPanel northPanel = new JPanel(new GridLayout(3,1));
         JPanel serverAndPort = new JPanel(new GridLayout(1,5, 1, 3));
@@ -54,10 +64,9 @@ public class ChatRoom extends JFrame implements ActionListener {
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(800, 400);
-        setVisible(true);
     }
 
-    void append(String str) {
+    public void append(String str) {
         ta.append(str);
         tfMsg.setText("");
     }

@@ -4,7 +4,6 @@ import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.SlickException;
 
 import carwars.game.CarWars;
-import carwars.init.GameSetup;
 import carwars.init.PlayerLogin;
 import carwars.util.Config;
 
@@ -24,13 +23,5 @@ public class Main {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	public static void launchApp(PlayerLogin pl){
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	        public void run() {
-	        	new GameSetup(pl);
-	        }
-	    });
 	}
 }

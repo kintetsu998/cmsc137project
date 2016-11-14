@@ -1,15 +1,27 @@
 package carwars.init;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-import carwars.Main;
-import carwars.chat.*;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+
+import carwars.chat.ChatRoom;
+import carwars.chat.Client;
 
 public class PlayerLogin extends JFrame implements ActionListener {
-
-    // PlayerLogin attributes
+	private static final long serialVersionUID = 1L;
+	// PlayerLogin attributes
     private int port;
     private String host;
     private JTextField tfHost, tfPort, tfUsername;
@@ -25,7 +37,6 @@ public class PlayerLogin extends JFrame implements ActionListener {
         super("Car Wars - Login");
         port = p;
         host = h;
-        client = new Client("", host, port, new ChatRoom(this));
         
         JPanel mainPanel = new JPanel(new GridLayout(3,1));
 
@@ -174,7 +185,8 @@ public class PlayerLogin extends JFrame implements ActionListener {
             	}
             	
             	this.username = t1;
-            	client.setName(username);
+            	client = new Client(username, host, port);
+            	client.setChatRoom(new ChatRoom(client, port, host));
             	connected = client.connect();
             	
             	if(!connected){
@@ -186,7 +198,11 @@ public class PlayerLogin extends JFrame implements ActionListener {
             	else{
                 	// launch app
                 	this.dispose();
-                	Main.launchApp(this);
+                	javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            	        public void run() {
+            	        	new GameSetup(PlayerLogin.this);
+            	        }
+            	    });
             	}
 
             }

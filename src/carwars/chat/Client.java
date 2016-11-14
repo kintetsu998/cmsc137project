@@ -10,17 +10,17 @@ public class Client {
     
     private DataInputStream in;
     private DataOutputStream out;
+    
     private int port;
     private String name;
     private String server;
     private Socket sock;
     private ChatRoom gui;
 
-    public Client(String name, String server, int port, ChatRoom gui) {
+    public Client(String name, String server, int port) {
         this.name = name;
         this.server = server;
         this.port = port;
-        this.gui = gui;
     }
 
     public boolean connect() {
@@ -38,7 +38,7 @@ public class Client {
                 return false;
             }
 
-//            out.writeUTF(this.name);
+            out.writeUTF(this.name);
 
             // receive messages
             new Thread() {
@@ -80,6 +80,11 @@ public class Client {
     public String getName(){
         return this.name;
     }
+    
+    public void setChatRoom(ChatRoom gui) {
+    	this.gui = gui;
+    }
+    
     public void setName(String n){
         name = n;
     }
@@ -111,6 +116,10 @@ public class Client {
 
     public void display(String msg) {
         gui.append(msg + "\n");      // append to the PlayerLogin JTextArea (or whatever)
+    }
+    
+    public ChatRoom getChatRoom() {
+    	return this.gui;
     }
 
     /*private static void help() {
