@@ -8,6 +8,8 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.HashMap;
 
+import carwars.util.Config;
+
 public class Server extends Thread {
 	private ServerSocket serverSocket;
 	private HashMap<String, Socket> sockets;
@@ -55,7 +57,12 @@ public class Server extends Thread {
 							
 							while(true) {
 								message = in.readUTF();
-								Server.this.sendToAll(name + ": " + message, server);
+								if(message.equals(Config.START_CODE)) {
+									Server.this.sendToAll(message, server);
+									System.out.println(message);
+								} else {
+									Server.this.sendToAll(name + ": " + message, server);
+								}
 							}
 						} catch(SocketException e) {
 							Server.this.sendToAll(name + " has disconnected.", server);

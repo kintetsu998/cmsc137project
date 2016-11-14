@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import carwars.init.GameSetup;
+import carwars.util.Config;
 
 public class Client {
     
@@ -29,9 +30,11 @@ public class Client {
         this.name = name;
         this.server = server;
         this.port = port;
+        
+        this.pNames = new ArrayList<>();
+        
         this.hasName = false;
         this.hasList = false;
-        this.pNames = new ArrayList<>();
     }
 
     public boolean connect() {
@@ -78,6 +81,10 @@ public class Client {
                             	addPNames(reply.split(" "));
                             	hasList = true;
                             }
+                            //receives a code that should start the game;
+                            else if(reply.equals(Config.START_CODE)) {
+                            	gs.startGame(Client.this);
+                            }
                             //else, no code detected. display the message on screen
                             else {
                             	display(reply);
@@ -113,6 +120,15 @@ public class Client {
         try {
             out.writeUTF(message);
             display(name + ": " + message);
+        }
+        catch(IOException e) {
+            display("Exception sending to server: " + e);
+        }
+    }
+    
+    public void startGame() {
+    	try {
+            out.writeUTF(Config.START_CODE);
         }
         catch(IOException e) {
             display("Exception sending to server: " + e);

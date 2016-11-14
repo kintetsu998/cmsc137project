@@ -1,13 +1,12 @@
 package carwars.model;
 
-import java.io.IOException;
 import java.net.MulticastSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.geom.Rectangle;
 
+import carwars.chat.Client;
 import carwars.util.Config;
 
 public class Player extends Entity{
@@ -29,7 +28,7 @@ public class Player extends Entity{
 	static public final int CAR_MAX_DIST = 150;
 	
 	private String name;
-	private Socket tcpSocket;
+	private Client client;
 	private MulticastSocket udpSocket;
 	private Animation spriteAnim;
 	
@@ -43,10 +42,10 @@ public class Player extends Entity{
 	private boolean turn;
 	
 	/** CONSTRUCTOR **/	
-	public Player(String name, Animation sprite_file, int x, int y, String ip, int port) {
+	public Player(String name, Animation sprite_file, int x, int y) {
 		super(x, y);
 		this.name = name;
-		this.connectTo(ip,  port);
+		this.client = null;
 		this.spriteAnim = sprite_file;
 		
 		this.front = RIGHT;
@@ -62,10 +61,10 @@ public class Player extends Entity{
 		players.add(this);
 	}
 	
-	public Player(String name, Animation sprite_file, int x, int y, Socket s) {
+	public Player(String name, Animation sprite_file, int x, int y, Client c) {
 		super(x, y);
 		this.name = name;
-		this.tcpSocket = s;
+		this.client = c;
 		this.spriteAnim = sprite_file;
 		
 		this.front = RIGHT;
@@ -78,28 +77,14 @@ public class Player extends Entity{
 		this.turn = true;
 		
 		players.add(this);
-	}
-	
-	public Player(String name, Animation sprite, int x, int y) {
-		this(name, sprite, x, y, null);
 	}
 	
 	public Player(String name, Animation sprite) {
-		this(name, sprite, 0, 0, null);
+		this(name, sprite, 0, 0);
 	}
 	
 	public Player(String name, Animation sprite, String ip, int port) {
-		this(name, sprite, 0, 0, ip, port);
-	}
-	
-	/** METHODS **/
-	private void connectTo(String ip, int port) {
-		try{
-			tcpSocket = new Socket(ip, port);
-		} catch(IOException e) {
-			e.printStackTrace();
-			System.err.println("Server not found.");
-		}
+		this(name, sprite, 0, 0);
 	}
 	
 	public void moveRight(){
@@ -197,8 +182,8 @@ public class Player extends Entity{
 		return this.name;
 	}
 	
-	public Socket getTcpSocket() {
-		return this.tcpSocket;
+	public Client getClient() {
+		return this.client;
 	}
 	
 	public MulticastSocket udpSocket() {

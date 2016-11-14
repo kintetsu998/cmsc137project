@@ -21,6 +21,7 @@ import javax.swing.table.DefaultTableModel;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.SlickException;
 
+import carwars.chat.Client;
 import carwars.game.CarWars;
  
 public class GameSetup extends JPanel {
@@ -30,8 +31,6 @@ public class GameSetup extends JPanel {
 	public final static String TABLE_COLUMN_HEADER_PLAYER_NAME = "Player Name";
 	public final static String TABLE_COLUMN_HEADER_STATUS = "Status";
 	public final static String STATUS_CONNECTED = "Connected";
-	public final static String STATUS_READY = "Ready";
-	public final static String BUTTON_READY = "READY";
 	public final static String BUTTON_START = "START";
     
 	private static final long serialVersionUID = 1L;
@@ -42,8 +41,12 @@ public class GameSetup extends JPanel {
     private static int playersCount = 0;
     private DefaultTableModel tableModel;
     
+    private Client client;
+    
     public GameSetup(PlayerLogin pl) {
         super(new BorderLayout());
+        
+        this.client = pl.getClient();
         
         //Create and set up the window.
         frame = new JFrame(WINDOW_TITLE_GAME_SETUP);
@@ -77,26 +80,14 @@ public class GameSetup extends JPanel {
      
         //Build control area (use default FlowLayout).
         JPanel controlPane = new JPanel();
-        final JButton readyButton = new JButton(BUTTON_READY);
         final JButton startGameButton = new JButton(BUTTON_START);
-        controlPane.add(readyButton);
         controlPane.add(startGameButton);
         
         startGameButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				frame.dispose();
-				try {
-					AppGameContainer app = new AppGameContainer(new CarWars("Car Wars", username));
-					app.setDisplayMode(800, 600, false); //create 800x600 frame
-					app.setTargetFrameRate(60); //cap FPS to 60
-					app.setShowFPS(false);
-					app.setAlwaysRender(true);
-					app.start();
-					
-				} catch (SlickException e) {
-					e.printStackTrace();
-				}
+				GameSetup.this.client.startGame();
+				GameSetup.this.startGame(client);
 			}
 		});
  
@@ -133,6 +124,20 @@ public class GameSetup extends JPanel {
         //bottomHalf.setMinimumSize(new Dimension(400, 50));
         bottomHalf.setPreferredSize(new Dimension(450, 110));
         splitPane.add(bottomHalf);
+    }
+    
+    public void startGame(Client client) {
+    	try {
+    		frame.dispose();
+			AppGameContainer app = new AppGameContainer(new CarWars("Car Wars", client));
+			app.setDisplayMode(800, 600, false); //create 800x600 frame
+			app.setTargetFrameRate(60); //cap FPS to 60
+			app.setShowFPS(false);
+			app.setAlwaysRender(true);
+			app.start();
+		} catch (SlickException e) {
+			e.printStackTrace();
+		}
     }
     
     public void addPlayer(String playerName) {

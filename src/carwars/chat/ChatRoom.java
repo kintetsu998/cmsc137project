@@ -15,6 +15,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import carwars.util.Config;
+
 public class ChatRoom extends JFrame implements ActionListener {
 
     private static final long serialVersionUID = 1L;
@@ -77,7 +79,7 @@ public class ChatRoom extends JFrame implements ActionListener {
             	System.out.println(message);
             	
             	//detects if the client tries to send a coded message
-            	if(message.startsWith("join: ")) {
+            	if(message.startsWith("join: ") || message.equals(Config.START_CODE)) {
             		this.append("Invalid message to send...");
             	}
             	//else it is a normal message

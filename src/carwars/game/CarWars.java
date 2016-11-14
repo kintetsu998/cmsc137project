@@ -13,6 +13,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.TrueTypeFont;
 
+import carwars.chat.Client;
 import carwars.model.Player;
 import carwars.model.Terrain;
 import carwars.util.Config;
@@ -26,9 +27,12 @@ public class CarWars extends BasicGame {
 	private String username;
 	private boolean shooting;
 	
-	public CarWars(String title, String username) {
+	private Client client;
+	
+	public CarWars(String title, Client c) {
 		super(title);
-		this.username = username;
+		this.username = c.getName();
+		this.client = c;
 	}
 	
 	public CarWars(String title) {
@@ -47,7 +51,7 @@ public class CarWars extends BasicGame {
 		
 		SpriteSheet p1Sheet = new SpriteSheet("resource/car1-sprites.png", 40, 30);
 		
-		p = new Player(this.username, new Animation(p1Sheet, Config.ANIM_SPEED), 50, 0);
+		p = new Player(this.username, new Animation(p1Sheet, Config.ANIM_SPEED), 50, 0, client);
 		marker = new Image("resource/angle-rescale.png");
 		
 		for(int i=0, mapI=0; i<Config.MAP_HEIGHT; i++, mapI+=Terrain.TERR_SIZE) {
