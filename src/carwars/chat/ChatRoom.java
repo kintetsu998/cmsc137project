@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -25,15 +24,12 @@ public class ChatRoom extends JFrame implements ActionListener {
     private int defaultPort;
     private String defaultHost;
     private Client defaultClient;
-    private ArrayList<String> pNames;
 
     public ChatRoom(Client client, int port, String host) {
         super("Chat room");
         defaultPort = port;
         defaultHost = host;
         defaultClient = client;
-        
-        pNames = new ArrayList<>();
         
         JPanel northPanel = new JPanel(new GridLayout(3,1));
         JPanel serverAndPort = new JPanel(new GridLayout(1,5, 1, 3));
@@ -79,7 +75,10 @@ public class ChatRoom extends JFrame implements ActionListener {
         	try{
         		String message = tfMsg.getText().trim();
             	System.out.println(message);
-            	if(message.length()>0){
+            	
+            	if(message.startsWith("join: ")) {
+            		this.append("Invalid message to send...");
+            	} else if(message.length()>0) {
             		defaultClient.sendMessage(message);
             	}
         	}catch(Exception ex){
