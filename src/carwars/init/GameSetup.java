@@ -51,7 +51,7 @@ public class GameSetup extends JPanel {
         frame.setAlwaysOnTop(true);
         //Create and set up the content pane.
         addComponents(pl.getUsername());
-        addPlayer(pl.getUsername());
+        //addPlayer(pl.getClient().getName());
         
         setOpaque(true);
         frame.setContentPane(this);
@@ -61,6 +61,7 @@ public class GameSetup extends JPanel {
         frame.setResizable(false);
         frame.setVisible(true);
         
+        pl.getClient().setGameSetup(this);
         pl.getClient().getChatRoom().setVisible(true);
     }
     

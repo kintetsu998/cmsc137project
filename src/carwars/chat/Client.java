@@ -5,17 +5,23 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.util.ArrayList;
+
+import carwars.init.GameSetup;
 
 public class Client {
     
     private DataInputStream in;
     private DataOutputStream out;
+    private ChatRoom gui;
+    private GameSetup gs;
     
     private int port;
     private String name;
     private String server;
     private Socket sock;
-    private ChatRoom gui;
+    private ArrayList<String> pNames;
+    
     private boolean hasName;
     private boolean hasList;
 
@@ -25,6 +31,7 @@ public class Client {
         this.port = port;
         this.hasName = false;
         this.hasList = false;
+        this.pNames = new ArrayList<>();
     }
 
     public boolean connect() {
@@ -53,15 +60,32 @@ public class Client {
                             while((reply = in.readUTF()) == null){}
                             if(reply.startsWith("name: ") && !hasName) {
                             	String[] tok = reply.split(" ");
+                            	
                             	Client.this.name = tok[1];
                             	hasName = true;
-                            } else {
-                            	display(reply);
+                            } else if(reply.startsWith("join: ")) {
+                            	String[] tok = reply.split(" ");
+                            	
+                            	Client.this.pNames.add(tok[1]);
+                            	gs.addPlayer(tok[1]);
+                            } else if(reply.startsWith("list: ") && !hasList) {
+                            	addPNames(reply.split(" "));
+                            	hasList = true;
                             }
+                            
+                            display(reply);
                         }
                     } catch(Exception e1) {
                         display("Exception in thread: " + e1);
                     }
+                }
+                
+                private void addPNames(String[] tok) {
+                	for(int i = 1; i < tok.length; i++) {
+                		if(!tok[i].trim().equals("")) {
+                			Client.this.pNames.add(tok[i]);
+                		}
+                	}
                 }
             }.start();
 
@@ -93,6 +117,14 @@ public class Client {
     
     public void setChatRoom(ChatRoom gui) {
     	this.gui = gui;
+    }
+    
+    public void setGameSetup(GameSetup gs) {
+    	this.gs = gs;
+    	
+    	for(String player : pNames) {
+    		gs.addPlayer(player);
+    	}
     }
     
     public void setName(String n){

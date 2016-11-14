@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.HashMap;
 
 public class Server extends Thread {
@@ -39,18 +40,18 @@ public class Server extends Thread {
 
 							out = new DataOutputStream(server.getOutputStream());
 							out.writeUTF("You are now connected as " + name);
-							out.writeUTF("list: " + sendNames());
+							out.writeUTF("list: " + sendNames(name));
 							out.writeUTF("name: " + name);
-
-							System.out.println(name + " connected!");
+							
+							Server.this.sendToAll("join: " + name, server);
 							Server.this.sendToAll(name + " connected!", server);
-							while(!(message = in.readUTF()).equalsIgnoreCase("exit")) {
-								System.out.println(name + ": " + message);
+							while(true) {
+								message = in.readUTF();
 								Server.this.sendToAll(name + ": " + message, server);
 							}
-
-							System.out.println(name + " disconnected.");
-							Server.this.sendToAll(name + " disconnected.", server);
+						} catch(SocketException e) {
+							Server.this.sendToAll(name + " has disconnected.", server);
+							sockets.remove(name);
 						} catch(IOException e) {
 							e.printStackTrace();
 						} finally {
@@ -59,7 +60,6 @@ public class Server extends Thread {
 							} catch(IOException e) {
 								e.printStackTrace();
 							}
-							sockets.remove(name);
 						}
 					}
 				}.start();
@@ -71,7 +71,7 @@ public class Server extends Thread {
 		System.out.println("Server closing...");
 	}
 	
-	private String sendNames() {
+	private String sendNames(String name) {
 		String str = "";
 		
 		for(String s : sockets.keySet()) {
