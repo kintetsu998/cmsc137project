@@ -11,9 +11,8 @@ public class Config {
 	static public final int MAP_WIDTH = GAME_WIDTH/Terrain.TERR_SIZE;
 	static public final int MAP_HEIGHT = GAME_HEIGHT/Terrain.TERR_SIZE;
 	
-	static public final int GRAVITY = 6;
-	static public final int GRAVITY_SPEED = 20;
-	static public final int TERMINAL_SPEED = 7;
+	static public final int GRAVITY = 3;
+	static public final int TERMINAL_SPEED = 12;
 	
 	static public final int ANIM_SPEED = 250;
 	

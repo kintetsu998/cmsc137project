@@ -6,6 +6,7 @@ import org.newdawn.slick.Animation;
 import org.newdawn.slick.geom.Rectangle;
 
 import carwars.chat.Client;
+import carwars.chat.UDPClient;
 import carwars.util.Config;
 
 public class Player extends Entity {
@@ -23,7 +24,7 @@ public class Player extends Entity {
 	static public final int MAX_ANGLE = 90;
 	static public final int MIN_ANGLE = 0;
 	
-	static public final int JUMP_SPEED = -100;
+	static public final int JUMP_SPEED = -18;
 	
 	
 	private String name;
@@ -36,7 +37,10 @@ public class Player extends Entity {
 	
 	private float force;
 	private float angle;
+	
 	private boolean turn;
+	private boolean jumping;
+	private boolean hasJumped;
 	
 	private Client tcpClient;
 	
@@ -54,6 +58,8 @@ public class Player extends Entity {
 		this.vertSpeed = 0;
 		
 		this.turn = false;
+		this.jumping = false;
+		this.hasJumped = false;
 		
 		this.tcpClient = null;
 		
@@ -73,6 +79,8 @@ public class Player extends Entity {
 		this.vertSpeed = 0;
 		
 		this.turn = false;
+		this.jumping = false;
+		this.hasJumped = false;
 		
 		this.tcpClient = c;
 		
@@ -101,16 +109,17 @@ public class Player extends Entity {
 		}
 	}
 	
-	public void fall() {
+	public void fall(UDPClient client) {
 		while(!this.isDead()) {
 			boolean intersects = Player.intersectsTerrain(this.hitBox());
 			
-			System.out.println(this.vertSpeed);
-			if(intersects){
+			if(intersects && !jumping){
 				while(Player.intersectsTerrain(this.hitBox())) {
 					this.setY(this.getY()-1);
+					client.sendStatus();
 				}
 				this.setY(this.getY()+1);
+				this.hasJumped = false;
 				//this.vertSpeed = 0;
 			} else if(this.getY() >= Config.GAME_HEIGHT-CAR_HEIGHT) {
 				this.damage(MAX_HP);
@@ -120,8 +129,14 @@ public class Player extends Entity {
 						this.vertSpeed + Config.GRAVITY: 
 						Config.TERMINAL_SPEED;
 				
+				if(vertSpeed >= 0) {
+					jumping = false;
+				}
+				
 				if(this.getY() <= Config.GAME_HEIGHT-CAR_HEIGHT)
 					this.setY(this.getY() + this.vertSpeed);
+				
+				client.sendStatus();
 			}
 
 			try{
@@ -137,12 +152,12 @@ public class Player extends Entity {
 		System.out.println(this.force);
 	}
 	
-	private Rectangle leftHitBox() {
-		return new Rectangle(this.getX(), this.getY(), 1, CAR_HEIGHT-1);
+	public Rectangle leftHitBox() {
+		return new Rectangle(this.getX()-3, this.getY(), 3, CAR_HEIGHT-1);
 	}
 	
-	private Rectangle rightHitBox() {
-		return new Rectangle(this.getX()+CAR_WIDTH-1, this.getY(), 1, CAR_HEIGHT-1);
+	public Rectangle rightHitBox() {
+		return new Rectangle(this.getX()+CAR_WIDTH, this.getY(), 3, CAR_HEIGHT-1);
 	}
 	
 	public static boolean intersectsTerrain(Rectangle r) {
@@ -160,8 +175,10 @@ public class Player extends Entity {
 	}
 	
 	public void jump() {
-		if(vertSpeed >= 0) {
+		if(!hasJumped) {
 			this.vertSpeed = JUMP_SPEED;
+			jumping = true;
+			hasJumped = true;
 		}
 	}
 	
@@ -187,15 +204,16 @@ public class Player extends Entity {
 		this.force = (this.force < MAX_FORCE)? this.force + 1: this.force;
 	}*/
 	
-	public void update(int x, int hp, int front) {
+	public void update(int x, int y, int hp, int front) {
 		this.setX(x);
+		this.setY(y);
 		this.hp = hp;
 		this.front = front;
 	}
 	
 	@Override
 	public String toString() {
-		return this.name + " " + this.getX() + " " + this.hp + " " + this.front;
+		return this.name + " " + this.getX() + " " + this.getY() + " " + this.hp + " " + this.front;
 	}
 	
 	public void setAngle(float angle) {

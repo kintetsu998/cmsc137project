@@ -73,13 +73,11 @@ public class CarWars extends BasicGame {
 			}
 		}
 		
-		for(final Player p : Player.players.values()) {
-			new Thread() {
-				public void run() {
-					p.fall();
-				}
-			}.start();
-		}
+		new Thread() {
+			public void run() {
+				player.fall(udpClient);
+			}
+		}.start();
 	}
 	
 	@Override
@@ -94,11 +92,16 @@ public class CarWars extends BasicGame {
 		} else if(input.isKeyDown(Input.KEY_RIGHT)) {
 			player.moveRight();
 			udpClient.sendStatus();
-		} else if(input.isKeyDown(Input.KEY_UP)) {
+		} 
+		
+		if(input.isKeyDown(Input.KEY_UP)) {
 			player.jump();
-		} else if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+		}
+		
+		if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
 			player.shoot();
 		}
+		
 		/* else if(input.isKeyDown(Input.KEY_UP)) {
 			player.incAngle();
 		} else if(input.isKeyDown(Input.KEY_DOWN)) {
@@ -139,8 +142,11 @@ public class CarWars extends BasicGame {
 		renderTerrain(g);
 		
 		for(Player p : Player.players.values()) {
-			renderPlayer(p, g);
+			if(!p.isDead()) {
+				renderPlayer(p, g);
+			}
 		}
+		
 		renderAddInfo(player, g);
 	}
 	
@@ -184,7 +190,8 @@ public class CarWars extends BasicGame {
 					Player p = Player.players.get(tok[0]);
 					p.update(Integer.parseInt(tok[1]),
 							 Integer.parseInt(tok[2]),
-							 Integer.parseInt(tok[3]));
+							 Integer.parseInt(tok[3]),
+							 Integer.parseInt(tok[4]));
 				}
 			}
 		}
@@ -240,6 +247,13 @@ public class CarWars extends BasicGame {
 		if(shooting) {
 			g.setColor(Color.orange);
 			g.fillRect(p.getX(), p.getY() + Player.CAR_HEIGHT + 7, remainingForce(p), 5);
+		}
+		
+		if(Config.DEBUG) {
+			g.setColor(Color.red);
+			g.draw(p.hitBox());
+			g.draw(p.leftHitBox());
+			g.draw(p.rightHitBox());
 		}
 	}
 	
