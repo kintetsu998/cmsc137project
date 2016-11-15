@@ -15,7 +15,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import carwars.util.Config;
+import carwars.util.Codes;
 
 public class ChatRoom extends JFrame implements ActionListener {
 
@@ -65,6 +65,7 @@ public class ChatRoom extends JFrame implements ActionListener {
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(800, 400);
+        setLocationRelativeTo(null);
     }
 
     public void append(String str) {
@@ -79,7 +80,7 @@ public class ChatRoom extends JFrame implements ActionListener {
             	System.out.println(message);
             	
             	//detects if the client tries to send a coded message
-            	if(message.startsWith("join: ") || message.equals(Config.START_CODE)) {
+            	if(message.startsWith("join: ") || Codes.codeExists(message)) {
             		this.append("Invalid message to send...");
             	}
             	//else it is a normal message

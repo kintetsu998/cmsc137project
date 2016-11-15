@@ -3,29 +3,55 @@ package carwars.chat;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.HashMap;
 
+import carwars.model.Queue;
+import carwars.util.Codes;
 import carwars.util.Config;
 
 public class Server extends Thread {
 	private ServerSocket serverSocket;
+	private DatagramSocket udpSocket;
 	private HashMap<String, Socket> sockets;
+	private Queue queue;
+	
+	private boolean hasStarted;
 
 	public Server(int port) throws IOException {
 		serverSocket = new ServerSocket(port);
+		udpSocket = new DatagramSocket(Config.UDP_SERVER_PORT);
 		sockets = new HashMap<>();
+		hasStarted = false;
 	}
 
 	public void run(){
 		System.out.println("Server waiting... ");
 
 		try{
+			new Thread() {
+				@Override
+				public void run() {
+					Server.this.udpReceive();
+				}
+			}.start();
+			
 			while(true){
 				final Socket server = serverSocket.accept();
-
+				
+				if(hasStarted) {
+					DataOutputStream out = new DataOutputStream(server.getOutputStream());
+					out.writeUTF("The game has already started.");
+				} else if(sockets.size() > Config.MAX_PLAYERS) {
+					DataOutputStream out = new DataOutputStream(server.getOutputStream());
+					out.writeUTF("The server's max players reached. Cannot accept anymore players.");
+				}
+				
 				new Thread(){
 					@Override
 					public void run(){
@@ -44,7 +70,7 @@ public class Server extends Thread {
 							out.writeUTF("You are now connected as " + name);
 							
 							//sends a list of names for the newly joined player
-							out.writeUTF("list: " + sendNames(name));
+							out.writeUTF("list: " + getNames());
 							
 							//sends the new name in case there are duplicates
 							out.writeUTF("name: " + name);
@@ -57,9 +83,15 @@ public class Server extends Thread {
 							
 							while(true) {
 								message = in.readUTF();
-								if(message.equals(Config.START_CODE)) {
+								if(message.equals(Codes.START_CODE)) {
 									Server.this.sendToAll(message, server);
-									System.out.println(message);
+									hasStarted = true;
+									
+									Server.this.queue = new Queue(getNames());
+									
+									Thread.sleep(1000);
+									Server.this.udpSend(queue.returnStatuses());
+									queue.start();
 								} else {
 									Server.this.sendToAll(name + ": " + message, server);
 								}
@@ -67,14 +99,8 @@ public class Server extends Thread {
 						} catch(SocketException e) {
 							Server.this.sendToAll(name + " has disconnected.", server);
 							sockets.remove(name);
-						} catch(IOException e) {
+						} catch (Exception e) {
 							e.printStackTrace();
-						} finally {
-							try{
-								server.close();
-							} catch(IOException e) {
-								e.printStackTrace();
-							}
 						}
 					}
 				}.start();
@@ -86,11 +112,15 @@ public class Server extends Thread {
 		System.out.println("Server closing...");
 	}
 	
-	private String sendNames(String name) {
+	private String getNames() {
 		String str = "";
 		
 		for(String s : sockets.keySet()) {
 			str += s + " ";
+		}
+		
+		if(Config.DEBUG) {
+			System.out.println(str);
 		}
 		
 		return str;
@@ -117,6 +147,10 @@ public class Server extends Thread {
 	}
 
 	private void sendToAll(String message, Socket socket) {
+		if(Config.DEBUG) {
+			System.out.println(message);
+		}
+		
 		for(String name : sockets.keySet()) {
 			Socket s = sockets.get(name);
 
@@ -135,10 +169,39 @@ public class Server extends Thread {
 		System.out.println("Using the Server class:");
 		System.out.println("java Server [port number]");
 	}
+	
+	public void udpReceive() {
+		DatagramPacket packet;
+		byte[] buf = new byte[Config.BUFFER_SIZE];
+		try{
+			while(true) {
+				String msg;
+				
+				packet = new DatagramPacket(buf, buf.length);
+				this.udpSocket.receive(packet);
+				
+				msg = new String(packet.getData(), 0, packet.getLength());
+				if(Config.DEBUG) {
+					System.out.println(msg);
+				}
+				Server.this.udpSend(msg);
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void udpSend(String msg) throws Exception {
+		byte[] buf = msg.getBytes();
+		InetAddress group = InetAddress.getByName(Config.UDP_SERVER_IP);
+		DatagramPacket packet = new DatagramPacket(buf, buf.length, group, Config.UDP_CLIENT_PORT);
+		
+		this.udpSocket.send(packet);
+	}
 
 	public static void main(String[] args) {
 		int port;
-
+		Server s = null;
 		try{
 			port = Integer.parseInt(args[0]);
 		} catch (Exception e) {
@@ -147,8 +210,8 @@ public class Server extends Thread {
 		}
 
 		try{
-			Thread t = new Server(port);
-			t.start();
+			s = new Server(port);
+			s.start();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;

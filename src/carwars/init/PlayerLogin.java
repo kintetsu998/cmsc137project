@@ -100,6 +100,7 @@ public class PlayerLogin extends JFrame implements ActionListener {
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(800, 600);
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 

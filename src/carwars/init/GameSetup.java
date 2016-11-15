@@ -61,6 +61,7 @@ public class GameSetup extends JPanel {
         
         //Display the window.
         frame.setSize(400, 600);
+        frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.setVisible(true);
         

@@ -14,6 +14,7 @@ import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.TrueTypeFont;
 
 import carwars.chat.Client;
+import carwars.chat.UDPClient;
 import carwars.model.Player;
 import carwars.model.Terrain;
 import carwars.util.Config;
@@ -21,13 +22,14 @@ import carwars.util.Config;
 public class CarWars extends BasicGame {
 	public int[][] terrainMap;
 	public SpriteSheet terrain;
-	public Player p;
+	public Player player;
 	public Image marker;
 	public TrueTypeFont ttf;
 	private String username;
 	private boolean shooting;
 	
 	private Client client;
+	private UDPClient udpClient;
 	
 	public CarWars(String title, Client c) {
 		super(title);
@@ -42,16 +44,28 @@ public class CarWars extends BasicGame {
 
 	@Override
 	public void init(GameContainer container) throws SlickException {
+		SpriteSheet p1Sheet = new SpriteSheet("resource/car1-sprites.png", 40, 30);
+		Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
+		udpClient = new UDPClient();
+		
+		try{
+			String statuses = udpClient.receive();
+			initStatuses(statuses, username);
+		} catch(Exception e) {
+			e.printStackTrace();
+			
+			player = new Player(this.username, 
+					new Animation(p1Sheet, Config.ANIM_SPEED), 
+					50, 
+					client, 
+					null
+			);
+		}
+		
 		terrainMap = Terrain.loadTerrain();
 		terrain = new SpriteSheet("resource/land-rescale.png", 
 				Terrain.TERR_SIZE, Terrain.TERR_SIZE);
-		
-		Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
 		ttf = new TrueTypeFont(font, true);
-		
-		SpriteSheet p1Sheet = new SpriteSheet("resource/car1-sprites.png", 40, 30);
-		
-		p = new Player(this.username, new Animation(p1Sheet, Config.ANIM_SPEED), 50, 0, client);
 		marker = new Image("resource/angle-rescale.png");
 		
 		for(int i=0, mapI=0; i<Config.MAP_HEIGHT; i++, mapI+=Terrain.TERR_SIZE) {
@@ -63,11 +77,13 @@ public class CarWars extends BasicGame {
 			}
 		}
 		
-		new Thread() {
-			public void run() {
-				p.fall();
-			}
-		}.start();
+		for(final Player p : Player.players) {
+			new Thread() {
+				public void run() {
+					p.fall();
+				}
+			}.start();
+		}
 	}
 	
 	@Override
@@ -76,19 +92,21 @@ public class CarWars extends BasicGame {
 		
 		shooting = false;
 		
-		p.getSpriteAnim().update(delta);
-		
-		if(input.isKeyDown(Input.KEY_LEFT) && p.isTurn()) {
-			p.moveLeft();
-		} else if(input.isKeyDown(Input.KEY_RIGHT) && p.isTurn()) {
-			p.moveRight();
-		} else if(input.isKeyDown(Input.KEY_UP)) {
-			p.incAngle();
-		} else if(input.isKeyDown(Input.KEY_DOWN)) {
-			p.decAngle();
-		} else if(input.isKeyDown(Input.KEY_SPACE)) {
-			shooting = true;
-			p.incForce();
+		for(Player p : Player.players) {
+			p.getSpriteAnim().update(delta);
+			
+			if(input.isKeyDown(Input.KEY_LEFT) && p.isTurn()) {
+				p.moveLeft();
+			} else if(input.isKeyDown(Input.KEY_RIGHT) && p.isTurn()) {
+				p.moveRight();
+			} else if(input.isKeyDown(Input.KEY_UP)) {
+				p.incAngle();
+			} else if(input.isKeyDown(Input.KEY_DOWN)) {
+				p.decAngle();
+			} else if(input.isKeyDown(Input.KEY_SPACE)) {
+				shooting = true;
+				p.incForce();
+			}
 		}
 	}
 	
@@ -96,7 +114,41 @@ public class CarWars extends BasicGame {
 	public void render(GameContainer container, Graphics g) throws SlickException {
 		setFont(g);
 		renderTerrain(g);
-		renderPlayer(p, g);
+		for(Player p : Player.players) {
+			renderPlayer(p, g);
+		}
+	}
+	
+	private void initStatuses(String msg, String username) throws SlickException{
+		SpriteSheet p1Sheet = new SpriteSheet("resource/car1-sprites.png", 40, 30);
+		String[] statuses = msg.split(",");
+		
+		System.out.println(statuses[0]);
+		
+		for(String status : statuses) {
+			if(!status.trim().equals("")){
+				String[] tok = status.trim().split(" ");
+				
+				System.out.println("0" + tok[0]);
+				System.out.println("1" + tok[1]);
+				
+				if(tok[0].equals(username)) {
+					player = new Player(tok[0], 
+							new Animation(p1Sheet, Config.ANIM_SPEED),
+							Integer.parseInt(tok[1]),
+							client,
+							udpClient
+					);
+				} else {
+					new Player(tok[0], 
+							new Animation(p1Sheet, Config.ANIM_SPEED),
+							Integer.parseInt(tok[1]),
+							client,
+							udpClient
+					);
+				}
+			}
+		}
 	}
 	
 	private void setFont(Graphics g) {
