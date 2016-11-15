@@ -12,7 +12,7 @@ import java.net.SocketException;
 import java.util.HashMap;
 
 import carwars.model.Queue;
-import carwars.util.Codes;
+import carwars.util.Code;
 import carwars.util.Config;
 
 public class Server extends Thread {
@@ -34,13 +34,6 @@ public class Server extends Thread {
 		System.out.println("Server waiting... ");
 
 		try{
-			new Thread() {
-				@Override
-				public void run() {
-					Server.this.udpReceive();
-				}
-			}.start();
-			
 			while(true){
 				final Socket server = serverSocket.accept();
 				
@@ -83,15 +76,22 @@ public class Server extends Thread {
 							
 							while(true) {
 								message = in.readUTF();
-								if(message.equals(Codes.START_CODE)) {
+								if(message.equals(Code.START_CODE)) {
 									Server.this.sendToAll(message, server);
 									hasStarted = true;
 									
 									Server.this.queue = new Queue(getNames());
 									
-									Thread.sleep(1000);
-									Server.this.udpSend(queue.returnStatuses());
+									new Thread() {
+										@Override
+										public void run() {
+											Server.this.udpReceive();
+										}
+									}.start();
+									
 									queue.start();
+									
+									System.out.println("Game has started.");
 								} else {
 									Server.this.sendToAll(name + ": " + message, server);
 								}
@@ -119,10 +119,6 @@ public class Server extends Thread {
 			str += s + " ";
 		}
 		
-		if(Config.DEBUG) {
-			System.out.println(str);
-		}
-		
 		return str;
 	}
 
@@ -146,11 +142,7 @@ public class Server extends Thread {
 		return name;
 	}
 
-	private void sendToAll(String message, Socket socket) {
-		if(Config.DEBUG) {
-			System.out.println(message);
-		}
-		
+	private void sendToAll(String message, Socket socket) {		
 		for(String name : sockets.keySet()) {
 			Socket s = sockets.get(name);
 
@@ -173,6 +165,21 @@ public class Server extends Thread {
 	public void udpReceive() {
 		DatagramPacket packet;
 		byte[] buf = new byte[Config.BUFFER_SIZE];
+		
+		new Thread() {
+			@Override
+			public void run() {
+				while(true) {
+					try{
+						Server.this.udpSend(Code.GET_ALL_STATUS + queue.returnStatuses());
+						Thread.sleep(100);
+					} catch(Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}.start();
+		
 		try{
 			while(true) {
 				String msg;
@@ -181,9 +188,9 @@ public class Server extends Thread {
 				this.udpSocket.receive(packet);
 				
 				msg = new String(packet.getData(), 0, packet.getLength());
-				if(Config.DEBUG) {
-					System.out.println(msg);
-				}
+				
+				System.out.println(msg);
+				
 				Server.this.udpSend(msg);
 			}
 		} catch(Exception e) {
