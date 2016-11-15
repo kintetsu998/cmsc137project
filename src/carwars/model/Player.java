@@ -1,16 +1,15 @@
 package carwars.model;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.geom.Rectangle;
 
 import carwars.chat.Client;
-import carwars.chat.UDPClient;
 import carwars.util.Config;
 
-public class Player extends Entity implements Runnable{
-	public static final ArrayList<Player> players = new ArrayList<>();
+public class Player extends Entity {
+	public static final HashMap<String, Player> players = new HashMap<>();
 	public static final int RIGHT = 0;
 	public static final int LEFT = 1;
 	
@@ -40,7 +39,6 @@ public class Player extends Entity implements Runnable{
 	private boolean turn;
 	
 	private Client tcpClient;
-	private UDPClient udpClient;
 	
 	/** CONSTRUCTOR **/	
 	public Player(String name, Animation sprite_file, int x) {
@@ -58,12 +56,11 @@ public class Player extends Entity implements Runnable{
 		this.turn = false;
 		
 		this.tcpClient = null;
-		this.udpClient = null;
 		
-		players.add(this);
+		players.put(name, this);
 	}
 	
-	public Player(String name, Animation sprite_file, int x, Client c, UDPClient u) {
+	public Player(String name, Animation sprite_file, int x, Client c) {
 		super(x, 0);
 		this.name = name;
 		this.spriteAnim = sprite_file;
@@ -78,25 +75,16 @@ public class Player extends Entity implements Runnable{
 		this.turn = false;
 		
 		this.tcpClient = c;
-		this.udpClient = u;
 		
-		players.add(this);
+		players.put(name, this);
 	}
 	
-	@Override
-	public void run() {
-		while(true) {
-			try {
-				Player.this.udpClient.receive();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
 	public void moveRight(){
 		this.front = RIGHT;
-		if(!Player.intersectsTerrain(this.rightHitBox()) && this.getX() <= Config.GAME_WIDTH - CAR_WIDTH
-				&& this.movement > 0) {
+		if(!Player.intersectsTerrain(this.rightHitBox()) 
+				&& this.getX() <= Config.GAME_WIDTH - CAR_WIDTH
+				&& this.movement > 0
+				&& this.turn) {
 			this.setX(this.getX()+CAR_SPEED);
 			this.movement -= CAR_SPEED;
 		}
@@ -104,8 +92,10 @@ public class Player extends Entity implements Runnable{
 	
 	public void moveLeft(){
 		this.front = LEFT;
-		if(!Player.intersectsTerrain(this.leftHitBox()) && this.getX() >= 0
-				&& this.movement > 0){
+		if(!Player.intersectsTerrain(this.leftHitBox()) 
+				&& this.getX() >= 0
+				&& this.movement > 0
+				&& this.turn) {
 			this.setX(this.getX()-CAR_SPEED);
 			this.movement -= CAR_SPEED;
 		}
@@ -182,9 +172,15 @@ public class Player extends Entity implements Runnable{
 		this.force = (this.force < MAX_FORCE)? this.force + 1: this.force;
 	}
 	
+	public void update(int x, int hp, int front) {
+		this.setX(x);
+		this.hp = hp;
+		this.front = front;
+	}
+	
 	@Override
 	public String toString() {
-		return this.name + " " + this.getX();
+		return this.name + " " + this.getX() + " " + this.hp + " " + this.front;
 	}
 	
 	/** GETTERS **/
@@ -194,10 +190,6 @@ public class Player extends Entity implements Runnable{
 	
 	public Client getTCPClient() {
 		return this.tcpClient;
-	}
-	
-	public UDPClient getUDPSocket() {
-		return this.udpClient;
 	}
 	
 	public int getFront() {

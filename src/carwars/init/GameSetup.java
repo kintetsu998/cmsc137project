@@ -10,6 +10,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -23,6 +24,7 @@ import org.newdawn.slick.SlickException;
 
 import carwars.chat.Client;
 import carwars.game.CarWars;
+import carwars.util.Config;
  
 public class GameSetup extends JPanel {
 	public final static String WINDOW_TITLE_GAME_SETUP = "Car Wars - Game Setup";
@@ -51,7 +53,7 @@ public class GameSetup extends JPanel {
         //Create and set up the window.
         frame = new JFrame(WINDOW_TITLE_GAME_SETUP);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setAlwaysOnTop(true);
+        
         //Create and set up the content pane.
         addComponents(pl.getUsername());
         //addPlayer(pl.getClient().getName());
@@ -87,8 +89,12 @@ public class GameSetup extends JPanel {
         startGameButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				GameSetup.this.client.startGame();
-				GameSetup.this.startGame(client);
+				if(tableModel.getRowCount() >= Config.MIN_PLAYERS) {
+					GameSetup.this.client.startGame();
+					GameSetup.this.startGame(client);
+				} else {
+					JOptionPane.showMessageDialog(frame, "Wait for more players...");
+				}
 			}
 		});
  

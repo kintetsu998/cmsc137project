@@ -3,19 +3,21 @@ package carwars.model;
 import java.util.ArrayList;
 import java.util.Random;
 
-import org.newdawn.slick.Animation;
-
 import carwars.util.Config;
 
 public class Queue extends ArrayList<Player> {
 	private static final long serialVersionUID = 1L;
-
+	
 	public Queue(String pNames) {
 		String[] tok = pNames.split(" ");
 		Random r = new Random();
 		
 		for(String s : tok) {
-			this.add(new Player(s, new Animation(), r.nextInt(Config.MAP_WIDTH), null, null));
+			this.add(new Player(s, 
+					null, 
+					r.nextInt(Config.GAME_WIDTH - Player.CAR_WIDTH), 
+					null)
+			);
 		}
 	}
 	

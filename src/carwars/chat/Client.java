@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import carwars.init.GameSetup;
-import carwars.util.Codes;
+import carwars.util.Code;
 
 public class Client {
     
@@ -82,7 +82,7 @@ public class Client {
                             	hasList = true;
                             }
                             //receives a code that should start the game;
-                            else if(reply.equals(Codes.START_CODE)) {
+                            else if(reply.equals(Code.START_CODE)) {
                             	gs.startGame(Client.this);
                             }
                             //else, no code detected. display the message on screen
@@ -128,7 +128,7 @@ public class Client {
     
     public void startGame() {
     	try {
-            out.writeUTF(Codes.START_CODE);
+            out.writeUTF(Code.START_CODE);
         }
         catch(IOException e) {
             display("Exception sending to server: " + e);

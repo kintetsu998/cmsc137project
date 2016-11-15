@@ -17,6 +17,7 @@ import carwars.chat.Client;
 import carwars.chat.UDPClient;
 import carwars.model.Player;
 import carwars.model.Terrain;
+import carwars.util.Code;
 import carwars.util.Config;
 
 public class CarWars extends BasicGame {
@@ -44,23 +45,18 @@ public class CarWars extends BasicGame {
 
 	@Override
 	public void init(GameContainer container) throws SlickException {
-		SpriteSheet p1Sheet = new SpriteSheet("resource/car1-sprites.png", 40, 30);
 		Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
-		udpClient = new UDPClient();
+		udpClient = new UDPClient(this);
 		
 		try{
 			String statuses = udpClient.receive();
 			initStatuses(statuses, username);
+			udpClient.setPlayer(player);
 		} catch(Exception e) {
 			e.printStackTrace();
-			
-			player = new Player(this.username, 
-					new Animation(p1Sheet, Config.ANIM_SPEED), 
-					50, 
-					client, 
-					null
-			);
 		}
+		
+		udpClient.start();
 		
 		terrainMap = Terrain.loadTerrain();
 		terrain = new SpriteSheet("resource/land-rescale.png", 
@@ -77,7 +73,7 @@ public class CarWars extends BasicGame {
 			}
 		}
 		
-		for(final Player p : Player.players) {
+		for(final Player p : Player.players.values()) {
 			new Thread() {
 				public void run() {
 					p.fall();
@@ -92,21 +88,21 @@ public class CarWars extends BasicGame {
 		
 		shooting = false;
 		
-		for(Player p : Player.players) {
+		if(input.isKeyDown(Input.KEY_LEFT)) {
+			player.moveLeft();
+		} else if(input.isKeyDown(Input.KEY_RIGHT)) {
+			player.moveRight();
+		} else if(input.isKeyDown(Input.KEY_UP)) {
+			player.incAngle();
+		} else if(input.isKeyDown(Input.KEY_DOWN)) {
+			player.decAngle();
+		} else if(input.isKeyDown(Input.KEY_SPACE) && player.isTurn()) {
+			shooting = true;
+			player.incForce();
+		}
+		
+		for(Player p : Player.players.values()) {
 			p.getSpriteAnim().update(delta);
-			
-			if(input.isKeyDown(Input.KEY_LEFT) && p.isTurn()) {
-				p.moveLeft();
-			} else if(input.isKeyDown(Input.KEY_RIGHT) && p.isTurn()) {
-				p.moveRight();
-			} else if(input.isKeyDown(Input.KEY_UP)) {
-				p.incAngle();
-			} else if(input.isKeyDown(Input.KEY_DOWN)) {
-				p.decAngle();
-			} else if(input.isKeyDown(Input.KEY_SPACE)) {
-				shooting = true;
-				p.incForce();
-			}
 		}
 	}
 	
@@ -114,38 +110,53 @@ public class CarWars extends BasicGame {
 	public void render(GameContainer container, Graphics g) throws SlickException {
 		setFont(g);
 		renderTerrain(g);
-		for(Player p : Player.players) {
+		
+		for(Player p : Player.players.values()) {
 			renderPlayer(p, g);
 		}
 	}
 	
 	private void initStatuses(String msg, String username) throws SlickException{
 		SpriteSheet p1Sheet = new SpriteSheet("resource/car1-sprites.png", 40, 30);
-		String[] statuses = msg.split(",");
-		
-		System.out.println(statuses[0]);
+		String[] statuses = msg.replace(Code.GET_ALL_STATUS, "").split(",");
 		
 		for(String status : statuses) {
 			if(!status.trim().equals("")){
 				String[] tok = status.trim().split(" ");
 				
-				System.out.println("0" + tok[0]);
-				System.out.println("1" + tok[1]);
-				
 				if(tok[0].equals(username)) {
 					player = new Player(tok[0], 
 							new Animation(p1Sheet, Config.ANIM_SPEED),
 							Integer.parseInt(tok[1]),
-							client,
-							udpClient
+							client
 					);
 				} else {
 					new Player(tok[0], 
 							new Animation(p1Sheet, Config.ANIM_SPEED),
 							Integer.parseInt(tok[1]),
-							client,
-							udpClient
+							client
 					);
+				}
+			}
+		}
+	}
+	
+	public void updateStatuses(String msg, String name) throws SlickException{
+		String[] statuses = msg.replace(Code.GET_ALL_STATUS, "").trim().split(",");
+		
+		if(Player.players.size() <= 0) {
+			return;
+		}
+		
+		for(String status : statuses) {
+			if(!status.trim().equals("")){
+				String[] tok = status.trim().split(" ");
+				
+				if(!name.equals(tok[0])) {
+					Player p = Player.players.get(tok[0]);
+					p.update(Integer.parseInt(tok[1]),
+							Integer.parseInt(tok[2]),
+							Integer.parseInt(tok[3]));
 				}
 			}
 		}
