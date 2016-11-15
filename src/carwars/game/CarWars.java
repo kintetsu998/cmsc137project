@@ -90,20 +90,47 @@ public class CarWars extends BasicGame {
 		
 		if(input.isKeyDown(Input.KEY_LEFT)) {
 			player.moveLeft();
+			udpClient.sendStatus();
 		} else if(input.isKeyDown(Input.KEY_RIGHT)) {
 			player.moveRight();
+			udpClient.sendStatus();
 		} else if(input.isKeyDown(Input.KEY_UP)) {
+			player.jump();
+		} else if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+			player.shoot();
+		}
+		/* else if(input.isKeyDown(Input.KEY_UP)) {
 			player.incAngle();
 		} else if(input.isKeyDown(Input.KEY_DOWN)) {
 			player.decAngle();
-		} else if(input.isKeyDown(Input.KEY_SPACE) && player.isTurn()) {
+		} else if(input.isKeyDown(Input.KEY_SPACE)) { //&& player.isTurn()) {
 			shooting = true;
 			player.incForce();
-		}
+		}*/
+		
+		player.setAngle(getPlayerAngle(player, input.getMouseX(), input.getMouseY()));
+		player.setForce(getPlayerForce(player, input.getMouseX(), input.getMouseY()));
+		
 		
 		for(Player p : Player.players.values()) {
 			p.getSpriteAnim().update(delta);
 		}
+	}
+	
+	private float getPlayerAngle(Player p, int x, int y) {
+		int xdist = (int) p.getX()-x;
+		int ydist = (int) (p.getY()-y) * -1;
+		float angle = (float) Math.toDegrees(Math.atan((float) ydist/xdist));
+		
+		return angle;
+	}
+	
+	private float getPlayerForce(Player p, int x, int y) {
+		int xdist = (int) p.getX()-x;
+		int ydist = (int) p.getY()-y;
+		float force = (float) Math.sqrt(xdist*xdist - ydist*ydist);
+		
+		return force;
 	}
 	
 	@Override
@@ -114,6 +141,7 @@ public class CarWars extends BasicGame {
 		for(Player p : Player.players.values()) {
 			renderPlayer(p, g);
 		}
+		renderAddInfo(player, g);
 	}
 	
 	private void initStatuses(String msg, String username) throws SlickException{
@@ -155,8 +183,8 @@ public class CarWars extends BasicGame {
 				if(!name.equals(tok[0])) {
 					Player p = Player.players.get(tok[0]);
 					p.update(Integer.parseInt(tok[1]),
-							Integer.parseInt(tok[2]),
-							Integer.parseInt(tok[3]));
+							 Integer.parseInt(tok[2]),
+							 Integer.parseInt(tok[3]));
 				}
 			}
 		}
@@ -175,23 +203,13 @@ public class CarWars extends BasicGame {
 		terrain.endUse();
 	}
 
-	
 	private void renderPlayer(Player p, Graphics g) {
-		Image markerCopy;
 		
 		g.setColor(Color.black);
 		if(p.getFront() == Player.RIGHT) {
 			p.getSpriteAnim().draw(p.getX(), p.getY());
-			markerCopy = marker.copy();
-			markerCopy.rotate(-1 * p.getAngle());
-			markerCopy.draw(p.getX()-Player.CAR_WIDTH*2/3, p.getY() + Player.CAR_HEIGHT/4);
-			g.drawString(Integer.toString(p.getAngle()), p.getX() + Player.CAR_WIDTH, p.getY());
 		} else {
 			p.getSpriteAnim().getCurrentFrame().getFlippedCopy(true, false).draw(p.getX(), p.getY());
-			markerCopy = marker.getFlippedCopy(true,false);
-			markerCopy.rotate(p.getAngle());
-			markerCopy.draw(p.getX()-Player.CAR_WIDTH, p.getY() + Player.CAR_HEIGHT/4);
-			g.drawString(Integer.toString(p.getAngle()), p.getX()-Player.CAR_WIDTH/5, p.getY());
 		}
 		
 		g.drawString(p.getName(), p.getX(), p.getY() - 15);
@@ -199,9 +217,25 @@ public class CarWars extends BasicGame {
 		
 		g.setColor(Color.green);
 		g.fillRect(p.getX(), p.getY() + Player.CAR_HEIGHT, remainingHP(p), 5);
+	}
+	
+	private void renderAddInfo(Player p, Graphics g) {
+		Image markerCopy;
+		/*g.setColor(Color.white);
+		g.fillRect(p.getX(), p.getY() + Player.CAR_HEIGHT + 14, remainingMov(p), 5);*/
 		
-		g.setColor(Color.white);
-		g.fillRect(p.getX(), p.getY() + Player.CAR_HEIGHT + 14, remainingMov(p), 5);
+		g.setColor(Color.black);
+		if(p.getFront() == Player.RIGHT) {
+			markerCopy = marker.copy();
+			markerCopy.rotate(p.getAngle() * -1);
+			markerCopy.draw(p.getX()-Player.CAR_WIDTH*2/3, p.getY() + Player.CAR_HEIGHT/4);
+			//g.drawString(Integer.toString(p.getAngle()), p.getX() + Player.CAR_WIDTH, p.getY());
+		} else {
+			markerCopy = marker.getFlippedCopy(true,false);
+			markerCopy.rotate(p.getAngle() * -1);
+			markerCopy.draw(p.getX()-Player.CAR_WIDTH, p.getY() + Player.CAR_HEIGHT/4);
+			//g.drawString(Integer.toString(p.getAngle()), p.getX()-Player.CAR_WIDTH/5, p.getY());
+		}
 		
 		if(shooting) {
 			g.setColor(Color.orange);

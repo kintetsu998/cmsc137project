@@ -81,14 +81,6 @@ public class UDPClient extends Thread{
 	}
 	
 	public void run() {
-		new Thread() {
-			@Override
-			public void run() {
-				while(player == null){}
-				UDPClient.this.sendStatus();
-			}
-		}.start();
-		
 		while(true) {
 			try {
 				this.receive();
@@ -99,7 +91,7 @@ public class UDPClient extends Thread{
 	}
 	
 	public void sendStatus() {
-		while(!player.isDead()) {
+		if(!player.isDead()) {
 			this.send(Code.UPDATE_STATUS + player.toString());
 		}
 	}

@@ -78,7 +78,9 @@ public class Server extends Thread {
 								message = in.readUTF();
 								if(message.equals(Code.START_CODE)) {
 									Server.this.sendToAll(message, server);
-									hasStarted = true;
+									if(!Config.DEBUG) {
+										hasStarted = true;
+									}
 									
 									Server.this.queue = new Queue(getNames());
 									
