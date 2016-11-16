@@ -25,4 +25,6 @@ public class Config {
 	
 	static public final int MAX_PLAYERS = 8;
 	static public final int MIN_PLAYERS = 2;
+
+	public static final long JUMP_REST = 200;
 }

@@ -122,7 +122,7 @@ public class Player extends Entity {
 				this.vertSpeed = 0;
 				
 				try{
-					Thread.sleep(250);
+					Thread.sleep(Config.JUMP_REST);
 				} catch(Exception e) {
 					Thread.currentThread().interrupt();
 				}
