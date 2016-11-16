@@ -39,8 +39,8 @@ public class Player extends Entity {
 	private float angle;
 	
 	private boolean turn;
+	private boolean goingUp;
 	private boolean jumping;
-	private boolean hasJumped;
 	
 	private Client tcpClient;
 	
@@ -58,8 +58,8 @@ public class Player extends Entity {
 		this.vertSpeed = 0;
 		
 		this.turn = false;
+		this.goingUp = false;
 		this.jumping = false;
-		this.hasJumped = false;
 		
 		this.tcpClient = null;
 		
@@ -79,8 +79,8 @@ public class Player extends Entity {
 		this.vertSpeed = 0;
 		
 		this.turn = false;
+		this.goingUp = false;
 		this.jumping = false;
-		this.hasJumped = false;
 		
 		this.tcpClient = c;
 		
@@ -113,13 +113,13 @@ public class Player extends Entity {
 		while(!this.isDead()) {
 			boolean intersects = Player.intersectsTerrain(this.hitBox());
 			
-			if(intersects && !jumping){
+			if(intersects && !goingUp){
 				while(Player.intersectsTerrain(this.hitBox())) {
 					this.setY(this.getY()-1);
 					client.sendStatus();
 				}
 				this.setY(this.getY()+1);
-				this.hasJumped = false;
+				this.jumping = false;
 				//this.vertSpeed = 0;
 			} else if(this.getY() >= Config.GAME_HEIGHT-CAR_HEIGHT) {
 				this.damage(MAX_HP);
@@ -130,7 +130,7 @@ public class Player extends Entity {
 						Config.TERMINAL_SPEED;
 				
 				if(vertSpeed >= 0) {
-					jumping = false;
+					goingUp = false;
 				}
 				
 				if(this.getY() <= Config.GAME_HEIGHT-CAR_HEIGHT)
@@ -175,10 +175,10 @@ public class Player extends Entity {
 	}
 	
 	public void jump() {
-		if(!hasJumped) {
+		if(!jumping) {
 			this.vertSpeed = JUMP_SPEED;
+			goingUp = true;
 			jumping = true;
-			hasJumped = true;
 		}
 	}
 	

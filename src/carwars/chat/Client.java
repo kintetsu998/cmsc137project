@@ -7,6 +7,7 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import carwars.game.CarWars;
 import carwars.init.GameSetup;
 import carwars.util.Code;
 
@@ -22,6 +23,7 @@ public class Client {
     private String server;
     private Socket sock;
     private ArrayList<String> pNames;
+    private CarWars game;
     
     private boolean hasName;
     private boolean hasList;
@@ -32,9 +34,14 @@ public class Client {
         this.port = port;
         
         this.pNames = new ArrayList<>();
+        this.game = null;
         
         this.hasName = false;
         this.hasList = false;
+    }
+    
+    public void setGame(CarWars g) {
+    	this.game = g;
     }
 
     public boolean connect() {
@@ -88,10 +95,13 @@ public class Client {
                             //else, no code detected. display the message on screen
                             else {
                             	display(reply);
+                            	if(game != null) {
+                            		game.updateChat(reply);
+                            	}
                             }
                         }
                     } catch(Exception e1) {
-                        display("Exception in thread: " + e1);
+                        e1.printStackTrace();
                     }
                 }
                 
@@ -103,14 +113,11 @@ public class Client {
                 	}
                 }
             }.start();
-
         } catch (ConnectException e2) {
-            display("Exception connecting to server: " + e2);
-            System.out.println(e2);
+            e2.printStackTrace();
             return false;
         } catch (IOException e3) {
-            // e.printStackTrace();
-            display("Exception in server/port I/O: " + e3);
+            e3.printStackTrace();
             return false;
         }
         return true;
@@ -120,6 +127,9 @@ public class Client {
         try {
             out.writeUTF(message);
             display(name + ": " + message);
+            if(game != null) {
+        		game.updateChat(name + ": " + message);
+        	}
         }
         catch(IOException e) {
             display("Exception sending to server: " + e);

@@ -1,6 +1,8 @@
 package carwars.game;
 
 import java.awt.Font;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.BasicGame;
@@ -27,10 +29,15 @@ public class CarWars extends BasicGame {
 	public Image marker;
 	public TrueTypeFont ttf;
 	private String username;
-	private boolean shooting;
 	
 	private Client client;
 	private UDPClient udpClient;
+	
+	//private boolean shooting;
+	
+	private boolean chatting;
+	
+	private ArrayList<String> messages;
 	
 	public CarWars(String title, Client c) {
 		super(title);
@@ -47,6 +54,7 @@ public class CarWars extends BasicGame {
 	public void init(GameContainer container) throws SlickException {
 		Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
 		udpClient = new UDPClient(this);
+		messages = new ArrayList<>(Arrays.asList("A","Quick","Brown","Fox"));
 		
 		try{
 			String statuses = udpClient.receive();
@@ -57,6 +65,7 @@ public class CarWars extends BasicGame {
 		}
 		
 		udpClient.start();
+		client.setGame(this);
 		
 		terrainMap = Terrain.loadTerrain();
 		terrain = new SpriteSheet("resource/land-rescale.png", 
@@ -73,33 +82,59 @@ public class CarWars extends BasicGame {
 			}
 		}
 		
+		chatting = false;
+		
 		new Thread() {
 			public void run() {
 				player.fall(udpClient);
 			}
 		}.start();
+		
+		/*new Thread() {
+			public void run() {
+				while(true) {
+					updateChat(messages.get(0));
+					try{
+						Thread.sleep(1000);
+					} catch(Exception e){}
+				}
+			}
+		}.start();*/
 	}
 	
 	@Override
 	public void update(GameContainer container, int delta) throws SlickException {
 		Input input = container.getInput();
 		
-		shooting = false;
+		//shooting = false;
 		
-		if(input.isKeyDown(Input.KEY_LEFT)) {
-			player.moveLeft();
-			udpClient.sendStatus();
-		} else if(input.isKeyDown(Input.KEY_RIGHT)) {
-			player.moveRight();
-			udpClient.sendStatus();
-		} 
-		
-		if(input.isKeyDown(Input.KEY_UP)) {
-			player.jump();
-		}
-		
-		if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
-			player.shoot();
+		if(!chatting) {
+			if(input.isKeyDown(Input.KEY_LEFT)) {
+				player.moveLeft();
+				udpClient.sendStatus();
+			} else if(input.isKeyDown(Input.KEY_RIGHT)) {
+				player.moveRight();
+				udpClient.sendStatus();
+			} else if(input.isKeyPressed(Input.KEY_ENTER)) {
+				chatting = true;
+			}
+			
+			if(input.isKeyDown(Input.KEY_UP)) {
+				player.jump();
+			}
+			
+			if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+				player.shoot();
+			}
+			
+			player.setAngle(getPlayerAngle(player, input.getMouseX(), input.getMouseY()));
+			player.setForce(getPlayerForce(player, input.getMouseX(), input.getMouseY()));
+		} else {
+			if(input.isKeyPressed(Input.KEY_ENTER)) {
+				chatting = false;
+			} else if(input.isKeyPressed(Input.KEY_ESCAPE)) {
+				chatting = false;
+			}
 		}
 		
 		/* else if(input.isKeyDown(Input.KEY_UP)) {
@@ -110,9 +145,6 @@ public class CarWars extends BasicGame {
 			shooting = true;
 			player.incForce();
 		}*/
-		
-		player.setAngle(getPlayerAngle(player, input.getMouseX(), input.getMouseY()));
-		player.setForce(getPlayerForce(player, input.getMouseX(), input.getMouseY()));
 		
 		
 		for(Player p : Player.players.values()) {
@@ -131,7 +163,7 @@ public class CarWars extends BasicGame {
 	private float getPlayerForce(Player p, int x, int y) {
 		int xdist = (int) p.getX()-x;
 		int ydist = (int) p.getY()-y;
-		float force = (float) Math.sqrt(xdist*xdist - ydist*ydist);
+		float force = (float) Math.sqrt(xdist*xdist + ydist*ydist);
 		
 		return force;
 	}
@@ -148,6 +180,7 @@ public class CarWars extends BasicGame {
 		}
 		
 		renderAddInfo(player, g);
+		renderChat(g);
 	}
 	
 	private void initStatuses(String msg, String username) throws SlickException{
@@ -211,7 +244,6 @@ public class CarWars extends BasicGame {
 	}
 
 	private void renderPlayer(Player p, Graphics g) {
-		
 		g.setColor(Color.black);
 		if(p.getFront() == Player.RIGHT) {
 			p.getSpriteAnim().draw(p.getX(), p.getY());
@@ -244,9 +276,13 @@ public class CarWars extends BasicGame {
 			//g.drawString(Integer.toString(p.getAngle()), p.getX()-Player.CAR_WIDTH/5, p.getY());
 		}
 		
-		if(shooting) {
+		/*if(shooting) {
 			g.setColor(Color.orange);
 			g.fillRect(p.getX(), p.getY() + Player.CAR_HEIGHT + 7, remainingForce(p), 5);
+		}*/
+		
+		if(chatting) {
+			g.drawString("Chatting...", 50, 50);
 		}
 		
 		if(Config.DEBUG) {
@@ -255,6 +291,21 @@ public class CarWars extends BasicGame {
 			g.draw(p.leftHitBox());
 			g.draw(p.rightHitBox());
 		}
+	}
+	
+	private void renderChat(Graphics g) {
+		int y = 10;
+		
+		g.setColor(Color.black);
+		for(int i=0; i<messages.size(); i++) {
+			g.drawString(messages.get(i), 10, y);
+			y += 15;
+		}
+	}
+	
+	public void updateChat(String msg) {
+		messages.remove(0);
+		messages.add(msg);
 	}
 	
 	private float remainingHP(Player p) {
