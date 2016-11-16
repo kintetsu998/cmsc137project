@@ -109,17 +109,17 @@ public class CarWars extends BasicGame {
 		//shooting = false;
 		
 		if(!chatting) {
-			if(input.isKeyDown(Input.KEY_LEFT)) {
+			if(input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
 				player.moveLeft();
 				udpClient.sendStatus();
-			} else if(input.isKeyDown(Input.KEY_RIGHT)) {
+			} else if(input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
 				player.moveRight();
 				udpClient.sendStatus();
 			} else if(input.isKeyPressed(Input.KEY_ENTER)) {
 				chatting = true;
 			}
 			
-			if(input.isKeyDown(Input.KEY_UP)) {
+			if(input.isKeyDown(Input.KEY_UP) || input.isKeyDown(Input.KEY_W)) {
 				player.jump();
 			}
 			
@@ -184,8 +184,11 @@ public class CarWars extends BasicGame {
 	}
 	
 	private void initStatuses(String msg, String username) throws SlickException{
-		SpriteSheet p1Sheet = new SpriteSheet("resource/car1-sprites.png", 40, 30);
+		ArrayList<SpriteSheet> playerSprites = new ArrayList<>();
 		String[] statuses = msg.replace(Code.GET_ALL_STATUS, "").split(",");
+		int i=0;
+		
+		initPlayerSprites(playerSprites);
 		
 		for(String status : statuses) {
 			if(!status.trim().equals("")){
@@ -193,18 +196,29 @@ public class CarWars extends BasicGame {
 				
 				if(tok[0].equals(username)) {
 					player = new Player(tok[0], 
-							new Animation(p1Sheet, Config.ANIM_SPEED),
+							new Animation(playerSprites.get(i), Config.ANIM_SPEED),
 							Integer.parseInt(tok[1]),
 							client
 					);
 				} else {
 					new Player(tok[0], 
-							new Animation(p1Sheet, Config.ANIM_SPEED),
+							new Animation(playerSprites.get(i), Config.ANIM_SPEED),
 							Integer.parseInt(tok[1]),
 							client
 					);
 				}
+				i++;
 			}
+		}
+	}
+	
+	private void initPlayerSprites(ArrayList<SpriteSheet> playerSprite) throws SlickException{
+		for(int i=1; i <= Config.MAX_PLAYERS; i++) {
+			String filename = "resource/sprites/car" 
+					+ Integer.toString(i)
+					+ "-sprites.png";
+			
+			playerSprite.add(new SpriteSheet(filename, 40, 30));
 		}
 	}
 	
@@ -312,13 +326,13 @@ public class CarWars extends BasicGame {
 		return getBarWidth(p.getHP(), Player.MAX_HP, Player.CAR_WIDTH);
 	}
 	
-	private float remainingMov(Player p) {
+	/*private float remainingMov(Player p) {
 		return getBarWidth(p.getMovement(), Player.CAR_MAX_DIST, Player.CAR_WIDTH);
 	}
 	
 	private float remainingForce(Player p) {
 		return getBarWidth(p.getForce(), Player.MAX_FORCE, Player.CAR_WIDTH);
-	}
+	}*/
 	
 	private float getBarWidth(float rem, float max, float width) {
 		return Math.max(((float) rem/max)*width, 0);

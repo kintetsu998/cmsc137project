@@ -176,7 +176,7 @@ public class Server extends Thread {
 						Server.this.udpSend(Code.GET_ALL_STATUS + queue.returnStatuses());
 						Thread.sleep(100);
 					} catch(Exception e) {
-						e.printStackTrace();
+						Thread.currentThread().interrupt();
 					}
 				}
 			}

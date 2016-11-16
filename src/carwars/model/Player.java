@@ -119,8 +119,14 @@ public class Player extends Entity {
 					client.sendStatus();
 				}
 				this.setY(this.getY()+1);
-				this.jumping = false;
-				//this.vertSpeed = 0;
+				this.vertSpeed = 0;
+				
+				try{
+					Thread.sleep(250);
+				} catch(Exception e) {
+					Thread.currentThread().interrupt();
+				}
+				Player.this.jumping = false;
 			} else if(this.getY() >= Config.GAME_HEIGHT-CAR_HEIGHT) {
 				this.damage(MAX_HP);
 				this.end();
@@ -142,7 +148,7 @@ public class Player extends Entity {
 			try{
 				Thread.sleep(20);
 			} catch(Exception e) {
-				e.printStackTrace();
+				Thread.currentThread().interrupt();
 			}
 		}
 	}
