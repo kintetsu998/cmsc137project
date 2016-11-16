@@ -142,7 +142,7 @@ public class Server extends Thread {
 		return name;
 	}
 
-	private void sendToAll(String message, Socket socket) {		
+	public void sendToAll(String message, Socket socket) {		
 		for(String name : sockets.keySet()) {
 			Socket s = sockets.get(name);
 

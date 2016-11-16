@@ -120,6 +120,7 @@ public class Client {
         try {
             out.writeUTF(message);
             display(name + ": " + message);
+
         }
         catch(IOException e) {
             display("Exception sending to server: " + e);
@@ -154,6 +155,10 @@ public class Client {
     public void setName(String n){
         name = n;
     }
+    
+    public Socket getSocket(){
+    	return this.sock;
+    }
 
     // public static void main(String[] args) {
     //     Scanner sc = new Scanner(System.in);
@@ -182,6 +187,7 @@ public class Client {
 
     public void display(String msg) {
         gui.append(msg + "\n");      // append to the PlayerLogin JTextArea (or whatever)
+        gs.displayInChat(msg + "\n");
     }
     
     public ChatRoom getChatRoom() {

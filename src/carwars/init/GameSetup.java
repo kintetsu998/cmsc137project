@@ -1,6 +1,7 @@
 package carwars.init;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -10,23 +11,28 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.SlickException;
 
 import carwars.chat.Client;
+import carwars.chat.Server;
 import carwars.game.CarWars;
 import carwars.util.Config;
+import carwars.util.Code;
  
-public class GameSetup extends JPanel {
+public class GameSetup extends JPanel implements ActionListener {
 	public final static String WINDOW_TITLE_GAME_SETUP = "Car Wars - Game Setup";
 	public final static String TABLE_TITLE_PLAYERS = "Players";
 	public final static String TABLE_COLUMN_HEADER_PLAYER_NUMBER = "No.";
@@ -39,6 +45,8 @@ public class GameSetup extends JPanel {
 	private JTextArea output;
     private JTable table;
     private JFrame frame;
+    private JLabel msgLabel;
+    private JTextField tfServer, tfPort, tfMsg;
     
     private static int playersCount = 0;
     private DefaultTableModel tableModel;
@@ -49,6 +57,8 @@ public class GameSetup extends JPanel {
         super(new BorderLayout());
         
         this.client = pl.getClient();
+        pl.getClient().setGameSetup(this);
+        
         
         //Create and set up the window.
         frame = new JFrame(WINDOW_TITLE_GAME_SETUP);
@@ -56,7 +66,7 @@ public class GameSetup extends JPanel {
         
         //Create and set up the content pane.
         addComponents(pl.getUsername());
-        //addPlayer(pl.getClient().getName());
+        addPlayer(pl.getClient().getName());
         
         setOpaque(true);
         frame.setContentPane(this);
@@ -68,7 +78,7 @@ public class GameSetup extends JPanel {
         frame.setVisible(true);
         
         pl.getClient().setGameSetup(this);
-        pl.getClient().getChatRoom().setVisible(true);
+        // pl.getClient().getChatRoom().setVisible(true);
     }
     
     private void addComponents(String username) {
@@ -127,6 +137,15 @@ public class GameSetup extends JPanel {
         JPanel bottomHalf = new JPanel(new BorderLayout());
         bottomHalf.add(controlPane, BorderLayout.PAGE_START);
         bottomHalf.add(outputPane, BorderLayout.CENTER);
+
+        msgLabel = new JLabel("Message", SwingConstants.CENTER);
+        bottomHalf.add(msgLabel,BorderLayout.SOUTH);
+        tfMsg = new JTextField("");
+        tfMsg.setBackground(Color.WHITE);
+        tfMsg.setForeground(Color.BLACK);
+        tfMsg.addActionListener(this);
+        bottomHalf.add(tfMsg, BorderLayout.SOUTH);
+
         //XXX: next line needed if bottomHalf is a scroll pane:
         //bottomHalf.setMinimumSize(new Dimension(400, 50));
         bottomHalf.setPreferredSize(new Dimension(450, 110));
@@ -156,5 +175,32 @@ public class GameSetup extends JPanel {
     
     public JFrame getFrame() {
     	return this.frame;
+    }
+    
+    public void displayInChat(String str) {
+        output.append(str);
+        tfMsg.setText("");
+    }
+    
+    public void actionPerformed(ActionEvent ev) {
+        if(ev.getSource() == tfMsg) {
+        	try{
+        		String message = tfMsg.getText().trim();
+            	System.out.println(message);
+            	
+            	//detects if the client tries to send a coded message
+            	if(message.startsWith("join: ") || Code.codeExists(message)) {
+            		this.displayInChat("Invalid message to send...");
+            	}
+            	//else it is a normal message
+            	else if(message.length()>0) {
+           		   client.sendMessage(message);
+//           		   Server.sendToAll(message, client);
+            	}
+        	}catch(Exception ex){
+        		JOptionPane.showMessageDialog(null , ex);
+        		ex.printStackTrace();
+        	}
+        }
     }
 }
