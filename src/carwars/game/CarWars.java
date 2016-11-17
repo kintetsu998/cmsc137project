@@ -244,10 +244,11 @@ public class CarWars extends BasicGame {
 			}
 		}
 		
+		
 		if(chatting){
+			chatBox.render(container, g);
 			g.setColor(new Color(0.6f, 0.6f, 0.6f, 0.5f));
 			g.fillRect(0, 0, Config.GAME_WIDTH/2, 100);
-			chatBox.render(container, g);
 		}
 		
 		renderChat(g);

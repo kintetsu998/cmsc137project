@@ -7,6 +7,8 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
 import carwars.game.CarWars;
 import carwars.init.GameSetup;
 import carwars.util.Code;
@@ -67,7 +69,9 @@ public class Client {
                     try{
                         String reply;
                         while(!sock.isClosed()){
-                            while((reply = in.readUTF()) == null){}
+                            while((reply = in.readUTF()) == null){
+                            	System.out.println("received: " + reply);
+                            }
                             
                             //receives a code for a new client name
                             if(reply.startsWith("name: ") && !hasName) {
@@ -102,7 +106,8 @@ public class Client {
                             }
                         }
                     } catch(Exception e1) {
-                        e1.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "The server closed.");
+                        System.exit(1);
                     }
                 }
                 
