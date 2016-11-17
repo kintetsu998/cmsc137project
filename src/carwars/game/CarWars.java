@@ -85,21 +85,25 @@ public class CarWars extends BasicGame {
 		chatting = false;
 		
 		new Thread() {
+			@Override
 			public void run() {
-				player.fall(udpClient);
+				player.fall();
 			}
 		}.start();
 		
-		/*new Thread() {
+		new Thread() {
+			@Override
 			public void run() {
 				while(true) {
 					updateChat(messages.get(0));
 					try{
 						Thread.sleep(1000);
-					} catch(Exception e){}
+					} catch(Exception e){
+						Thread.currentThread().interrupt();
+					}
 				}
 			}
-		}.start();*/
+		}.start();
 	}
 	
 	@Override
@@ -111,10 +115,8 @@ public class CarWars extends BasicGame {
 		if(!chatting) {
 			if(input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
 				player.moveLeft();
-				udpClient.sendStatus();
 			} else if(input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
 				player.moveRight();
-				udpClient.sendStatus();
 			} else if(input.isKeyPressed(Input.KEY_ENTER)) {
 				chatting = true;
 			}
@@ -150,6 +152,8 @@ public class CarWars extends BasicGame {
 		for(Player p : Player.players.values()) {
 			p.getSpriteAnim().update(delta);
 		}
+		
+		udpClient.sendStatus();
 	}
 	
 	private float getPlayerAngle(Player p, int x, int y) {
@@ -296,7 +300,7 @@ public class CarWars extends BasicGame {
 		}*/
 		
 		if(chatting) {
-			g.drawString("Chatting...", 50, 50);
+			g.drawString("Chatting...", 10, 80);
 		}
 		
 		if(Config.DEBUG) {

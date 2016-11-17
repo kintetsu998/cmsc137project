@@ -6,7 +6,6 @@ import org.newdawn.slick.Animation;
 import org.newdawn.slick.geom.Rectangle;
 
 import carwars.chat.Client;
-import carwars.chat.UDPClient;
 import carwars.util.Config;
 
 public class Player extends Entity {
@@ -16,7 +15,7 @@ public class Player extends Entity {
 	
 	static public final int CAR_WIDTH = 40;
 	static public final int CAR_HEIGHT = 30;
-	static public final int CAR_SPEED = 2;
+	static public final int CAR_SPEED = 5;
 	static public final int CAR_MAX_DIST = 150;
 	
 	static public final int MAX_HP = 100;
@@ -24,7 +23,7 @@ public class Player extends Entity {
 	static public final int MAX_ANGLE = 90;
 	static public final int MIN_ANGLE = 0;
 	
-	static public final int JUMP_SPEED = -18;
+	static public final int JUMP_SPEED = -27;
 	
 	
 	private String name;
@@ -109,14 +108,15 @@ public class Player extends Entity {
 		}
 	}
 	
-	public void fall(UDPClient client) {
+	public void fall() {
 		while(!this.isDead()) {
 			boolean intersects = Player.intersectsTerrain(this.hitBox());
 			
 			if(intersects && !goingUp){
+				Player.this.jumping = false;
+				
 				while(Player.intersectsTerrain(this.hitBox())) {
 					this.setY(this.getY()-1);
-					client.sendStatus();
 				}
 				this.setY(this.getY()+1);
 				this.vertSpeed = 0;
@@ -126,7 +126,6 @@ public class Player extends Entity {
 				} catch(Exception e) {
 					Thread.currentThread().interrupt();
 				}
-				Player.this.jumping = false;
 			} else if(this.getY() >= Config.GAME_HEIGHT-CAR_HEIGHT) {
 				this.damage(MAX_HP);
 				this.end();
@@ -135,14 +134,10 @@ public class Player extends Entity {
 						this.vertSpeed + Config.GRAVITY: 
 						Config.TERMINAL_SPEED;
 				
-				if(vertSpeed >= 0) {
-					goingUp = false;
-				}
+				goingUp = !(vertSpeed >= 0);
 				
 				if(this.getY() <= Config.GAME_HEIGHT-CAR_HEIGHT)
 					this.setY(this.getY() + this.vertSpeed);
-				
-				client.sendStatus();
 			}
 
 			try{

@@ -16,12 +16,11 @@ public class Config {
 	
 	static public final int ANIM_SPEED = 250;
 	
+	static public final int BUFFER_SIZE = 1024;
 	static public final int UDP_SERVER_PORT = 4445;
 	static public final int UDP_CLIENT_PORT = 4446;
 	
 	static public final String UDP_SERVER_IP = "224.0.0.1";
-	
-	static public final int BUFFER_SIZE = 1024;
 	
 	static public final int MAX_PLAYERS = 8;
 	static public final int MIN_PLAYERS = 2;
