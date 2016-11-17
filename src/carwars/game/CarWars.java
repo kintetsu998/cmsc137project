@@ -14,6 +14,7 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.TrueTypeFont;
+import org.newdawn.slick.gui.TextField;
 
 import carwars.chat.Client;
 import carwars.chat.UDPClient;
@@ -32,6 +33,8 @@ public class CarWars extends BasicGame {
 	
 	private Client client;
 	private UDPClient udpClient;
+	
+	private TextField chatBox;
 	
 	//private boolean shooting;
 	
@@ -54,7 +57,7 @@ public class CarWars extends BasicGame {
 	public void init(GameContainer container) throws SlickException {
 		Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
 		udpClient = new UDPClient(this);
-		messages = new ArrayList<>(Arrays.asList("A","Quick","Brown","Fox"));
+		messages = new ArrayList<>(Arrays.asList("","","",""));
 		
 		try{
 			String statuses = udpClient.receive();
@@ -72,6 +75,7 @@ public class CarWars extends BasicGame {
 				Terrain.TERR_SIZE, Terrain.TERR_SIZE);
 		ttf = new TrueTypeFont(font, true);
 		marker = new Image("resource/angle-rescale.png");
+		chatBox = new TextField(container, ttf, 10, 80, 200, 15);
 		
 		for(int i=0, mapI=0; i<Config.MAP_HEIGHT; i++, mapI+=Terrain.TERR_SIZE) {
 			for(int j=0, mapJ=0; j<Config.MAP_WIDTH; j++, mapJ+=Terrain.TERR_SIZE) {
@@ -91,7 +95,7 @@ public class CarWars extends BasicGame {
 			}
 		}.start();
 		
-		new Thread() {
+		/*new Thread() {
 			@Override
 			public void run() {
 				while(true) {
@@ -103,7 +107,7 @@ public class CarWars extends BasicGame {
 					}
 				}
 			}
-		}.start();
+		}.start();*/
 	}
 	
 	@Override
@@ -133,9 +137,16 @@ public class CarWars extends BasicGame {
 			player.setForce(getPlayerForce(player, input.getMouseX(), input.getMouseY()));
 		} else {
 			if(input.isKeyPressed(Input.KEY_ENTER)) {
+				String str = new String(chatBox.getText());
+				
 				chatting = false;
+				if(!str.trim().equals("")) {
+					client.sendMessage(str);
+				}
+				chatBox.setText("");
 			} else if(input.isKeyPressed(Input.KEY_ESCAPE)) {
 				chatting = false;
+				chatBox.setText("");
 			}
 		}
 		
@@ -148,11 +159,11 @@ public class CarWars extends BasicGame {
 			player.incForce();
 		}*/
 		
-		
 		for(Player p : Player.players.values()) {
 			p.getSpriteAnim().update(delta);
 		}
 		
+		chatBox.setFocus(chatting);
 		udpClient.sendStatus();
 	}
 	
@@ -181,6 +192,12 @@ public class CarWars extends BasicGame {
 			if(!p.isDead()) {
 				renderPlayer(p, g);
 			}
+		}
+		
+		if(chatting){
+			g.setColor(Color.lightGray);
+			g.fillRect(0, 0, Config.GAME_WIDTH/2, 100);
+			chatBox.render(container, g);
 		}
 		
 		renderAddInfo(player, g);
@@ -253,7 +270,7 @@ public class CarWars extends BasicGame {
 	}
 	
 	private void renderTerrain(Graphics g) {
-		g.setBackground(Color.lightGray);
+		g.setBackground(Color.cyan);
 		terrain.startUse();
 		for(Terrain t : Terrain.terrains) {
 			t.getSprite().drawEmbedded(t.getX(), t.getY(), Terrain.TERR_SIZE, Terrain.TERR_SIZE);
@@ -299,9 +316,9 @@ public class CarWars extends BasicGame {
 			g.fillRect(p.getX(), p.getY() + Player.CAR_HEIGHT + 7, remainingForce(p), 5);
 		}*/
 		
-		if(chatting) {
+		/*if(chatting) {
 			g.drawString("Chatting...", 10, 80);
-		}
+		}*/
 		
 		if(Config.DEBUG) {
 			g.setColor(Color.red);

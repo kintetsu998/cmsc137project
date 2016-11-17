@@ -149,8 +149,7 @@ public class Player extends Entity {
 	}
 	
 	public void shoot() {
-		System.out.println(this.angle);
-		System.out.println(this.force);
+		//TODO: shoots a bullet
 	}
 	
 	public Rectangle leftHitBox() {

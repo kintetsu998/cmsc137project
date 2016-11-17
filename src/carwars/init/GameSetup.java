@@ -22,6 +22,7 @@ import javax.swing.table.DefaultTableModel;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.SlickException;
 
+import carwars.chat.ChatRoom;
 import carwars.chat.Client;
 import carwars.game.CarWars;
 import carwars.util.Config;
@@ -43,6 +44,7 @@ public class GameSetup extends JPanel {
     private static int playersCount = 0;
     private DefaultTableModel tableModel;
     
+    private ChatRoom cr;
     private Client client;
     
     public GameSetup(PlayerLogin pl) {
@@ -68,7 +70,8 @@ public class GameSetup extends JPanel {
         frame.setVisible(true);
         
         pl.getClient().setGameSetup(this);
-        pl.getClient().getChatRoom().setVisible(true);
+        cr = pl.getClient().getChatRoom();
+        cr.setVisible(true);
     }
     
     private void addComponents(String username) {
@@ -136,6 +139,7 @@ public class GameSetup extends JPanel {
     public void startGame(Client client) {
     	try {
     		frame.dispose();
+    		cr.dispose();
 			AppGameContainer app = new AppGameContainer(new CarWars("Car Wars", client));
 			app.setDisplayMode(800, 600, false); //create 800x600 frame
 			app.setTargetFrameRate(60); //cap FPS to 60
@@ -148,7 +152,6 @@ public class GameSetup extends JPanel {
     }
     
     public void addPlayer(String playerName) {
-    	System.out.println(playerName);
     	tableModel.addRow(new Object[]{new Integer(++GameSetup.playersCount).toString(), playerName, GameSetup.STATUS_CONNECTED});
     	output.append(playerName+" is connected.\n");
     	output.setCaretPosition(output.getDocument().getLength());

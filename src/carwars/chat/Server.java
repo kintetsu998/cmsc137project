@@ -110,8 +110,6 @@ public class Server extends Thread {
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
-
-		System.out.println("Server closing...");
 	}
 	
 	private String getNames() {
@@ -190,9 +188,6 @@ public class Server extends Thread {
 				this.udpSocket.receive(packet);
 				
 				msg = new String(packet.getData(), 0, packet.getLength());
-				
-				System.out.println(msg);
-				
 				Server.this.udpSend(msg);
 			}
 		} catch(Exception e) {

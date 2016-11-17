@@ -40,6 +40,7 @@ public class Terrain extends Entity {
 			br.close();
 		}catch(IOException e) {
 			System.err.println("File not found.");
+			e.printStackTrace();
 			System.exit(1);
 		}
 		

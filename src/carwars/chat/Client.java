@@ -94,9 +94,10 @@ public class Client {
                             }
                             //else, no code detected. display the message on screen
                             else {
-                            	display(reply);
                             	if(game != null) {
                             		game.updateChat(reply);
+                            	} else {
+                            		display(reply);
                             	}
                             }
                         }
@@ -126,13 +127,15 @@ public class Client {
     public void sendMessage(String message){
         try {
             out.writeUTF(message);
-            display(name + ": " + message);
             if(game != null) {
         		game.updateChat(name + ": " + message);
+        	} else {
+        		display(name + ": " + message);
         	}
         }
         catch(IOException e) {
-            display("Exception sending to server: " + e);
+        	e.printStackTrace();
+            //display("Exception sending to server: " + e);
         }
     }
     
@@ -141,7 +144,8 @@ public class Client {
             out.writeUTF(Code.START_CODE);
         }
         catch(IOException e) {
-            display("Exception sending to server: " + e);
+        	e.printStackTrace();
+            //display("Exception sending to server: " + e);
         }
     }
 

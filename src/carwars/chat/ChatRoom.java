@@ -77,8 +77,6 @@ public class ChatRoom extends JFrame implements ActionListener {
         if(ev.getSource() == tfMsg) {
         	try{
         		String message = tfMsg.getText().trim();
-            	System.out.println(message);
-            	
             	//detects if the client tries to send a coded message
             	if(message.startsWith("join: ") || Code.codeExists(message)) {
             		this.append("Invalid message to send...");
