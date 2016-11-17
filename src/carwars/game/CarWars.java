@@ -3,6 +3,7 @@ package carwars.game;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.BasicGame;
@@ -14,6 +15,7 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.TrueTypeFont;
+import org.newdawn.slick.geom.Point;
 import org.newdawn.slick.gui.TextField;
 
 import carwars.chat.Client;
@@ -24,21 +26,30 @@ import carwars.util.Code;
 import carwars.util.Config;
 
 public class CarWars extends BasicGame {
-	public int[][] terrainMap;
-	public SpriteSheet terrain;
-	public Player player;
-	public Image marker;
-	public TrueTypeFont ttf;
-	private String username;
+	public static final int CLOUDS = 3;
 	
+	private int[][] terrainMap;
+	private SpriteSheet terrain;
+	private TrueTypeFont ttf;
+	
+	private Image marker;
+	private Image sun;
+	private Image cloud;
+	
+	private TextField chatBox;
+	
+	private Player player;
 	private Client client;
 	private UDPClient udpClient;
 	
-	private TextField chatBox;
+	private String username;
+	private Random rand;
 	
 	//private boolean shooting;
 	
 	private boolean chatting;
+	private Point[] cloudPoints;
+	private Point sunPoint;
 	
 	private ArrayList<String> messages;
 	
@@ -58,6 +69,7 @@ public class CarWars extends BasicGame {
 		Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
 		udpClient = new UDPClient(this);
 		messages = new ArrayList<>(Arrays.asList("","","",""));
+		rand = new Random();
 		
 		try{
 			String statuses = udpClient.receive();
@@ -71,10 +83,14 @@ public class CarWars extends BasicGame {
 		client.setGame(this);
 		
 		terrainMap = Terrain.loadTerrain();
-		terrain = new SpriteSheet("resource/land-rescale.png", 
+		terrain = new SpriteSheet("resource/terrain/land-rescale.png", 
 				Terrain.TERR_SIZE, Terrain.TERR_SIZE);
 		ttf = new TrueTypeFont(font, true);
-		marker = new Image("resource/angle-rescale.png");
+		
+		marker = new Image("resource/misc/angle-rescale.png");
+		
+		initWeather(CLOUDS);
+		
 		chatBox = new TextField(container, ttf, 10, 80, 200, 15);
 		
 		for(int i=0, mapI=0; i<Config.MAP_HEIGHT; i++, mapI+=Terrain.TERR_SIZE) {
@@ -94,20 +110,52 @@ public class CarWars extends BasicGame {
 				player.fall();
 			}
 		}.start();
+	}
+	
+	private void initWeather(int n) throws SlickException{
+		int x = rand.nextInt(50);
+		int y = rand.nextInt(40);
+		sun = new Image("resource/weather/sun.png");
+		cloud = new Image("resource/weather/cloud.png");
 		
-		/*new Thread() {
+		sunPoint = new Point((Config.GAME_WIDTH*4)/5, 30);
+		
+		cloudPoints = new Point[n];
+		for(int i = 0; i < n; i++) {
+			cloudPoints[i] = new Point(x, y);
+			x = (x + rand.nextInt(Config.GAME_WIDTH/n)) % Config.GAME_WIDTH;
+			y = (y + rand.nextInt(50) + 30) % 100;
+		}
+		
+		new Thread() {
 			@Override
 			public void run() {
-				while(true) {
-					updateChat(messages.get(0));
-					try{
-						Thread.sleep(1000);
-					} catch(Exception e){
-						Thread.currentThread().interrupt();
+				try{
+					while(true) {
+						for(Point p : cloudPoints) {
+							p.setX((p.getX() - 1) % Config.GAME_WIDTH);
+							Thread.sleep(100);
+						}
 					}
+				} catch(Exception e) {
+					Thread.currentThread().interrupt();
 				}
 			}
-		}.start();*/
+		}.start();
+		
+		new Thread() {
+			@Override
+			public void run() {
+				try{
+					while(true) {
+						sunPoint.setX((sunPoint.getX() - 1) % Config.GAME_WIDTH);
+						Thread.sleep(6000);
+					}
+				} catch(Exception e) {
+					Thread.currentThread().interrupt();
+				}
+			}
+		}.start();
 	}
 	
 	@Override
@@ -187,7 +235,9 @@ public class CarWars extends BasicGame {
 	public void render(GameContainer container, Graphics g) throws SlickException {
 		setFont(g);
 		renderTerrain(g);
+		renderWeather(g);
 		
+		renderAddInfo(player, g);
 		for(Player p : Player.players.values()) {
 			if(!p.isDead()) {
 				renderPlayer(p, g);
@@ -195,15 +245,21 @@ public class CarWars extends BasicGame {
 		}
 		
 		if(chatting){
-			g.setColor(Color.lightGray);
+			g.setColor(new Color(0.6f, 0.6f, 0.6f, 0.5f));
 			g.fillRect(0, 0, Config.GAME_WIDTH/2, 100);
 			chatBox.render(container, g);
 		}
 		
-		renderAddInfo(player, g);
 		renderChat(g);
 	}
 	
+	private void renderWeather(Graphics g) {
+		sun.draw(sunPoint.getX(), sunPoint.getY());
+		for(Point p : cloudPoints) {
+			cloud.draw(p.getX(), p.getY());
+		}
+	}
+
 	private void initStatuses(String msg, String username) throws SlickException{
 		ArrayList<SpriteSheet> playerSprites = new ArrayList<>();
 		String[] statuses = msg.replace(Code.GET_ALL_STATUS, "").split(",");
@@ -270,7 +326,7 @@ public class CarWars extends BasicGame {
 	}
 	
 	private void renderTerrain(Graphics g) {
-		g.setBackground(Color.cyan);
+		g.setBackground(new Color(224, 247, 250));
 		terrain.startUse();
 		for(Terrain t : Terrain.terrains) {
 			t.getSprite().drawEmbedded(t.getX(), t.getY(), Terrain.TERR_SIZE, Terrain.TERR_SIZE);
