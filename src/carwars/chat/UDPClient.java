@@ -75,20 +75,14 @@ public class UDPClient extends Thread{
 			Player p = Player.players.get(tok[0]);
 			
 			p.update(Integer.parseInt(tok[1]),
-					Integer.parseInt(tok[2]),
-					Integer.parseInt(tok[3]));
+					 Integer.parseInt(tok[2]),
+					 Integer.parseInt(tok[3]),
+					 Integer.parseInt(tok[4]),
+					 Integer.parseInt(tok[5]));
 		}
 	}
 	
 	public void run() {
-		new Thread() {
-			@Override
-			public void run() {
-				while(player == null){}
-				UDPClient.this.sendStatus();
-			}
-		}.start();
-		
 		while(true) {
 			try {
 				this.receive();
@@ -99,7 +93,7 @@ public class UDPClient extends Thread{
 	}
 	
 	public void sendStatus() {
-		while(!player.isDead()) {
+		if(!player.isDead()) {
 			this.send(Code.UPDATE_STATUS + player.toString());
 		}
 	}

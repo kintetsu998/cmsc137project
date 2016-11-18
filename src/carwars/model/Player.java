@@ -15,28 +15,28 @@ public class Player extends Entity {
 	
 	static public final int CAR_WIDTH = 40;
 	static public final int CAR_HEIGHT = 30;
-	static public final int CAR_SPEED = 2;
+	static public final int CAR_SPEED = 5;
+	static public final int CAR_MAX_DIST = 150;
 	
 	static public final int MAX_HP = 100;
 	
-	static public final int MAX_ANGLE = 90;
-	static public final int MIN_ANGLE = 0;
+	static public final int JUMP_SPEED = -27;
 	
-	static public final int MAX_FORCE = 100;
-	
-	static public final int CAR_MAX_DIST = 150;
 	
 	private String name;
 	private Animation spriteAnim;
 	
 	private int front;
 	private int hp;
-	private int angle;
 	private int movement;
-	private int force;
-	private int score;
+	private int vertSpeed;
+	
+	private int angle;
+	private float force;
 	
 	private boolean turn;
+	private boolean goingUp;
+	private boolean jumping;
 	
 	private Client tcpClient;
 	
@@ -48,12 +48,14 @@ public class Player extends Entity {
 		
 		this.front = RIGHT;
 		this.hp = MAX_HP;
-		this.angle = MIN_ANGLE;
+		this.angle = 0;
 		this.movement = CAR_MAX_DIST;
 		this.force = 0;
-		this.score = 0;
+		this.vertSpeed = 0;
 		
 		this.turn = false;
+		this.goingUp = false;
+		this.jumping = false;
 		
 		this.tcpClient = null;
 		
@@ -67,12 +69,14 @@ public class Player extends Entity {
 		
 		this.front = RIGHT;
 		this.hp = MAX_HP;
-		this.angle = MIN_ANGLE;
+		this.angle = 0;
 		this.movement = CAR_MAX_DIST;
 		this.force = 0;
-		this.score = 0;
+		this.vertSpeed = 0;
 		
 		this.turn = false;
+		this.goingUp = false;
+		this.jumping = false;
 		
 		this.tcpClient = c;
 		
@@ -83,10 +87,9 @@ public class Player extends Entity {
 		this.front = RIGHT;
 		if(!Player.intersectsTerrain(this.rightHitBox()) 
 				&& this.getX() <= Config.GAME_WIDTH - CAR_WIDTH
-				&& this.movement > 0
-				&& this.turn) {
+				&& this.movement > 0  
+				&& this.hp > 0 ) {
 			this.setX(this.getX()+CAR_SPEED);
-			this.movement -= CAR_SPEED;
 		}
 	}
 	
@@ -94,46 +97,56 @@ public class Player extends Entity {
 		this.front = LEFT;
 		if(!Player.intersectsTerrain(this.leftHitBox()) 
 				&& this.getX() >= 0
-				&& this.movement > 0
-				&& this.turn) {
+				&& this.movement > 0 
+				&& this.hp > 0 ) {
 			this.setX(this.getX()-CAR_SPEED);
-			this.movement -= CAR_SPEED;
 		}
 	}
 	
 	public void fall() {
 		while(!this.isDead()) {
 			boolean intersects = Player.intersectsTerrain(this.hitBox());
-			int vertSpeed = 0;
 			
-			if(intersects){
+			if(intersects && !goingUp){
+				Player.this.jumping = false;
+				
 				while(Player.intersectsTerrain(this.hitBox())) {
 					this.setY(this.getY()-1);
 				}
 				this.setY(this.getY()+1);
+				this.vertSpeed = 0;
 			} else if(this.getY() >= Config.GAME_HEIGHT-CAR_HEIGHT) {
 				this.damage(MAX_HP);
 				this.end();
 			} else {
-				vertSpeed = (vertSpeed < Config.TERMINAL_SPEED)? vertSpeed + Config.GRAVITY: Config.TERMINAL_SPEED;
+				this.vertSpeed = (this.vertSpeed < Config.TERMINAL_SPEED)? 
+						this.vertSpeed + Config.GRAVITY: 
+						Config.TERMINAL_SPEED;
+				
+				goingUp = !(vertSpeed >= 0);
+				
 				if(this.getY() <= Config.GAME_HEIGHT-CAR_HEIGHT)
-					this.setY(this.getY() + vertSpeed);
+					this.setY(this.getY() + this.vertSpeed);
 			}
 
 			try{
 				Thread.sleep(20);
 			} catch(Exception e) {
-				e.printStackTrace();
+				Thread.currentThread().interrupt();
 			}
 		}
 	}
 	
-	private Rectangle leftHitBox() {
-		return new Rectangle(this.getX(), this.getY(), 1, CAR_HEIGHT-1);
+	public void shoot() {
+		//TODO: shoots a bullet
 	}
 	
-	private Rectangle rightHitBox() {
-		return new Rectangle(this.getX()+CAR_WIDTH-1, this.getY(), 1, CAR_HEIGHT-1);
+	public Rectangle leftHitBox() {
+		return new Rectangle(this.getX()-3, this.getY(), 3, CAR_HEIGHT-1);
+	}
+	
+	public Rectangle rightHitBox() {
+		return new Rectangle(this.getX()+CAR_WIDTH, this.getY(), 3, CAR_HEIGHT-1);
 	}
 	
 	public static boolean intersectsTerrain(Rectangle r) {
@@ -150,12 +163,12 @@ public class Player extends Entity {
 		this.hp -= dmg;
 	}
 	
-	public void incAngle() {
-		this.angle = (this.angle < Player.MAX_ANGLE)? this.angle + 1: this.angle;
-	}
-	
-	public void decAngle() {
-		this.angle = (this.angle > Player.MIN_ANGLE)? this.angle - 1: this.angle;
+	public void jump() {
+		if(!jumping) {
+			this.vertSpeed = JUMP_SPEED;
+			goingUp = true;
+			jumping = true;
+		}
 	}
 	
 	public void start() {
@@ -168,19 +181,30 @@ public class Player extends Entity {
 		this.turn = false;
 	}
 	
-	public void incForce() {
-		this.force = (this.force < MAX_FORCE)? this.force + 1: this.force;
-	}
-	
-	public void update(int x, int hp, int front) {
+	public void update(int x, int y, int hp, int front, int angle) {
 		this.setX(x);
+		this.setY(y);
 		this.hp = hp;
 		this.front = front;
+		this.angle = angle;
 	}
 	
 	@Override
 	public String toString() {
-		return this.name + " " + this.getX() + " " + this.hp + " " + this.front;
+		return this.name + " " 
+				+ this.getX() + " " 
+				+ this.getY() + " " 
+				+ this.hp + " " 
+				+ this.front + " "
+				+ this.angle;
+	}
+	
+	public void setAngle(int angle) {
+		this.angle = angle;
+	}
+	
+	public void setForce(float force) {
+		this.force = force;
 	}
 	
 	/** GETTERS **/
@@ -208,7 +232,7 @@ public class Player extends Entity {
 		return this.movement;
 	}
 	
-	public int getForce() {
+	public float getForce() {
 		return this.force;
 	}
 	
@@ -218,10 +242,6 @@ public class Player extends Entity {
 	
 	public boolean isTurn() {
 		return this.turn;
-	}
-	
-	public int getScore() {
-		return this.score;
 	}
 	
 	public Animation getSpriteAnim() {

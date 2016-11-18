@@ -27,10 +27,8 @@ import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.SlickException;
 
 import carwars.chat.Client;
-import carwars.chat.Server;
 import carwars.game.CarWars;
 import carwars.util.Config;
-import carwars.util.Code;
  
 public class GameSetup extends JPanel implements ActionListener {
 	public final static String WINDOW_TITLE_GAME_SETUP = "Car Wars - Game Setup";
@@ -46,19 +44,18 @@ public class GameSetup extends JPanel implements ActionListener {
     private JTable table;
     private JFrame frame;
     private JLabel msgLabel;
-    private JTextField tfServer, tfPort, tfMsg;
+    private JTextField tfMsg;
     
     private static int playersCount = 0;
     private DefaultTableModel tableModel;
     
+    //private ChatRooms cr;
     private Client client;
     
-    public GameSetup(PlayerLogin pl) {
+    public GameSetup(PlayerLogin pl, Client c) {
         super(new BorderLayout());
         
-        this.client = pl.getClient();
-        pl.getClient().setGameSetup(this);
-        
+        this.client = c;
         
         //Create and set up the window.
         frame = new JFrame(WINDOW_TITLE_GAME_SETUP);
@@ -66,7 +63,6 @@ public class GameSetup extends JPanel implements ActionListener {
         
         //Create and set up the content pane.
         addComponents(pl.getUsername());
-        addPlayer(pl.getClient().getName());
         
         setOpaque(true);
         frame.setContentPane(this);
@@ -75,10 +71,12 @@ public class GameSetup extends JPanel implements ActionListener {
         frame.setSize(400, 600);
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
-        frame.setVisible(true);
         
         pl.getClient().setGameSetup(this);
-        // pl.getClient().getChatRoom().setVisible(true);
+    }
+    
+    public void showWindow() {
+    	frame.setVisible(true);
     }
     
     private void addComponents(String username) {
@@ -147,7 +145,6 @@ public class GameSetup extends JPanel implements ActionListener {
         bottomHalf.add(tfMsg, BorderLayout.SOUTH);
 
         //XXX: next line needed if bottomHalf is a scroll pane:
-        //bottomHalf.setMinimumSize(new Dimension(400, 50));
         bottomHalf.setPreferredSize(new Dimension(450, 110));
         splitPane.add(bottomHalf);
     }
@@ -155,10 +152,12 @@ public class GameSetup extends JPanel implements ActionListener {
     public void startGame(Client client) {
     	try {
     		frame.dispose();
+    		
+    		//starts the game
 			AppGameContainer app = new AppGameContainer(new CarWars("Car Wars", client));
 			app.setDisplayMode(800, 600, false); //create 800x600 frame
 			app.setTargetFrameRate(60); //cap FPS to 60
-			app.setShowFPS(false);
+			app.setShowFPS(Config.DEBUG);
 			app.setAlwaysRender(true);
 			app.start();
 		} catch (SlickException e) {
@@ -167,9 +166,7 @@ public class GameSetup extends JPanel implements ActionListener {
     }
     
     public void addPlayer(String playerName) {
-    	System.out.println(playerName);
     	tableModel.addRow(new Object[]{new Integer(++GameSetup.playersCount).toString(), playerName, GameSetup.STATUS_CONNECTED});
-    	output.append(playerName+" is connected.\n");
     	output.setCaretPosition(output.getDocument().getLength());
     }
     
@@ -186,16 +183,9 @@ public class GameSetup extends JPanel implements ActionListener {
         if(ev.getSource() == tfMsg) {
         	try{
         		String message = tfMsg.getText().trim();
-            	System.out.println(message);
-            	
-            	//detects if the client tries to send a coded message
-            	if(message.startsWith("join: ") || Code.codeExists(message)) {
-            		this.displayInChat("Invalid message to send...");
-            	}
-            	//else it is a normal message
-            	else if(message.length()>0) {
+        		
+            	if(message.length()>0) {
            		   client.sendMessage(message);
-//           		   Server.sendToAll(message, client);
             	}
         	}catch(Exception ex){
         		JOptionPane.showMessageDialog(null , ex);

@@ -7,11 +7,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -21,8 +18,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import carwars.chat.ChatRoom;
 import carwars.chat.Client;
+import carwars.util.Config;
 
 public class PlayerLogin extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
@@ -30,13 +27,73 @@ public class PlayerLogin extends JFrame implements ActionListener {
     private int port;
     private String host;
     private JTextField tfHost, tfPort, tfUsername;
-    private JLabel label;
     private JButton logButton;
     private String username;
     private Client client;
     private JLabel errLabel;
+    private GameSetup gs;
     private boolean connected;
+    
+    public PlayerLogin(String h, int p) {
 
+        super("Car Wars - Login");
+        port = p;
+        host = h;
+        
+        JPanel mainPanel = new JPanel(new GridLayout(3,1));
+        
+        /* For logo */
+        GridLayout layout = new GridLayout(1,2);
+        JPanel logo =  new JPanel(layout);
+        ImageIcon image = new ImageIcon("resource/car.png");
+        JLabel carLogo = new JLabel(image);
+        logo.add(carLogo, SwingConstants.CENTER);
+        JLabel carWarsLabel = new JLabel("CAR WARS");
+        logo.add(setLabelCustomLayout(carWarsLabel,FlowLayout.LEFT,"Arial",Font.ITALIC,55), SwingConstants.CENTER);
+        mainPanel.add(logo);
+
+        /* For inputs*/
+        JPanel inputToConnect = new JPanel(new GridLayout(3,2,1,3));
+
+        if(Config.DEBUG) {
+	        tfHost = new JTextField(host);
+	        tfPort = new JTextField(Integer.toString(port));
+	        tfUsername = new JTextField("Username");
+        } else {
+        	tfHost = new JTextField();
+        	tfPort = new JTextField();
+        	tfUsername = new JTextField();
+        }
+
+        inputToConnect.add(setLabelCustomLayout(new JLabel("Server Address:  "),FlowLayout.LEFT,"Arial",Font.PLAIN,25));
+        inputToConnect.add(setTextFieldCustomLayout(tfHost,"Arial",Font.PLAIN,25));
+        inputToConnect.add(setLabelCustomLayout(new JLabel("Port Number:  "),FlowLayout.LEFT,"Arial",Font.PLAIN,25));
+        inputToConnect.add(setTextFieldCustomLayout(tfPort,"Arial",Font.PLAIN,25));
+        inputToConnect.add(setLabelCustomLayout(new JLabel("Username: "),FlowLayout.LEFT,"Arial",Font.PLAIN,25));
+        
+        
+        inputToConnect.add(setTextFieldCustomLayout(tfUsername,"Arial",Font.PLAIN,25));
+
+        mainPanel.add(inputToConnect, BorderLayout.CENTER);
+
+        JPanel b = new JPanel(new GridLayout(2, 1));
+        logButton = new JButton("Login");
+        logButton.addActionListener(this);
+        errLabel = new JLabel("");
+        errLabel.setVerticalAlignment(JLabel.BOTTOM);
+        b.add(setLabelCustomLayout(errLabel,FlowLayout.CENTER, "Arial",Font.PLAIN,25));
+        b.add(setButtonCustomLayout(logButton,FlowLayout.CENTER, "Arial",Font.PLAIN,25));
+
+        mainPanel.add(b);
+
+        add(mainPanel);
+
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(800, 600);
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+    
     private Component setLabelCustomLayout(Component component,int ALIGNMENT,String FONT_NAME,int FONT_STYLE,int FONT_SIZE) {
         FlowLayout layout = new FlowLayout();
         layout.setAlignment(ALIGNMENT);
@@ -73,79 +130,6 @@ public class PlayerLogin extends JFrame implements ActionListener {
         button.setPreferredSize(new Dimension(200,50));
         panel.add(component);
     	return panel;
-    }
-    
-    public PlayerLogin(String h, int p) {
-
-        super("Car Wars - Login");
-        port = p;
-        host = h;
-        
-        JPanel mainPanel = new JPanel(new GridLayout(3,1));
-
-        /* For logo */
-        GridLayout layout = new GridLayout(1,2);
-        JPanel logo =  new JPanel(layout);
-        ImageIcon image = new ImageIcon("resource/car.png");
-        JLabel carLogo = new JLabel(image);
-        logo.add(carLogo, SwingConstants.CENTER);
-        JLabel carWarsLabel = new JLabel("CAR WARS");
-        logo.add(setLabelCustomLayout(carWarsLabel,FlowLayout.LEFT,"Arial",Font.ITALIC,55), SwingConstants.CENTER);
-        mainPanel.add(logo);
-
-        /* For inputs*/
-        JPanel inputToConnect = new JPanel(new GridLayout(3,2,1,3));
-
-        tfHost = new JTextField(host);
-        tfPort = new JTextField("" + port);
-        tfHost.addMouseListener(new MouseAdapter(){
-            public void mouseClicked(MouseEvent e){
-                if(!connected){
-                    errLabel.setText("");
-                }
-            }
-        });
-        tfPort.addMouseListener(new MouseAdapter(){
-        	public void mouseClicked(MouseEvent e){
-                if(!connected){
-                    errLabel.setText("");
-                }
-            }
-        });
-
-        inputToConnect.add(setLabelCustomLayout(new JLabel("Server Address:  "),FlowLayout.LEFT,"Arial",Font.PLAIN,25));
-        inputToConnect.add(setTextFieldCustomLayout(tfHost,"Arial",Font.PLAIN,25));
-        inputToConnect.add(setLabelCustomLayout(new JLabel("Port Number:  "),FlowLayout.LEFT,"Arial",Font.PLAIN,25));
-        inputToConnect.add(setTextFieldCustomLayout(tfPort,"Arial",Font.PLAIN,25));
-        inputToConnect.add(setLabelCustomLayout(new JLabel("Username: "),FlowLayout.LEFT,"Arial",Font.PLAIN,25));
-        tfUsername = new JTextField("Username");
-        tfUsername.addMouseListener(new MouseAdapter(){
-        	public void mouseClicked(MouseEvent e){
-                if(!connected){
-                    errLabel.setText("");
-                }
-            }
-        });
-        inputToConnect.add(setTextFieldCustomLayout(tfUsername,"Arial",Font.PLAIN,25));
-
-        mainPanel.add(inputToConnect, BorderLayout.CENTER);
-
-        JPanel b = new JPanel(new GridLayout(2, 1));
-        logButton = new JButton("Login");
-        logButton.addActionListener(this);
-        errLabel = new JLabel("");
-        errLabel.setVerticalAlignment(JLabel.BOTTOM);
-        b.add(setLabelCustomLayout(errLabel,FlowLayout.CENTER, "Arial",Font.PLAIN,25));
-        b.add(setButtonCustomLayout(logButton,FlowLayout.CENTER, "Arial",Font.PLAIN,25));
-
-        mainPanel.add(b);
-
-        add(mainPanel);
-
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(800, 600);
-        setLocationRelativeTo(null);
-        setVisible(true);
     }
 
     private boolean isEmptyInput(String txt){
@@ -216,7 +200,7 @@ public class PlayerLogin extends JFrame implements ActionListener {
 
             	// validate port number
             	try{
-                	int p3 = Integer.parseInt(t3);
+                	this.port = Integer.parseInt(t3);
                 }catch(NumberFormatException err){
                 	errLabel.setText("Invalid port number");
                 	errLabel.setForeground(Color.RED);
@@ -224,19 +208,12 @@ public class PlayerLogin extends JFrame implements ActionListener {
                 	return;
                 }
 
-            	// validate IP address
-            	if(!t2.equals("localhost")){
-            		if(!validIP(t2)){
-            			errLabel.setText("Invalid server address");
-            			errLabel.setForeground(Color.RED);
-            			connected = false;
-            			return;
-            		}
-            	}
-            	
+            	this.host = t2;
             	this.username = t1;
-            	client = new Client(username, host, port);
-            	client.setChatRoom(new ChatRoom(client, port, host));
+            	this.client = new Client(username, host, port);
+            	this.gs = new GameSetup(this, client);
+            	//client.setChatRoom(new ChatRooms(client, port, host));
+            	client.setGameSetup(gs);
             	connected = client.connect();
             	
             	if(!connected){
@@ -248,11 +225,7 @@ public class PlayerLogin extends JFrame implements ActionListener {
             	else{
                 	// launch app
                 	this.dispose();
-                	javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            	        public void run() {
-            	        	new GameSetup(PlayerLogin.this);
-            	        }
-            	    });
+                	gs.showWindow();
             	}
 
             }

@@ -7,6 +7,9 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
+import carwars.game.CarWars;
 import carwars.init.GameSetup;
 import carwars.util.Code;
 
@@ -14,7 +17,6 @@ public class Client {
     
     private DataInputStream in;
     private DataOutputStream out;
-    private ChatRoom gui;
     private GameSetup gs;
     
     private int port;
@@ -22,6 +24,7 @@ public class Client {
     private String server;
     private Socket sock;
     private ArrayList<String> pNames;
+    private CarWars game;
     
     private boolean hasName;
     private boolean hasList;
@@ -32,9 +35,14 @@ public class Client {
         this.port = port;
         
         this.pNames = new ArrayList<>();
+        this.game = null;
         
         this.hasName = false;
         this.hasList = false;
+    }
+    
+    public void setGame(CarWars g) {
+    	this.game = g;
     }
 
     public boolean connect() {
@@ -87,11 +95,18 @@ public class Client {
                             }
                             //else, no code detected. display the message on screen
                             else {
-                            	display(reply);
+                            	System.out.println(reply);
+                            	if(game != null) {
+                            		game.updateChat(reply);
+                            	} else {
+                            		display(reply);
+                            	}
                             }
                         }
                     } catch(Exception e1) {
-                        display("Exception in thread: " + e1);
+                        JOptionPane.showMessageDialog(null, "The server closed.");
+                        e1.printStackTrace();
+                        System.exit(1);
                     }
                 }
                 
@@ -99,18 +114,16 @@ public class Client {
                 	for(int i = 1; i < tok.length; i++) {
                 		if(!tok[i].trim().equals("")) {
                 			Client.this.pNames.add(tok[i]);
+                			gs.addPlayer(tok[i]);
                 		}
                 	}
                 }
             }.start();
-
         } catch (ConnectException e2) {
-            display("Exception connecting to server: " + e2);
-            System.out.println(e2);
+            e2.printStackTrace();
             return false;
         } catch (IOException e3) {
-            // e.printStackTrace();
-            display("Exception in server/port I/O: " + e3);
+            e3.printStackTrace();
             return false;
         }
         return true;
@@ -118,12 +131,25 @@ public class Client {
 
     public void sendMessage(String message){
         try {
-            out.writeUTF(message);
-            display(name + ": " + message);
-
+        	boolean invalid = false;
+        	
+        	if(message.startsWith("join: ") || Code.codeExists(message)) {
+        		message = "Invalid message to send...";
+        		invalid = true;
+        	}
+        	
+        	if(!invalid) {
+        		out.writeUTF(message);
+        	}
+        	
+            if(game != null) {
+        		game.updateChat(name + ": " + message);
+        	} else {
+        		display(name + ": " + message);
+        	}
         }
         catch(IOException e) {
-            display("Exception sending to server: " + e);
+        	e.printStackTrace();
         }
     }
     
@@ -132,18 +158,22 @@ public class Client {
             out.writeUTF(Code.START_CODE);
         }
         catch(IOException e) {
-            display("Exception sending to server: " + e);
+        	e.printStackTrace();
+        }
+    }
+
+    public void stopUDP() {
+    	try {
+            out.writeUTF(Code.UDP_STOP_STATUS);
+        }
+        catch(IOException e) {
+        	e.printStackTrace();
         }
     }
 
     public String getName(){
         return this.name;
     }
-    
-    public void setChatRoom(ChatRoom gui) {
-    	this.gui = gui;
-    }
-    
     public void setGameSetup(GameSetup gs) {
     	this.gs = gs;
     	
@@ -160,42 +190,7 @@ public class Client {
     	return this.sock;
     }
 
-    // public static void main(String[] args) {
-    //     Scanner sc = new Scanner(System.in);
-    //     String serverName;
-    //     String name;
-    //     int port;
-
-    //     if(args.length < 2) {
-    //         help();
-    //         return;
-    //     }
-
-    //     serverName = args[0];
-    //     try{
-    //         port = Integer.parseInt(args[1]);
-    //     } catch (NumberFormatException e) {
-    //         help();
-    //         return;
-    //     }
-
-    //     System.out.print("Enter your name: ");
-    //     name = sc.nextLine();
-        
-    //     new Client(name).connect(serverName, port); 
-    // }
-
     public void display(String msg) {
-        gui.append(msg + "\n");      // append to the PlayerLogin JTextArea (or whatever)
         gs.displayInChat(msg + "\n");
     }
-    
-    public ChatRoom getChatRoom() {
-    	return this.gui;
-    }
-
-    /*private static void help() {
-        System.out.println("Using the Client class:");
-        System.out.println("java Client [ip address] [port number]");
-    }*/
 }
