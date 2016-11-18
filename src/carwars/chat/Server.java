@@ -20,7 +20,9 @@ public class Server extends Thread {
 	private DatagramSocket udpSocket;
 	private HashMap<String, Socket> sockets;
 	private Queue queue;
+	private Thread udpSend;
 	
+	private int stop;
 	private boolean hasStarted;
 
 	public Server(int port) throws IOException {
@@ -28,6 +30,7 @@ public class Server extends Thread {
 		udpSocket = new DatagramSocket(Config.UDP_SERVER_PORT);
 		sockets = new HashMap<>();
 		hasStarted = false;
+		stop = 0;
 	}
 
 	public void run(){
@@ -35,7 +38,7 @@ public class Server extends Thread {
 
 		try{
 			while(true){
-				final Socket server = serverSocket.accept();
+				Socket server = serverSocket.accept();
 				
 				if(hasStarted) {
 					DataOutputStream out = new DataOutputStream(server.getOutputStream());
@@ -45,18 +48,19 @@ public class Server extends Thread {
 					out.writeUTF("The server's max players reached. Cannot accept anymore players.");
 				}
 				
+
 				new Thread(){
 					@Override
 					public void run(){
+						DataInputStream in;
+						DataOutputStream out;
+						String message;
 						String name = null;
+						
 						try {
-							DataInputStream in;
-							DataOutputStream out;
-							String message;
-
 							in = new DataInputStream(server.getInputStream());
 							name = Server.this.checkDuplicate(in.readUTF());
-
+							
 							sockets.put(name, server);
 
 							out = new DataOutputStream(server.getOutputStream());
@@ -94,7 +98,13 @@ public class Server extends Thread {
 									queue.start();
 									
 									System.out.println("Game has started.");
+								} else if(message.equals(Code.UDP_STOP_STATUS)) {
+									stop++;
+									if(stop == sockets.size() && !udpSend.isInterrupted()) {
+										udpSend.interrupt();
+									}
 								} else {
+									System.out.println(name + ": " + message);
 									Server.this.sendToAll(name + ": " + message, server);
 								}
 							}
@@ -142,7 +152,7 @@ public class Server extends Thread {
 		return name;
 	}
 
-	private void sendToAll(String message, Socket socket) {		
+	public void sendToAll(String message, Socket socket) {		
 		for(String name : sockets.keySet()) {
 			Socket s = sockets.get(name);
 
@@ -166,10 +176,10 @@ public class Server extends Thread {
 		DatagramPacket packet;
 		byte[] buf = new byte[Config.BUFFER_SIZE];
 		
-		new Thread() {
+		udpSend = new Thread() {
 			@Override
 			public void run() {
-				while(true) {
+				while(!this.isInterrupted()) {
 					try{
 						Server.this.udpSend(Code.GET_ALL_STATUS + queue.returnStatuses());
 						Thread.sleep(100);
@@ -178,7 +188,8 @@ public class Server extends Thread {
 					}
 				}
 			}
-		}.start();
+		};
+		udpSend.start();
 		
 		try{
 			while(true) {

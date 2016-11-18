@@ -69,9 +69,7 @@ public class Client {
                     try{
                         String reply;
                         while(!sock.isClosed()){
-                            while((reply = in.readUTF()) == null){
-                            	System.out.println("received: " + reply);
-                            }
+                            while((reply = in.readUTF()) == null){}
                             
                             //receives a code for a new client name
                             if(reply.startsWith("name: ") && !hasName) {
@@ -98,6 +96,7 @@ public class Client {
                             }
                             //else, no code detected. display the message on screen
                             else {
+                            	System.out.println(reply);
                             	if(game != null) {
                             		game.updateChat(reply);
                             	} else {
@@ -147,6 +146,16 @@ public class Client {
     public void startGame() {
     	try {
             out.writeUTF(Code.START_CODE);
+        }
+        catch(IOException e) {
+        	e.printStackTrace();
+            //display("Exception sending to server: " + e);
+        }
+    }
+
+    public void stopUDP() {
+    	try {
+            out.writeUTF(Code.UDP_STOP_STATUS);
         }
         catch(IOException e) {
         	e.printStackTrace();

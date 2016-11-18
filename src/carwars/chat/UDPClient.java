@@ -77,7 +77,8 @@ public class UDPClient extends Thread{
 			p.update(Integer.parseInt(tok[1]),
 					 Integer.parseInt(tok[2]),
 					 Integer.parseInt(tok[3]),
-					 Integer.parseInt(tok[4]));
+					 Integer.parseInt(tok[4]),
+					 Integer.parseInt(tok[5]));
 		}
 	}
 	

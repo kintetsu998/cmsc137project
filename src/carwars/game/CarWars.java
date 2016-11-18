@@ -31,6 +31,7 @@ public class CarWars extends BasicGame {
 	private int[][] terrainMap;
 	private SpriteSheet terrain;
 	private TrueTypeFont ttf;
+	private Animation deadCar;
 	
 	private Image marker;
 	private Image sun;
@@ -70,6 +71,13 @@ public class CarWars extends BasicGame {
 		udpClient = new UDPClient(this);
 		messages = new ArrayList<>(Arrays.asList("","","",""));
 		rand = new Random();
+		deadCar = new Animation(
+				new SpriteSheet(
+						"resource/sprites/car-dead.png", 
+						Player.CAR_WIDTH, 
+						Player.CAR_HEIGHT + 4), 
+				Config.ANIM_SPEED
+		);
 		
 		try{
 			String statuses = udpClient.receive();
@@ -115,6 +123,7 @@ public class CarWars extends BasicGame {
 	private void initWeather(int n) throws SlickException{
 		int x = rand.nextInt(50);
 		int y = rand.nextInt(40);
+		
 		sun = new Image("resource/weather/sun.png");
 		cloud = new Image("resource/weather/cloud.png");
 		
@@ -198,15 +207,6 @@ public class CarWars extends BasicGame {
 			}
 		}
 		
-		/* else if(input.isKeyDown(Input.KEY_UP)) {
-			player.incAngle();
-		} else if(input.isKeyDown(Input.KEY_DOWN)) {
-			player.decAngle();
-		} else if(input.isKeyDown(Input.KEY_SPACE)) { //&& player.isTurn()) {
-			shooting = true;
-			player.incForce();
-		}*/
-		
 		for(Player p : Player.players.values()) {
 			p.getSpriteAnim().update(delta);
 		}
@@ -215,12 +215,12 @@ public class CarWars extends BasicGame {
 		udpClient.sendStatus();
 	}
 	
-	private float getPlayerAngle(Player p, int x, int y) {
+	private int getPlayerAngle(Player p, int x, int y) {
 		int xdist = (int) p.getX()-x;
 		int ydist = (int) (p.getY()-y) * -1;
 		float angle = (float) Math.toDegrees(Math.atan((float) ydist/xdist));
 		
-		return angle;
+		return (int) Math.floor(angle);
 	}
 	
 	private float getPlayerForce(Player p, int x, int y) {
@@ -237,7 +237,6 @@ public class CarWars extends BasicGame {
 		renderTerrain(g);
 		renderWeather(g);
 		
-		renderAddInfo(player, g);
 		for(Player p : Player.players.values()) {
 			if(!p.isDead()) {
 				renderPlayer(p, g);
@@ -252,6 +251,13 @@ public class CarWars extends BasicGame {
 		}
 		
 		renderChat(g);
+		
+		if(Config.DEBUG) {
+			g.setColor(Color.red);
+			g.draw(player.hitBox());
+			g.draw(player.leftHitBox());
+			g.draw(player.rightHitBox());
+		}
 	}
 	
 	private void renderWeather(Graphics g) {
@@ -288,6 +294,8 @@ public class CarWars extends BasicGame {
 				i++;
 			}
 		}
+		
+		client.stopUDP();
 	}
 	
 	private void initPlayerSprites(ArrayList<SpriteSheet> playerSprite) throws SlickException{
@@ -296,7 +304,7 @@ public class CarWars extends BasicGame {
 					+ Integer.toString(i)
 					+ "-sprites.png";
 			
-			playerSprite.add(new SpriteSheet(filename, 40, 30));
+			playerSprite.add(new SpriteSheet(filename, Player.CAR_WIDTH, Player.CAR_HEIGHT));
 		}
 	}
 	
@@ -307,6 +315,8 @@ public class CarWars extends BasicGame {
 			return;
 		}
 		
+		System.out.println(msg);
+		
 		for(String status : statuses) {
 			if(!status.trim().equals("")){
 				String[] tok = status.trim().split(" ");
@@ -316,7 +326,8 @@ public class CarWars extends BasicGame {
 					p.update(Integer.parseInt(tok[1]),
 							 Integer.parseInt(tok[2]),
 							 Integer.parseInt(tok[3]),
-							 Integer.parseInt(tok[4]));
+							 Integer.parseInt(tok[4]),
+							 Integer.parseInt(tok[5]));
 				}
 			}
 		}
@@ -336,52 +347,27 @@ public class CarWars extends BasicGame {
 	}
 
 	private void renderPlayer(Player p, Graphics g) {
-		g.setColor(Color.black);
-		if(p.getFront() == Player.RIGHT) {
-			p.getSpriteAnim().draw(p.getX(), p.getY());
-		} else {
-			p.getSpriteAnim().getCurrentFrame().getFlippedCopy(true, false).draw(p.getX(), p.getY());
-		}
-		
-		g.drawString(p.getName(), p.getX(), p.getY() - 15);
-		g.fillRect(p.getX()-1, p.getY() + Player.CAR_HEIGHT-1, Player.CAR_WIDTH+2, 7);
-		
-		g.setColor(Color.green);
-		g.fillRect(p.getX(), p.getY() + Player.CAR_HEIGHT, remainingHP(p), 5);
-	}
-	
-	private void renderAddInfo(Player p, Graphics g) {
 		Image markerCopy;
-		/*g.setColor(Color.white);
-		g.fillRect(p.getX(), p.getY() + Player.CAR_HEIGHT + 14, remainingMov(p), 5);*/
 		
 		g.setColor(Color.black);
 		if(p.getFront() == Player.RIGHT) {
 			markerCopy = marker.copy();
 			markerCopy.rotate(p.getAngle() * -1);
 			markerCopy.draw(p.getX()-Player.CAR_WIDTH*2/3, p.getY() + Player.CAR_HEIGHT/4);
-			//g.drawString(Integer.toString(p.getAngle()), p.getX() + Player.CAR_WIDTH, p.getY());
+			p.getSpriteAnim().draw(p.getX(), p.getY());
 		} else {
 			markerCopy = marker.getFlippedCopy(true,false);
 			markerCopy.rotate(p.getAngle() * -1);
 			markerCopy.draw(p.getX()-Player.CAR_WIDTH, p.getY() + Player.CAR_HEIGHT/4);
-			//g.drawString(Integer.toString(p.getAngle()), p.getX()-Player.CAR_WIDTH/5, p.getY());
+			p.getSpriteAnim().getCurrentFrame().getFlippedCopy(true, false).draw(p.getX(), p.getY());
 		}
 		
-		/*if(shooting) {
-			g.setColor(Color.orange);
-			g.fillRect(p.getX(), p.getY() + Player.CAR_HEIGHT + 7, remainingForce(p), 5);
-		}*/
-		
-		/*if(chatting) {
-			g.drawString("Chatting...", 10, 80);
-		}*/
-		
-		if(Config.DEBUG) {
-			g.setColor(Color.red);
-			g.draw(p.hitBox());
-			g.draw(p.leftHitBox());
-			g.draw(p.rightHitBox());
+		if(!p.isDead()) {
+			g.drawString(p.getName(), p.getX(), p.getY() - 15);
+			g.fillRect(p.getX()-1, p.getY() + Player.CAR_HEIGHT-1, Player.CAR_WIDTH+2, 7);
+			
+			g.setColor(Color.green);
+			g.fillRect(p.getX(), p.getY() + Player.CAR_HEIGHT, remainingHP(p), 5);
 		}
 	}
 	
@@ -403,14 +389,6 @@ public class CarWars extends BasicGame {
 	private float remainingHP(Player p) {
 		return getBarWidth(p.getHP(), Player.MAX_HP, Player.CAR_WIDTH);
 	}
-	
-	/*private float remainingMov(Player p) {
-		return getBarWidth(p.getMovement(), Player.CAR_MAX_DIST, Player.CAR_WIDTH);
-	}
-	
-	private float remainingForce(Player p) {
-		return getBarWidth(p.getForce(), Player.MAX_FORCE, Player.CAR_WIDTH);
-	}*/
 	
 	private float getBarWidth(float rem, float max, float width) {
 		return Math.max(((float) rem/max)*width, 0);
