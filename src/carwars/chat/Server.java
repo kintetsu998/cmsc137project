@@ -9,28 +9,32 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
-import carwars.model.Queue;
+import carwars.model.Player;
 import carwars.util.Code;
 import carwars.util.Config;
 
 public class Server extends Thread {
 	private ServerSocket serverSocket;
 	private DatagramSocket udpSocket;
-	private HashMap<String, Socket> sockets;
-	private Queue queue;
 	private Thread udpSend;
+	
+	private HashMap<String, Socket> sockets;
+	private ArrayList<Player> pList;
 	
 	private int stop;
 	private boolean hasStarted;
 
 	public Server(int port) throws IOException {
-		serverSocket = new ServerSocket(port);
-		udpSocket = new DatagramSocket(Config.UDP_SERVER_PORT);
-		sockets = new HashMap<>();
-		hasStarted = false;
-		stop = 0;
+		serverSocket 	= new ServerSocket(port);
+		udpSocket 		= new DatagramSocket(Config.UDP_SERVER_PORT);
+		sockets 		= new HashMap<>();
+		pList 			= new ArrayList<>();
+		hasStarted 		= false;
+		stop 			= 0;
 	}
 
 	public void run(){
@@ -86,7 +90,7 @@ public class Server extends Thread {
 										hasStarted = true;
 									}
 									
-									Server.this.queue = new Queue(getNames());
+									initializePList(getNames());
 									
 									new Thread() {
 										@Override
@@ -94,8 +98,6 @@ public class Server extends Thread {
 											Server.this.udpReceive();
 										}
 									}.start();
-									
-									queue.start();
 									
 									System.out.println("Game has started.");
 								} else if(message.equals(Code.UDP_STOP_STATUS)) {
@@ -122,6 +124,19 @@ public class Server extends Thread {
 		}
 	}
 	
+	protected void initializePList(String names) {
+		String[] tok = names.split(" ");
+		Random r = new Random();
+		
+		for(String s : tok) {
+			pList.add(new Player(s, 
+					null, 
+					r.nextInt(Config.GAME_WIDTH - Player.CAR_WIDTH), 
+					null)
+			);
+		}
+	}
+
 	private String getNames() {
 		String str = "";
 		
@@ -152,7 +167,7 @@ public class Server extends Thread {
 		return name;
 	}
 
-	public void sendToAll(String message, Socket socket) {		
+	public void sendToAll(String message, Socket socket) {
 		for(String name : sockets.keySet()) {
 			Socket s = sockets.get(name);
 
@@ -166,11 +181,6 @@ public class Server extends Thread {
 			}
 		}
 	}
-
-	private static void help() {
-		System.out.println("Using the Server class:");
-		System.out.println("java Server [port number]");
-	}
 	
 	public void udpReceive() {
 		DatagramPacket packet;
@@ -181,12 +191,22 @@ public class Server extends Thread {
 			public void run() {
 				while(!this.isInterrupted()) {
 					try{
-						Server.this.udpSend(Code.GET_ALL_STATUS + queue.returnStatuses());
+						Server.this.udpSend(Code.GET_ALL_STATUS + returnStatuses());
 						Thread.sleep(100);
 					} catch(Exception e) {
 						Thread.currentThread().interrupt();
 					}
 				}
+			}
+			
+			private String returnStatuses() {
+				String status = " ";
+				
+				for(Player p : pList) {
+					status += p.toString() + ",";
+				}
+				
+				return status;
 			}
 		};
 		udpSend.start();
@@ -220,7 +240,7 @@ public class Server extends Thread {
 		try{
 			port = Integer.parseInt(args[0]);
 		} catch (Exception e) {
-			help();
+			port = 8080;
 			return;
 		}
 

@@ -315,8 +315,6 @@ public class CarWars extends BasicGame {
 			return;
 		}
 		
-		System.out.println(msg);
-		
 		for(String status : statuses) {
 			if(!status.trim().equals("")){
 				String[] tok = status.trim().split(" ");

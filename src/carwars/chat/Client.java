@@ -17,7 +17,6 @@ public class Client {
     
     private DataInputStream in;
     private DataOutputStream out;
-    private ChatRoom gui;
     private GameSetup gs;
     
     private int port;
@@ -106,6 +105,7 @@ public class Client {
                         }
                     } catch(Exception e1) {
                         JOptionPane.showMessageDialog(null, "The server closed.");
+                        e1.printStackTrace();
                         System.exit(1);
                     }
                 }
@@ -114,6 +114,7 @@ public class Client {
                 	for(int i = 1; i < tok.length; i++) {
                 		if(!tok[i].trim().equals("")) {
                 			Client.this.pNames.add(tok[i]);
+                			gs.addPlayer(tok[i]);
                 		}
                 	}
                 }
@@ -130,7 +131,17 @@ public class Client {
 
     public void sendMessage(String message){
         try {
-            out.writeUTF(message);
+        	boolean invalid = false;
+        	
+        	if(message.startsWith("join: ") || Code.codeExists(message)) {
+        		message = "Invalid message to send...";
+        		invalid = true;
+        	}
+        	
+        	if(!invalid) {
+        		out.writeUTF(message);
+        	}
+        	
             if(game != null) {
         		game.updateChat(name + ": " + message);
         	} else {
@@ -139,7 +150,6 @@ public class Client {
         }
         catch(IOException e) {
         	e.printStackTrace();
-            //display("Exception sending to server: " + e);
         }
     }
     
@@ -149,7 +159,6 @@ public class Client {
         }
         catch(IOException e) {
         	e.printStackTrace();
-            //display("Exception sending to server: " + e);
         }
     }
 
@@ -159,18 +168,12 @@ public class Client {
         }
         catch(IOException e) {
         	e.printStackTrace();
-            //display("Exception sending to server: " + e);
         }
     }
 
     public String getName(){
         return this.name;
     }
-    
-    public void setChatRoom(ChatRoom gui) {
-    	this.gui = gui;
-    }
-    
     public void setGameSetup(GameSetup gs) {
     	this.gs = gs;
     	
@@ -182,42 +185,12 @@ public class Client {
     public void setName(String n){
         name = n;
     }
-
-    // public static void main(String[] args) {
-    //     Scanner sc = new Scanner(System.in);
-    //     String serverName;
-    //     String name;
-    //     int port;
-
-    //     if(args.length < 2) {
-    //         help();
-    //         return;
-    //     }
-
-    //     serverName = args[0];
-    //     try{
-    //         port = Integer.parseInt(args[1]);
-    //     } catch (NumberFormatException e) {
-    //         help();
-    //         return;
-    //     }
-
-    //     System.out.print("Enter your name: ");
-    //     name = sc.nextLine();
-        
-    //     new Client(name).connect(serverName, port); 
-    // }
+    
+    public Socket getSocket(){
+    	return this.sock;
+    }
 
     public void display(String msg) {
-        gui.append(msg + "\n");      // append to the PlayerLogin JTextArea (or whatever)
+        gs.displayInChat(msg + "\n");
     }
-    
-    public ChatRoom getChatRoom() {
-    	return this.gui;
-    }
-
-    /*private static void help() {
-        System.out.println("Using the Client class:");
-        System.out.println("java Client [ip address] [port number]");
-    }*/
 }
