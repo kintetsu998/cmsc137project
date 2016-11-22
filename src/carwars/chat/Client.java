@@ -71,36 +71,35 @@ public class Client {
                             while((reply = in.readUTF()) == null){}
                             
                             //receives a code for a new client name
-                            if(reply.startsWith("name: ") && !hasName) {
+                           if(reply.startsWith(Code.PLAYER_NAME) && !hasName) {
                             	String[] tok = reply.split(" ");
                             	
                             	Client.this.name = tok[1];
                             	hasName = true;
+                            	
+                            	showMessage("You are now connected as " + tok[1] + ".");
                             } 
                             //receives a code for someone joining the game
-                            else if(reply.startsWith("join: ")) {
+                            else if(reply.startsWith(Code.PLAYER_JOIN)) {
                             	String[] tok = reply.split(" ");
                             	
                             	Client.this.pNames.add(tok[1]);
                             	gs.addPlayer(tok[1]);
+                            	
+                            	showMessage(tok[1] + " has connected to the game!");
                             }
                             //receives a code for a list of current players in the room
-                            else if(reply.startsWith("list: ") && !hasList) {
+                            else if(reply.startsWith(Code.PLAYER_LIST) && !hasList) {
                             	addPNames(reply.split(" "));
                             	hasList = true;
                             }
                             //receives a code that should start the game;
                             else if(reply.equals(Code.START_CODE)) {
-                            	gs.startGame(Client.this);
+                            	gs.startGame();
                             }
                             //else, no code detected. display the message on screen
                             else {
-                            	System.out.println(reply);
-                            	if(game != null) {
-                            		game.updateChat(reply);
-                            	} else {
-                            		display(reply);
-                            	}
+                            	showMessage(reply);
                             }
                         }
                     } catch(Exception e1) {
@@ -128,17 +127,20 @@ public class Client {
         }
         return true;
     }
+    
+    private void showMessage(String message) {
+    	if(game != null) {
+    		game.updateChat(message);
+    	} else {
+    		display(message);
+    	}
+    }
 
-    public void sendMessage(String message){
-        try {
-        	boolean invalid = false;
-        	
-        	if(message.startsWith("join: ") || Code.codeExists(message)) {
+    public void sendMessage(String message) {
+        try {        	
+        	if(Code.codeExists(message)) {
         		message = "Invalid message to send...";
-        		invalid = true;
-        	}
-        	
-        	if(!invalid) {
+        	} else {
         		out.writeUTF(message);
         	}
         	

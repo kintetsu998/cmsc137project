@@ -195,6 +195,11 @@ public class PlayerLogin extends JFrame implements ActionListener {
                 errLabel.setForeground(Color.RED);
                 connected = false;
                 return;
+            } else if(t1.contains("@")) {
+            	errLabel.setText("Username should not contain @ symbol.");
+                errLabel.setForeground(Color.RED);
+                connected = false;
+                return;
             }
             else{
 

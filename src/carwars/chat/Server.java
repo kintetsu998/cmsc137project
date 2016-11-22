@@ -68,37 +68,30 @@ public class Server extends Thread {
 							sockets.put(name, server);
 
 							out = new DataOutputStream(server.getOutputStream());
-							out.writeUTF("You are now connected as " + name);
+							//out.writeUTF("You are now connected as " + name);
 							
 							//sends a list of names for the newly joined player
-							out.writeUTF("list: " + getNames());
+							out.writeUTF(Code.PLAYER_LIST + getNames());
 							
 							//sends the new name in case there are duplicates
-							out.writeUTF("name: " + name);
+							out.writeUTF(Code.PLAYER_NAME + name);
 							
 							//sends to all that someone will join the game
-							Server.this.sendToAll("join: " + name, server);
+							Server.this.sendToAll(Code.PLAYER_JOIN + name, server);
 							
 							//send to all that someone connected the game
-							Server.this.sendToAll(name + " connected!", server);
+							//Server.this.sendToAll(name + " connected!", server);
 							
 							while(true) {
 								message = in.readUTF();
 								if(message.equals(Code.START_CODE)) {
-									Server.this.sendToAll(message, server);
-									if(!Config.DEBUG) {
-										hasStarted = true;
-									}
+									hasStarted = (Config.DEBUG)? false: true;
 									
 									initializePList(getNames());
+									Server.this.startUDP();
 									
-									new Thread() {
-										@Override
-										public void run() {
-											Server.this.udpReceive();
-										}
-									}.start();
-									
+									Server.this.sendToAll(message, server);
+									//Server.this.startGame();
 									System.out.println("Game has started.");
 								} else if(message.equals(Code.UDP_STOP_STATUS)) {
 									stop++;
@@ -106,7 +99,6 @@ public class Server extends Thread {
 										udpSend.interrupt();
 									}
 								} else {
-									System.out.println(name + ": " + message);
 									Server.this.sendToAll(name + ": " + message, server);
 								}
 							}
@@ -182,10 +174,20 @@ public class Server extends Thread {
 		}
 	}
 	
-	public void udpReceive() {
-		DatagramPacket packet;
-		byte[] buf = new byte[Config.BUFFER_SIZE];
-		
+	public void startGame() {
+		for(String name : sockets.keySet()) {
+			Socket s = sockets.get(name);
+
+			try{
+				DataOutputStream out = new DataOutputStream(s.getOutputStream());
+				out.writeUTF(Code.START_CODE);
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void startUDP() {
 		udpSend = new Thread() {
 			@Override
 			public void run() {
@@ -210,20 +212,6 @@ public class Server extends Thread {
 			}
 		};
 		udpSend.start();
-		
-		try{
-			while(true) {
-				String msg;
-				
-				packet = new DatagramPacket(buf, buf.length);
-				this.udpSocket.receive(packet);
-				
-				msg = new String(packet.getData(), 0, packet.getLength());
-				Server.this.udpSend(msg);
-			}
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
 	}
 	
 	public void udpSend(String msg) throws Exception {
