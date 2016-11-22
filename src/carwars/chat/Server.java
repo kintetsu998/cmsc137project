@@ -68,7 +68,6 @@ public class Server extends Thread {
 							sockets.put(name, server);
 
 							out = new DataOutputStream(server.getOutputStream());
-							//out.writeUTF("You are now connected as " + name);
 							
 							//sends a list of names for the newly joined player
 							out.writeUTF(Code.PLAYER_LIST + getNames());
@@ -78,9 +77,6 @@ public class Server extends Thread {
 							
 							//sends to all that someone will join the game
 							Server.this.sendToAll(Code.PLAYER_JOIN + name, server);
-							
-							//send to all that someone connected the game
-							//Server.this.sendToAll(name + " connected!", server);
 							
 							while(true) {
 								message = in.readUTF();
