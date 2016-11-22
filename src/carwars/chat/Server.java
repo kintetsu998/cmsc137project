@@ -89,9 +89,8 @@ public class Server extends Thread {
 									
 									initializePList(getNames());
 									Server.this.startUDP();
+									Server.this.startGame();
 									
-									Server.this.sendToAll(message, server);
-									//Server.this.startGame();
 									System.out.println("Game has started.");
 								} else if(message.equals(Code.UDP_STOP_STATUS)) {
 									stop++;
@@ -116,7 +115,7 @@ public class Server extends Thread {
 		}
 	}
 	
-	protected void initializePList(String names) {
+	private void initializePList(String names) {
 		String[] tok = names.split(" ");
 		Random r = new Random();
 		

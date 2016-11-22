@@ -95,9 +95,7 @@ public class GameSetup extends JPanel implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if(tableModel.getRowCount() >= Config.MIN_PLAYERS) {
-					System.out.println(client.getName());
 					GameSetup.this.client.startGame();
-					GameSetup.this.startGame();
 				} else {
 					JOptionPane.showMessageDialog(frame, "Wait for more players...");
 				}
@@ -149,6 +147,7 @@ public class GameSetup extends JPanel implements ActionListener {
     
     public void startGame() {
     	frame.dispose();
+    	
     	new Thread() {
     		@Override
     		public void run() {
