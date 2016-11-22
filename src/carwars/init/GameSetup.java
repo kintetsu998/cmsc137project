@@ -49,7 +49,6 @@ public class GameSetup extends JPanel implements ActionListener {
     private static int playersCount = 0;
     private DefaultTableModel tableModel;
     
-    //private ChatRooms cr;
     private Client client;
     
     public GameSetup(PlayerLogin pl, Client c) {
@@ -71,8 +70,6 @@ public class GameSetup extends JPanel implements ActionListener {
         frame.setSize(400, 600);
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
-        
-        pl.getClient().setGameSetup(this);
     }
     
     public void showWindow() {
@@ -98,8 +95,9 @@ public class GameSetup extends JPanel implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if(tableModel.getRowCount() >= Config.MIN_PLAYERS) {
+					System.out.println(client.getName());
 					GameSetup.this.client.startGame();
-					GameSetup.this.startGame(client);
+					GameSetup.this.startGame();
 				} else {
 					JOptionPane.showMessageDialog(frame, "Wait for more players...");
 				}
@@ -149,20 +147,24 @@ public class GameSetup extends JPanel implements ActionListener {
         splitPane.add(bottomHalf);
     }
     
-    public void startGame(Client client) {
-    	try {
-    		frame.dispose();
-    		
-    		//starts the game
-			AppGameContainer app = new AppGameContainer(new CarWars("Car Wars", client));
-			app.setDisplayMode(800, 600, false); //create 800x600 frame
-			app.setTargetFrameRate(60); //cap FPS to 60
-			app.setShowFPS(Config.DEBUG);
-			app.setAlwaysRender(true);
-			app.start();
-		} catch (SlickException e) {
-			e.printStackTrace();
-		}
+    public void startGame() {
+    	frame.dispose();
+    	new Thread() {
+    		@Override
+    		public void run() {
+		    	try {
+		    		//starts the game
+					AppGameContainer app = new AppGameContainer(new CarWars("Car Wars", client));
+					app.setDisplayMode(800, 600, false); //create 800x600 frame
+					app.setTargetFrameRate(60); //cap FPS to 60
+					app.setShowFPS(Config.DEBUG);
+					app.setAlwaysRender(true);
+					app.start();
+				} catch (SlickException e) {
+					e.printStackTrace();
+				}
+    		}
+    	}.start();
     }
     
     public void addPlayer(String playerName) {

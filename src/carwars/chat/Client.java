@@ -76,6 +76,8 @@ public class Client {
                             	
                             	Client.this.name = tok[1];
                             	hasName = true;
+                            	
+                            	showMessage("You are now connected as " + tok[1] + ".");
                             } 
                             //receives a code for someone joining the game
                             else if(reply.startsWith(Code.PLAYER_JOIN)) {
@@ -83,6 +85,8 @@ public class Client {
                             	
                             	Client.this.pNames.add(tok[1]);
                             	gs.addPlayer(tok[1]);
+                            	
+                            	showMessage(tok[1] + " has connected to the game!");
                             }
                             //receives a code for a list of current players in the room
                             else if(reply.startsWith(Code.PLAYER_LIST) && !hasList) {
@@ -91,16 +95,11 @@ public class Client {
                             }
                             //receives a code that should start the game;
                             else if(reply.equals(Code.START_CODE)) {
-                            	gs.startGame(Client.this);
+                            	gs.startGame();
                             }
                             //else, no code detected. display the message on screen
                             else {
-                            	System.out.println(reply);
-                            	if(game != null) {
-                            		game.updateChat(reply);
-                            	} else {
-                            		display(reply);
-                            	}
+                            	showMessage(reply);
                             }
                         }
                     } catch(Exception e1) {
@@ -128,8 +127,16 @@ public class Client {
         }
         return true;
     }
+    
+    private void showMessage(String message) {
+    	if(game != null) {
+    		game.updateChat(message);
+    	} else {
+    		display(message);
+    	}
+    }
 
-    public void sendMessage(String message){
+    public void sendMessage(String message) {
         try {        	
         	if(Code.codeExists(message)) {
         		message = "Invalid message to send...";
