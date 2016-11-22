@@ -68,19 +68,19 @@ public class Server extends Thread {
 							sockets.put(name, server);
 
 							out = new DataOutputStream(server.getOutputStream());
-							out.writeUTF("You are now connected as " + name);
+							//out.writeUTF("You are now connected as " + name);
 							
 							//sends a list of names for the newly joined player
-							out.writeUTF("list: " + getNames());
+							out.writeUTF(Code.PLAYER_LIST + getNames());
 							
 							//sends the new name in case there are duplicates
-							out.writeUTF("name: " + name);
+							out.writeUTF(Code.PLAYER_NAME + name);
 							
 							//sends to all that someone will join the game
-							Server.this.sendToAll("join: " + name, server);
+							Server.this.sendToAll(Code.PLAYER_JOIN + name, server);
 							
 							//send to all that someone connected the game
-							Server.this.sendToAll(name + " connected!", server);
+							//Server.this.sendToAll(name + " connected!", server);
 							
 							while(true) {
 								message = in.readUTF();
@@ -178,6 +178,19 @@ public class Server extends Thread {
 				} catch(IOException e) {
 					e.printStackTrace();
 				}
+			}
+		}
+	}
+	
+	public void startGame() {
+		for(String name : sockets.keySet()) {
+			Socket s = sockets.get(name);
+
+			try{
+				DataOutputStream out = new DataOutputStream(s.getOutputStream());
+				out.writeUTF(Code.START_CODE);
+			} catch(IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}

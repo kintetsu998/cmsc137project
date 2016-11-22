@@ -71,21 +71,21 @@ public class Client {
                             while((reply = in.readUTF()) == null){}
                             
                             //receives a code for a new client name
-                            if(reply.startsWith("name: ") && !hasName) {
+                           if(reply.startsWith(Code.PLAYER_NAME) && !hasName) {
                             	String[] tok = reply.split(" ");
                             	
                             	Client.this.name = tok[1];
                             	hasName = true;
                             } 
                             //receives a code for someone joining the game
-                            else if(reply.startsWith("join: ")) {
+                            else if(reply.startsWith(Code.PLAYER_JOIN)) {
                             	String[] tok = reply.split(" ");
                             	
                             	Client.this.pNames.add(tok[1]);
                             	gs.addPlayer(tok[1]);
                             }
                             //receives a code for a list of current players in the room
-                            else if(reply.startsWith("list: ") && !hasList) {
+                            else if(reply.startsWith(Code.PLAYER_LIST) && !hasList) {
                             	addPNames(reply.split(" "));
                             	hasList = true;
                             }
@@ -130,15 +130,10 @@ public class Client {
     }
 
     public void sendMessage(String message){
-        try {
-        	boolean invalid = false;
-        	
-        	if(message.startsWith("join: ") || Code.codeExists(message)) {
+        try {        	
+        	if(Code.codeExists(message)) {
         		message = "Invalid message to send...";
-        		invalid = true;
-        	}
-        	
-        	if(!invalid) {
+        	} else {
         		out.writeUTF(message);
         	}
         	
