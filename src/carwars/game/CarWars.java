@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
+import javax.swing.JOptionPane;
+
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
@@ -33,7 +35,6 @@ public class CarWars extends BasicGame {
 	private int[][] terrainMap;
 	private SpriteSheet terrain;
 	private TrueTypeFont ttf;
-	private Animation deadCar;
 	
 	private Image marker;
 	private Image sun;
@@ -74,10 +75,6 @@ public class CarWars extends BasicGame {
 		udpClient = new UDPClient(this);
 		messages = new ArrayList<>(Arrays.asList("","","",""));
 		rand = new Random();
-		deadCar = new Animation(
-				new SpriteSheet(Resources.DEAD_CAR, Player.CAR_WIDTH, Player.CAR_HEIGHT+4), 
-				Config.ANIM_SPEED
-		);
 		
 		try{
 			String statuses = udpClient.receive();
@@ -212,8 +209,37 @@ public class CarWars extends BasicGame {
 		
 		chatBox.setFocus(chatting);
 		udpClient.sendStatus();
+		
+		if(aliveCount() <= 1) {
+			String name = getAlive();
+			if(name != null) {
+				JOptionPane.showMessageDialog(null, name + " won the game!");
+				System.exit(0);
+			} else {
+				JOptionPane.showMessageDialog(null, "It is a draw.");
+				System.exit(0);
+			}
+		}
 	}
 	
+	private int aliveCount() {
+		int count = 0;
+		for(Player p: Player.players.values()){
+			if(!p.isDead()) count++;
+		}
+		
+		return count;
+	}
+	
+	private String getAlive() {
+		for(String name: Player.players.keySet()){
+			if(!Player.players.get(name).isDead()) 
+				return name;
+		}
+		
+		return null;
+	}
+
 	private int getPlayerAngle(Player p, int x, int y) {
 		int xdist = (int) p.getX()-x;
 		int ydist = (int) (p.getY()-y) * -1;
@@ -238,9 +264,7 @@ public class CarWars extends BasicGame {
 		renderBullet();
 		
 		for(Player p : Player.players.values()) {
-			if(!p.isDead()) {
-				renderPlayer(p, g);
-			}
+			renderPlayer(p, g);
 		}
 		
 		
@@ -278,6 +302,15 @@ public class CarWars extends BasicGame {
 		ArrayList<SpriteSheet> playerSprites = new ArrayList<>();
 		String[] statuses = msg.replace(Code.GET_ALL_STATUS, "").split(",");
 		int i=0;
+		
+		Animation deadCar = new Animation(
+				new SpriteSheet(
+						Resources.DEAD_CAR, 
+						Player.CAR_WIDTH, 
+						Player.CAR_HEIGHT+4
+				), 
+				Config.ANIM_SPEED
+		);
 		
 		initPlayerSprites(playerSprites);
 		
@@ -360,14 +393,18 @@ public class CarWars extends BasicGame {
 		
 		g.setColor(Color.black);
 		if(p.getFront() == Player.RIGHT) {
-			markerCopy = marker.copy();
-			markerCopy.rotate(p.getAngle() * -1);
-			markerCopy.draw(p.getX()-Player.CAR_WIDTH*2/3, p.getY() + Player.CAR_HEIGHT/4);
-			p.getSpriteAnim().draw(p.getX(), p.getY());
+			if(!p.isDead()) {
+				markerCopy = marker.copy();
+				markerCopy.rotate(p.getAngle() * -1);
+				markerCopy.draw(p.getX()-Player.CAR_WIDTH*2/3, p.getY() + Player.CAR_HEIGHT/4);
+			}
+			p.getSpriteAnim().getCurrentFrame().draw(p.getX(), p.getY());
 		} else {
-			markerCopy = marker.getFlippedCopy(true,false);
-			markerCopy.rotate(p.getAngle() * -1);
-			markerCopy.draw(p.getX()-Player.CAR_WIDTH, p.getY() + Player.CAR_HEIGHT/4);
+			if(!p.isDead()) {
+				markerCopy = marker.getFlippedCopy(true,false);
+				markerCopy.rotate(p.getAngle() * -1);
+				markerCopy.draw(p.getX()-Player.CAR_WIDTH, p.getY() + Player.CAR_HEIGHT/4);
+			}
 			p.getSpriteAnim().getCurrentFrame().getFlippedCopy(true, false).draw(p.getX(), p.getY());
 		}
 		

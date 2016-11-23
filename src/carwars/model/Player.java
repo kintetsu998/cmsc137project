@@ -143,10 +143,11 @@ public class Player extends Entity {
 	}
 	
 	public void shoot(UDPClient udpClient) {
-		//TODO: send bullet info via UDP
-		Bullet b = new Bullet(this);
-		udpClient.send(Code.CREATE_BULLET + b.toString());
-		new Thread(b).start();
+		if(!this.isDead()) {
+			Bullet b = new Bullet(this);
+			udpClient.send(Code.CREATE_BULLET + b.toString());
+			new Thread(b).start();
+		}
 	}
 	
 	public Rectangle leftHitBox() {
