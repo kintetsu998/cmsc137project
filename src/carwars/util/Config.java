@@ -3,7 +3,7 @@ package carwars.util;
 import carwars.model.Terrain;
 
 public class Config {
-	static public final boolean DEBUG = true;
+	static public final boolean DEBUG = false;
 	
 	static public final int GAME_WIDTH = 800;
 	static public final int GAME_HEIGHT = 600;

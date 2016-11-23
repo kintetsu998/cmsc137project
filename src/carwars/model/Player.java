@@ -151,11 +151,11 @@ public class Player extends Entity {
 	}
 	
 	public Rectangle leftHitBox() {
-		return new Rectangle(this.getX()-3, this.getY(), 3, CAR_HEIGHT-1);
+		return new Rectangle(this.getX()-5, this.getY(), 5, CAR_HEIGHT-1);
 	}
 	
 	public Rectangle rightHitBox() {
-		return new Rectangle(this.getX()+CAR_WIDTH, this.getY(), 3, CAR_HEIGHT-1);
+		return new Rectangle(this.getX()+CAR_WIDTH, this.getY(), 5, CAR_HEIGHT-1);
 	}
 	
 	public boolean intersectsTerrain(Rectangle r) {
