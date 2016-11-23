@@ -21,7 +21,7 @@ public class Player extends Entity {
 	
 	static public final int MAX_HP = 100;
 	
-	static public final int JUMP_SPEED = -27;
+	static public final float JUMP_SPEED = -3.0f;
 	
 	
 	private String name;
@@ -30,10 +30,10 @@ public class Player extends Entity {
 	private int front;
 	private int hp;
 	private int movement;
-	private int vertSpeed;
 	
 	private int angle;
 	private float force;
+	private float vertSpeed;
 	
 	private boolean turn;
 	private boolean goingUp;
@@ -121,7 +121,7 @@ public class Player extends Entity {
 				this.end();
 			} else {
 				this.vertSpeed = (this.vertSpeed < Config.TERMINAL_SPEED)? 
-						this.vertSpeed + Config.GRAVITY: 
+						this.vertSpeed + Config.GRAVITY/100.0f: 
 						Config.TERMINAL_SPEED;
 				
 				goingUp = !(vertSpeed >= 0);
@@ -131,7 +131,7 @@ public class Player extends Entity {
 			}
 
 			try{
-				Thread.sleep(20);
+				Thread.sleep(5);
 			} catch(Exception e) {
 				Thread.currentThread().interrupt();
 			}
@@ -139,6 +139,7 @@ public class Player extends Entity {
 	}
 	
 	public void shoot(Image bullet) {
+		//TODO: send bullet info via UDP
 		new Thread(new Bullet(bullet, this)).start();
 	}
 	
