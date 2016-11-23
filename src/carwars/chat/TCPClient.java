@@ -13,7 +13,7 @@ import carwars.game.CarWars;
 import carwars.init.GameSetup;
 import carwars.util.Code;
 
-public class Client {
+public class TCPClient {
     
     private DataInputStream in;
     private DataOutputStream out;
@@ -29,7 +29,7 @@ public class Client {
     private boolean hasName;
     private boolean hasList;
 
-    public Client(String name, String server, int port) {
+    public TCPClient(String name, String server, int port) {
         this.name = name;
         this.server = server;
         this.port = port;
@@ -68,13 +68,13 @@ public class Client {
                     try{
                         String reply;
                         while(!sock.isClosed()){
-                            while((reply = in.readUTF()) == null){}
+                            reply = in.readUTF();
                             
                             //receives a code for a new client name
                            if(reply.startsWith(Code.PLAYER_NAME) && !hasName) {
                             	String[] tok = reply.split(" ");
                             	
-                            	Client.this.name = tok[1];
+                            	TCPClient.this.name = tok[1];
                             	hasName = true;
                             	
                             	showMessage("You are now connected as " + tok[1] + ".");
@@ -83,7 +83,7 @@ public class Client {
                             else if(reply.startsWith(Code.PLAYER_JOIN)) {
                             	String[] tok = reply.split(" ");
                             	
-                            	Client.this.pNames.add(tok[1]);
+                            	TCPClient.this.pNames.add(tok[1]);
                             	gs.addPlayer(tok[1]);
                             	
                             	showMessage(tok[1] + " has connected to the game!");
@@ -112,7 +112,7 @@ public class Client {
                 private void addPNames(String[] tok) {
                 	for(int i = 1; i < tok.length; i++) {
                 		if(!tok[i].trim().equals("")) {
-                			Client.this.pNames.add(tok[i]);
+                			TCPClient.this.pNames.add(tok[i]);
                 			gs.addPlayer(tok[i]);
                 		}
                 	}

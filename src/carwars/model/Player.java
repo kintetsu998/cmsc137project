@@ -5,7 +5,9 @@ import java.util.HashMap;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.geom.Rectangle;
 
-import carwars.chat.Client;
+import carwars.chat.TCPClient;
+import carwars.chat.UDPClient;
+import carwars.util.Code;
 import carwars.util.Config;
 
 public class Player extends Entity {
@@ -20,31 +22,33 @@ public class Player extends Entity {
 	
 	static public final int MAX_HP = 100;
 	
-	static public final int JUMP_SPEED = -27;
+	static public final float JUMP_SPEED = -3.0f;
 	
 	
 	private String name;
 	private Animation spriteAnim;
+	private Animation deadAnim;
 	
 	private int front;
 	private int hp;
 	private int movement;
-	private int vertSpeed;
 	
 	private int angle;
 	private float force;
+	private float vertSpeed;
 	
 	private boolean turn;
 	private boolean goingUp;
 	private boolean jumping;
 	
-	private Client tcpClient;
+	private TCPClient tcpClient;
 	
 	/** CONSTRUCTOR **/	
-	public Player(String name, Animation sprite_file, int x) {
+	public Player(String name, Animation spriteFile, Animation deadCar, float x) {
 		super(x, 0);
 		this.name = name;
-		this.spriteAnim = sprite_file;
+		this.spriteAnim = spriteFile;
+		this.deadAnim = deadCar;
 		
 		this.front = RIGHT;
 		this.hp = MAX_HP;
@@ -62,10 +66,11 @@ public class Player extends Entity {
 		players.put(name, this);
 	}
 	
-	public Player(String name, Animation sprite_file, int x, Client c) {
+	public Player(String name, Animation spriteFile, Animation deadCar, float x, TCPClient c) {
 		super(x, 0);
 		this.name = name;
-		this.spriteAnim = sprite_file;
+		this.spriteAnim = spriteFile;
+		this.deadAnim = deadCar;
 		
 		this.front = RIGHT;
 		this.hp = MAX_HP;
@@ -120,7 +125,7 @@ public class Player extends Entity {
 				this.end();
 			} else {
 				this.vertSpeed = (this.vertSpeed < Config.TERMINAL_SPEED)? 
-						this.vertSpeed + Config.GRAVITY: 
+						this.vertSpeed + Config.GRAVITY/100.0f: 
 						Config.TERMINAL_SPEED;
 				
 				goingUp = !(vertSpeed >= 0);
@@ -130,15 +135,19 @@ public class Player extends Entity {
 			}
 
 			try{
-				Thread.sleep(20);
+				Thread.sleep(5);
 			} catch(Exception e) {
 				Thread.currentThread().interrupt();
 			}
 		}
 	}
 	
-	public void shoot() {
-		//TODO: shoots a bullet
+	public void shoot(UDPClient udpClient) {
+		if(!this.isDead()) {
+			Bullet b = new Bullet(this);
+			udpClient.send(Code.CREATE_BULLET + b.toString());
+			new Thread(b).start();
+		}
 	}
 	
 	public Rectangle leftHitBox() {
@@ -181,7 +190,7 @@ public class Player extends Entity {
 		this.turn = false;
 	}
 	
-	public void update(int x, int y, int hp, int front, int angle) {
+	public void update(float x, float y, int hp, int front, int angle) {
 		this.setX(x);
 		this.setY(y);
 		this.hp = hp;
@@ -212,7 +221,7 @@ public class Player extends Entity {
 		return this.name;
 	}
 	
-	public Client getTCPClient() {
+	public TCPClient getTCPClient() {
 		return this.tcpClient;
 	}
 	
@@ -245,7 +254,7 @@ public class Player extends Entity {
 	}
 	
 	public Animation getSpriteAnim() {
-		return this.spriteAnim;
+		return (this.isDead())? this.deadAnim: this.spriteAnim;
 	}
 	
 	public Rectangle hitBox() {

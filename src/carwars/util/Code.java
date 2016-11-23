@@ -12,6 +12,8 @@ public class Code {
 	public static final String PLAYER_NAME = "@name ";
 	public static final String PLAYER_JOIN = "@join ";
 	
+	public static final String CREATE_BULLET = "@bullet ";
+	
 	static private ArrayList<String> codes = new ArrayList<>();
 	
 	public static void init() {
@@ -23,6 +25,8 @@ public class Code {
 		codes.add(PLAYER_LIST);
 		codes.add(PLAYER_NAME);
 		codes.add(PLAYER_JOIN);
+		
+		codes.add(CREATE_BULLET);
 	}
 	
 	public static boolean codeExists(String code) {

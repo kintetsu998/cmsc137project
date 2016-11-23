@@ -54,6 +54,7 @@ public class Server extends Thread {
 				
 
 				new Thread(){
+					@SuppressWarnings("unused")
 					@Override
 					public void run(){
 						DataInputStream in;
@@ -82,6 +83,7 @@ public class Server extends Thread {
 								message = in.readUTF();
 								if(message.equals(Code.START_CODE)) {
 									hasStarted = (Config.DEBUG)? false: true;
+									//hasStarted = true;
 									
 									initializePList(getNames());
 									Server.this.startUDP();
@@ -90,7 +92,7 @@ public class Server extends Thread {
 									System.out.println("Game has started.");
 								} else if(message.equals(Code.UDP_STOP_STATUS)) {
 									stop++;
-									if(stop == sockets.size() && !udpSend.isInterrupted()) {
+									if(stop == sockets.size() && !udpSend.isInterrupted() && !Config.DEBUG) {
 										udpSend.interrupt();
 									}
 								} else {
@@ -100,6 +102,7 @@ public class Server extends Thread {
 						} catch(SocketException e) {
 							Server.this.sendToAll(name + " has disconnected.", server);
 							sockets.remove(name);
+							System.out.println(sockets.size());
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -117,7 +120,7 @@ public class Server extends Thread {
 		
 		for(String s : tok) {
 			pList.add(new Player(s, 
-					null, 
+					null, null,
 					r.nextInt(Config.GAME_WIDTH - Player.CAR_WIDTH), 
 					null)
 			);

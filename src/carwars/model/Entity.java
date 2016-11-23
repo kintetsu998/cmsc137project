@@ -7,29 +7,29 @@ import org.newdawn.slick.geom.Rectangle;
 public abstract class Entity {
 	public static final ArrayList<Entity> entities = new ArrayList<>();
 	
-	private int x;
-	private int y;
+	private float x;
+	private float y;
 	
-	public Entity(int x, int y) {
+	public Entity(float x, float y) {
 		this.x = x;
 		this.y = y;
 		
 		entities.add(this);
 	}
 	
-	public int getX() {
+	public float getX() {
 		return this.x;
 	}
 	
-	public int getY() {
+	public float getY() {
 		return this.y;
 	}
 	
-	public int setX(int x) {
+	public float setX(float x) {
 		return (this.x = x);
 	}
 	
-	public int setY(int y) {
+	public float setY(float y) {
 		return (this.y = y);
 	}
 	
