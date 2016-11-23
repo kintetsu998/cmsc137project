@@ -54,7 +54,6 @@ public class Server extends Thread {
 				
 
 				new Thread(){
-					@SuppressWarnings("unused")
 					@Override
 					public void run(){
 						DataInputStream in;
@@ -102,7 +101,10 @@ public class Server extends Thread {
 						} catch(SocketException e) {
 							Server.this.sendToAll(name + " has disconnected.", server);
 							sockets.remove(name);
-							System.out.println(sockets.size());
+							if(hasStarted && sockets.size() <= 0) {
+								System.out.println("All players disconnected. Closing the server...");
+								System.exit(0);
+							}
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
