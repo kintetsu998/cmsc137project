@@ -26,7 +26,7 @@ import javax.swing.table.DefaultTableModel;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.SlickException;
 
-import carwars.chat.Client;
+import carwars.chat.TCPClient;
 import carwars.game.CarWars;
 import carwars.util.Config;
  
@@ -49,9 +49,9 @@ public class GameSetup extends JPanel implements ActionListener {
     private static int playersCount = 0;
     private DefaultTableModel tableModel;
     
-    private Client client;
+    private TCPClient client;
     
-    public GameSetup(PlayerLogin pl, Client c) {
+    public GameSetup(PlayerLogin pl, TCPClient c) {
         super(new BorderLayout());
         
         this.client = c;

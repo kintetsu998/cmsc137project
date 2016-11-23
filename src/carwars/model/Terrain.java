@@ -9,6 +9,7 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.geom.Rectangle;
 
 import carwars.util.Config;
+import carwars.util.Resources;
 
 public class Terrain extends Entity {
 	public static final ArrayList<Terrain> terrains = new ArrayList<>();
@@ -25,7 +26,7 @@ public class Terrain extends Entity {
 	public static int[][] loadTerrain() {
 		int[][] terrain = new int[Config.MAP_HEIGHT][Config.MAP_WIDTH];
 		try{
-			BufferedReader br = new BufferedReader(new FileReader("resource/terrain.txt"));
+			BufferedReader br = new BufferedReader(new FileReader(Resources.TERRAIN_TXT));
 			String line;
 			int i=0;
 			

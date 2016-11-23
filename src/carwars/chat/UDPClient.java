@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 
 import carwars.game.CarWars;
+import carwars.model.Bullet;
 import carwars.model.Player;
 import carwars.util.Code;
 import carwars.util.Config;
@@ -64,9 +65,30 @@ public class UDPClient extends Thread{
 			hasUpdated = true;
 		} else if(reply.startsWith(Code.UPDATE_STATUS) && Player.players.size() > 0) {
 			updatePlayer(reply.replace(Code.UPDATE_STATUS, ""));
+		}else if(reply.startsWith(Code.CREATE_BULLET)) {
+			createBullet(reply.replace(Code.CREATE_BULLET, ""));
 		}
 		
 		return reply;
+	}
+	
+	private void createBullet(String msg) {
+		String[] tok = msg.split(" ");
+		
+		if(!tok[0].equals(player.getName())) {
+			Player p = Player.players.get(tok[0]);
+			Bullet b = new Bullet(p,
+				Float.parseFloat(tok[1]),
+				Float.parseFloat(tok[2]),
+				Integer.parseInt(tok[3]),
+				Float.parseFloat(tok[4]),
+				Integer.parseInt(tok[5]),
+				Integer.parseInt(tok[6])
+			);
+			
+			new Thread(b).start();
+			System.out.println("bullet " + msg);
+		}
 	}
 	
 	private void updatePlayer(String msg) {

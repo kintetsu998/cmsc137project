@@ -3,10 +3,11 @@ package carwars.model;
 import java.util.HashMap;
 
 import org.newdawn.slick.Animation;
-import org.newdawn.slick.Image;
 import org.newdawn.slick.geom.Rectangle;
 
-import carwars.chat.Client;
+import carwars.chat.TCPClient;
+import carwars.chat.UDPClient;
+import carwars.util.Code;
 import carwars.util.Config;
 
 public class Player extends Entity {
@@ -26,6 +27,7 @@ public class Player extends Entity {
 	
 	private String name;
 	private Animation spriteAnim;
+	private Animation deadAnim;
 	
 	private int front;
 	private int hp;
@@ -39,13 +41,14 @@ public class Player extends Entity {
 	private boolean goingUp;
 	private boolean jumping;
 	
-	private Client tcpClient;
+	private TCPClient tcpClient;
 	
 	/** CONSTRUCTOR **/	
-	public Player(String name, Animation sprite_file, float x) {
+	public Player(String name, Animation spriteFile, Animation deadCar, float x) {
 		super(x, 0);
 		this.name = name;
-		this.spriteAnim = sprite_file;
+		this.spriteAnim = spriteFile;
+		this.deadAnim = deadCar;
 		
 		this.front = RIGHT;
 		this.hp = MAX_HP;
@@ -63,10 +66,11 @@ public class Player extends Entity {
 		players.put(name, this);
 	}
 	
-	public Player(String name, Animation sprite_file, float x, Client c) {
+	public Player(String name, Animation spriteFile, Animation deadCar, float x, TCPClient c) {
 		super(x, 0);
 		this.name = name;
-		this.spriteAnim = sprite_file;
+		this.spriteAnim = spriteFile;
+		this.deadAnim = deadCar;
 		
 		this.front = RIGHT;
 		this.hp = MAX_HP;
@@ -138,9 +142,11 @@ public class Player extends Entity {
 		}
 	}
 	
-	public void shoot(Image bullet) {
+	public void shoot(UDPClient udpClient) {
 		//TODO: send bullet info via UDP
-		new Thread(new Bullet(bullet, this)).start();
+		Bullet b = new Bullet(this);
+		udpClient.send(Code.CREATE_BULLET + b.toString());
+		new Thread(b).start();
 	}
 	
 	public Rectangle leftHitBox() {
@@ -214,7 +220,7 @@ public class Player extends Entity {
 		return this.name;
 	}
 	
-	public Client getTCPClient() {
+	public TCPClient getTCPClient() {
 		return this.tcpClient;
 	}
 	
@@ -247,7 +253,7 @@ public class Player extends Entity {
 	}
 	
 	public Animation getSpriteAnim() {
-		return this.spriteAnim;
+		return (this.isDead())? this.deadAnim: this.spriteAnim;
 	}
 	
 	public Rectangle hitBox() {

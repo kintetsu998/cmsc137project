@@ -120,7 +120,7 @@ public class Server extends Thread {
 		
 		for(String s : tok) {
 			pList.add(new Player(s, 
-					null, 
+					null, null,
 					r.nextInt(Config.GAME_WIDTH - Player.CAR_WIDTH), 
 					null)
 			);

@@ -18,13 +18,14 @@ import org.newdawn.slick.TrueTypeFont;
 import org.newdawn.slick.geom.Point;
 import org.newdawn.slick.gui.TextField;
 
-import carwars.chat.Client;
+import carwars.chat.TCPClient;
 import carwars.chat.UDPClient;
 import carwars.model.Bullet;
 import carwars.model.Player;
 import carwars.model.Terrain;
 import carwars.util.Code;
 import carwars.util.Config;
+import carwars.util.Resources;
 
 public class CarWars extends BasicGame {
 	public static final int CLOUDS = 3;
@@ -42,7 +43,7 @@ public class CarWars extends BasicGame {
 	private TextField chatBox;
 	
 	private Player player;
-	private Client client;
+	private TCPClient client;
 	private UDPClient udpClient;
 	
 	private String username;
@@ -56,7 +57,7 @@ public class CarWars extends BasicGame {
 	
 	private ArrayList<String> messages;
 	
-	public CarWars(String title, Client c) {
+	public CarWars(String title, TCPClient c) {
 		super(title);
 		this.username = c.getName();
 		this.client = c;
@@ -74,10 +75,7 @@ public class CarWars extends BasicGame {
 		messages = new ArrayList<>(Arrays.asList("","","",""));
 		rand = new Random();
 		deadCar = new Animation(
-				new SpriteSheet(
-						"resource/sprites/car-dead.png", 
-						Player.CAR_WIDTH, 
-						Player.CAR_HEIGHT + 4), 
+				new SpriteSheet(Resources.DEAD_CAR, Player.CAR_WIDTH, Player.CAR_HEIGHT+4), 
 				Config.ANIM_SPEED
 		);
 		
@@ -93,12 +91,12 @@ public class CarWars extends BasicGame {
 		client.setGame(this);
 		
 		terrainMap = Terrain.loadTerrain();
-		terrain = new SpriteSheet("resource/terrain/land-rescale.png", 
+		terrain = new SpriteSheet(Resources.TERRAIN_SPRITE, 
 				Terrain.TERR_SIZE, Terrain.TERR_SIZE);
 		ttf = new TrueTypeFont(font, true);
 		
-		marker = new Image("resource/misc/angle-rescale.png");
-		bullet = new Image("resource/sprites/bullet.png");
+		marker = new Image(Resources.MARKER);
+		bullet = new Image(Resources.BULLET);
 		
 		initWeather(CLOUDS);
 		
@@ -127,8 +125,8 @@ public class CarWars extends BasicGame {
 		int x = rand.nextInt(50);
 		int y = rand.nextInt(40);
 		
-		sun = new Image("resource/weather/sun.png");
-		cloud = new Image("resource/weather/cloud.png");
+		sun = new Image(Resources.SUN);
+		cloud = new Image(Resources.CLOUD);
 		
 		sunPoint = new Point((Config.GAME_WIDTH*4)/5, 30);
 		
@@ -174,8 +172,6 @@ public class CarWars extends BasicGame {
 	public void update(GameContainer container, int delta) throws SlickException {
 		Input input = container.getInput();
 		
-		//shooting = false;
-		
 		if(!chatting) {
 			if(input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
 				player.moveLeft();
@@ -190,7 +186,7 @@ public class CarWars extends BasicGame {
 			}
 			
 			if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
-				player.shoot(bullet);
+				player.shoot(udpClient);
 			}
 			
 			player.setAngle(getPlayerAngle(player, input.getMouseX(), input.getMouseY()));
@@ -272,9 +268,9 @@ public class CarWars extends BasicGame {
 	}
 	
 	private void renderBullet() {
-		ArrayList<Bullet> bullets = new ArrayList<>(Bullet.bullets);
-		for(Bullet b : bullets) {
-			b.getSprite().draw(b.getX(), b.getY());
+		for(int i=0; i<Bullet.bullets.size(); i++) {
+			Bullet b = Bullet.bullets.get(i);
+			bullet.draw(b.getX(), b.getY());
 		}
 	}
 
@@ -295,12 +291,14 @@ public class CarWars extends BasicGame {
 					if(tok[0].equals(username)) {
 						player = new Player(tok[0], 
 								new Animation(playerSprites.get(i), Config.ANIM_SPEED),
+								deadCar,
 								Float.parseFloat(tok[1]),
 								client
 						);
 					} else {
 						new Player(tok[0], 
 								new Animation(playerSprites.get(i), Config.ANIM_SPEED),
+								deadCar,
 								Float.parseFloat(tok[1]),
 								client
 						);
@@ -317,9 +315,7 @@ public class CarWars extends BasicGame {
 	
 	private void initPlayerSprites(ArrayList<SpriteSheet> playerSprite) throws SlickException{
 		for(int i=1; i <= Config.MAX_PLAYERS; i++) {
-			String filename = "resource/sprites/car" 
-					+ Integer.toString(i)
-					+ "-sprites.png";
+			String filename = Resources.CAR_SPRITE.replace("I", Integer.toString(i));
 			
 			playerSprite.add(new SpriteSheet(filename, Player.CAR_WIDTH, Player.CAR_HEIGHT));
 		}

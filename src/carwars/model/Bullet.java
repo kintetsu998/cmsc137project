@@ -3,7 +3,6 @@ package carwars.model;
 import java.util.ArrayList;
 import java.util.Random;
 
-import org.newdawn.slick.Image;
 import org.newdawn.slick.geom.Rectangle;
 
 import carwars.util.Config;
@@ -15,25 +14,41 @@ public class Bullet extends Entity implements Runnable {
 	public static final Random rand = new Random();
 	
 	private Player player;
-	private Image sprite;
 	
 	private float force;
 	private int angle;
 	private int front;
 	private int damage;
 	
-	public Bullet(Image sprite, Player p) {
+	public Bullet(Player p) {
+		
 		super(
 				p.getX() + Player.CAR_WIDTH/2 - BULLET_WIDTH/2, 
 				p.getY() + Player.CAR_HEIGHT/2 - BULLET_HEIGHT/2
 		);
 		
 		this.player = p;
-		this.force = p.getForce();//(int) Math.floor((p.getForce()/Config.GAME_WIDTH)*100);
+		this.force = p.getForce();
 		this.angle = p.getAngle();
 		this.front = p.getFront();
 		this.damage = Bullet.rand.nextInt(8) + 8;
-		this.sprite = sprite.getFlippedCopy(false, this.front == Player.LEFT);
+		
+		bullets.add(this);
+	}
+	
+	public Bullet(Player p, 
+			float x, float y, int angle, float force, int damage, int front) {
+		
+		super(
+				x + Player.CAR_WIDTH/2 - BULLET_WIDTH/2, 
+				y + Player.CAR_HEIGHT/2 - BULLET_HEIGHT/2
+		);
+		
+		this.player = p;
+		this.force = force;
+		this.angle = angle;
+		this.front = front;
+		this.damage = damage;
 		
 		bullets.add(this);
 	}
@@ -56,7 +71,6 @@ public class Bullet extends Entity implements Runnable {
 			if(this.front == Player.LEFT) {
 				this.setX(this.getX() - xspeed);
 			} else {
-				
 				this.setX(this.getX() + xspeed);
 			}
 			
@@ -76,7 +90,6 @@ public class Bullet extends Entity implements Runnable {
 		for(Player p : Player.players.values()) {
 			if(p == this.player) continue;
 			else {
-				//TODO: damage player
 				intersects = this.hitBox().intersects(p.hitBox());
 				if(intersects) {
 					p.damage(this.damage);
@@ -85,7 +98,9 @@ public class Bullet extends Entity implements Runnable {
 			}
 		}
 		
-		if(intersects) return true;
+		if(intersects) {
+			return true;
+		}
 		
 		for(Terrain t : Terrain.terrains) {
 			intersects = this.hitBox().intersects(t.hitBox());
@@ -102,11 +117,7 @@ public class Bullet extends Entity implements Runnable {
 	@Override
 	public String toString() {
 		return this.player.getName() + " " + this.getX() + " " + this.getY() 
-			+ " " + this.angle + " " + this.force + " " + this.damage;
-	}
-	
-	public Image getSprite() {
-		return this.sprite;
+			+ " " + this.angle + " " + this.force + " " + this.damage + " " + this.front;
 	}
 	
 	public int getFront() {

@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import carwars.chat.Client;
+import carwars.chat.TCPClient;
 import carwars.util.Config;
 
 public class PlayerLogin extends JFrame implements ActionListener {
@@ -29,7 +29,7 @@ public class PlayerLogin extends JFrame implements ActionListener {
     private JTextField tfHost, tfPort, tfUsername;
     private JButton logButton;
     private String username;
-    private Client client;
+    private TCPClient client;
     private JLabel errLabel;
     private GameSetup gs;
     private boolean connected;
@@ -215,7 +215,7 @@ public class PlayerLogin extends JFrame implements ActionListener {
 
             	this.host = t2;
             	this.username = t1;
-            	this.client = new Client(username, host, port);
+            	this.client = new TCPClient(username, host, port);
             	this.gs = new GameSetup(this, client);
             	//client.setChatRoom(new ChatRooms(client, port, host));
             	client.setGameSetup(gs);
@@ -247,7 +247,7 @@ public class PlayerLogin extends JFrame implements ActionListener {
     public int getPort(){
     	return port;
     }
-    public Client getClient(){
+    public TCPClient getClient(){
     	return client;
     }
     
