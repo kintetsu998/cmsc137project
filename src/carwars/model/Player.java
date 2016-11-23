@@ -3,6 +3,7 @@ package carwars.model;
 import java.util.HashMap;
 
 import org.newdawn.slick.Animation;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.geom.Rectangle;
 
 import carwars.chat.Client;
@@ -41,7 +42,7 @@ public class Player extends Entity {
 	private Client tcpClient;
 	
 	/** CONSTRUCTOR **/	
-	public Player(String name, Animation sprite_file, int x) {
+	public Player(String name, Animation sprite_file, float x) {
 		super(x, 0);
 		this.name = name;
 		this.spriteAnim = sprite_file;
@@ -62,7 +63,7 @@ public class Player extends Entity {
 		players.put(name, this);
 	}
 	
-	public Player(String name, Animation sprite_file, int x, Client c) {
+	public Player(String name, Animation sprite_file, float x, Client c) {
 		super(x, 0);
 		this.name = name;
 		this.spriteAnim = sprite_file;
@@ -137,8 +138,8 @@ public class Player extends Entity {
 		}
 	}
 	
-	public void shoot() {
-		//TODO: shoots a bullet
+	public void shoot(Image bullet) {
+		new Thread(new Bullet(bullet, this)).start();
 	}
 	
 	public Rectangle leftHitBox() {
@@ -181,7 +182,7 @@ public class Player extends Entity {
 		this.turn = false;
 	}
 	
-	public void update(int x, int y, int hp, int front, int angle) {
+	public void update(float x, float y, int hp, int front, int angle) {
 		this.setX(x);
 		this.setY(y);
 		this.hp = hp;

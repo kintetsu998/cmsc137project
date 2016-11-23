@@ -74,8 +74,8 @@ public class UDPClient extends Thread{
 		if(!player.getName().equals(tok[0])) {
 			Player p = Player.players.get(tok[0]);
 			
-			p.update(Integer.parseInt(tok[1]),
-					 Integer.parseInt(tok[2]),
+			p.update(Float.parseFloat(tok[1]),
+					 Float.parseFloat(tok[2]),
 					 Integer.parseInt(tok[3]),
 					 Integer.parseInt(tok[4]),
 					 Integer.parseInt(tok[5]));

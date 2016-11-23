@@ -20,6 +20,7 @@ import org.newdawn.slick.gui.TextField;
 
 import carwars.chat.Client;
 import carwars.chat.UDPClient;
+import carwars.model.Bullet;
 import carwars.model.Player;
 import carwars.model.Terrain;
 import carwars.util.Code;
@@ -36,6 +37,7 @@ public class CarWars extends BasicGame {
 	private Image marker;
 	private Image sun;
 	private Image cloud;
+	private Image bullet;
 	
 	private TextField chatBox;
 	
@@ -96,6 +98,7 @@ public class CarWars extends BasicGame {
 		ttf = new TrueTypeFont(font, true);
 		
 		marker = new Image("resource/misc/angle-rescale.png");
+		bullet = new Image("resource/sprites/bullet.png");
 		
 		initWeather(CLOUDS);
 		
@@ -187,7 +190,7 @@ public class CarWars extends BasicGame {
 			}
 			
 			if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
-				player.shoot();
+				player.shoot(bullet);
 			}
 			
 			player.setAngle(getPlayerAngle(player, input.getMouseX(), input.getMouseY()));
@@ -228,7 +231,7 @@ public class CarWars extends BasicGame {
 		int ydist = (int) p.getY()-y;
 		float force = (float) Math.sqrt(xdist*xdist + ydist*ydist);
 		
-		return force;
+		return (force/Config.GAME_WIDTH) * 10.0f;
 	}
 	
 	@Override
@@ -236,6 +239,7 @@ public class CarWars extends BasicGame {
 		setFont(g);
 		renderTerrain(g);
 		renderWeather(g);
+		renderBullet();
 		
 		for(Player p : Player.players.values()) {
 			if(!p.isDead()) {
@@ -266,6 +270,13 @@ public class CarWars extends BasicGame {
 			cloud.draw(p.getX(), p.getY());
 		}
 	}
+	
+	private void renderBullet() {
+		ArrayList<Bullet> bullets = new ArrayList<>(Bullet.bullets);
+		for(Bullet b : bullets) {
+			b.getSprite().draw(b.getX(), b.getY());
+		}
+	}
 
 	private void initStatuses(String msg, String username) throws SlickException{
 		ArrayList<SpriteSheet> playerSprites = new ArrayList<>();
@@ -274,28 +285,34 @@ public class CarWars extends BasicGame {
 		
 		initPlayerSprites(playerSprites);
 		
-		for(String status : statuses) {
-			if(!status.trim().equals("")){
-				String[] tok = status.trim().split(" ");
-				
-				if(tok[0].equals(username)) {
-					player = new Player(tok[0], 
-							new Animation(playerSprites.get(i), Config.ANIM_SPEED),
-							Integer.parseInt(tok[1]),
-							client
-					);
-				} else {
-					new Player(tok[0], 
-							new Animation(playerSprites.get(i), Config.ANIM_SPEED),
-							Integer.parseInt(tok[1]),
-							client
-					);
+		try{
+			for(String status : statuses) {
+				if(!status.trim().equals("")){
+					String[] tok = status.trim().split(" ");
+					
+					System.out.println(status);
+					
+					if(tok[0].equals(username)) {
+						player = new Player(tok[0], 
+								new Animation(playerSprites.get(i), Config.ANIM_SPEED),
+								Float.parseFloat(tok[1]),
+								client
+						);
+					} else {
+						new Player(tok[0], 
+								new Animation(playerSprites.get(i), Config.ANIM_SPEED),
+								Float.parseFloat(tok[1]),
+								client
+						);
+					}
+					i++;
 				}
-				i++;
 			}
+		} catch(IndexOutOfBoundsException e) {
+			e.printStackTrace();
+		} finally {
+			client.stopUDP();
 		}
-		
-		client.stopUDP();
 	}
 	
 	private void initPlayerSprites(ArrayList<SpriteSheet> playerSprite) throws SlickException{
@@ -321,8 +338,8 @@ public class CarWars extends BasicGame {
 				
 				if(!name.equals(tok[0])) {
 					Player p = Player.players.get(tok[0]);
-					p.update(Integer.parseInt(tok[1]),
-							 Integer.parseInt(tok[2]),
+					p.update(Float.parseFloat(tok[1]),
+							 Float.parseFloat(tok[2]),
 							 Integer.parseInt(tok[3]),
 							 Integer.parseInt(tok[4]),
 							 Integer.parseInt(tok[5]));
