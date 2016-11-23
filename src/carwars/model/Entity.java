@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import org.newdawn.slick.geom.Rectangle;
 
-public class Entity {
+public abstract class Entity {
 	public static final ArrayList<Entity> entities = new ArrayList<>();
 	
 	private int x;
@@ -33,10 +33,5 @@ public class Entity {
 		return (this.y = y);
 	}
 	
-	public Rectangle hitBox() {
-		if(this instanceof Player)
-			return new Rectangle(this.getX(), this.getY(), Player.CAR_WIDTH, Player.CAR_HEIGHT);
-		else
-			return new Rectangle(this.getX(), this.getY(), Terrain.TERR_SIZE, Terrain.TERR_SIZE);
-	}
+	public abstract Rectangle hitBox();
 }

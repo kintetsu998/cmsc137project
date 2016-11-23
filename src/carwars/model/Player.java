@@ -85,7 +85,7 @@ public class Player extends Entity {
 	
 	public void moveRight(){
 		this.front = RIGHT;
-		if(!Player.intersectsTerrain(this.rightHitBox()) 
+		if(!this.intersectsTerrain(this.rightHitBox()) 
 				&& this.getX() <= Config.GAME_WIDTH - CAR_WIDTH
 				&& this.movement > 0  
 				&& this.hp > 0 ) {
@@ -95,7 +95,7 @@ public class Player extends Entity {
 	
 	public void moveLeft(){
 		this.front = LEFT;
-		if(!Player.intersectsTerrain(this.leftHitBox()) 
+		if(!this.intersectsTerrain(this.leftHitBox()) 
 				&& this.getX() >= 0
 				&& this.movement > 0 
 				&& this.hp > 0 ) {
@@ -105,12 +105,12 @@ public class Player extends Entity {
 	
 	public void fall() {
 		while(!this.isDead()) {
-			boolean intersects = Player.intersectsTerrain(this.hitBox());
+			boolean intersects = this.intersectsTerrain(this.hitBox());
 			
 			if(intersects && !goingUp){
 				Player.this.jumping = false;
 				
-				while(Player.intersectsTerrain(this.hitBox())) {
+				while(this.intersectsTerrain(this.hitBox())) {
 					this.setY(this.getY()-1);
 				}
 				this.setY(this.getY()+1);
@@ -149,7 +149,7 @@ public class Player extends Entity {
 		return new Rectangle(this.getX()+CAR_WIDTH, this.getY(), 3, CAR_HEIGHT-1);
 	}
 	
-	public static boolean intersectsTerrain(Rectangle r) {
+	public boolean intersectsTerrain(Rectangle r) {
 		boolean intersects = false;
 		for(Terrain e : Terrain.terrains) {
 			intersects = r.intersects(e.hitBox());
@@ -246,5 +246,9 @@ public class Player extends Entity {
 	
 	public Animation getSpriteAnim() {
 		return this.spriteAnim;
+	}
+	
+	public Rectangle hitBox() {
+		return new Rectangle(this.getX(), this.getY(), Player.CAR_WIDTH, Player.CAR_HEIGHT);
 	}
 }

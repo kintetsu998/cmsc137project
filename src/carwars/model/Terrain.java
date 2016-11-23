@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.newdawn.slick.Image;
+import org.newdawn.slick.geom.Rectangle;
 
 import carwars.util.Config;
 
@@ -49,5 +50,9 @@ public class Terrain extends Entity {
 	
 	public Image getSprite() {
 		return this.sprite;
+	}
+	
+	public Rectangle hitBox() {
+		return new Rectangle(this.getX(), this.getY(), Terrain.TERR_SIZE, Terrain.TERR_SIZE);
 	}
 }
