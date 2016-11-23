@@ -250,9 +250,4 @@ public class PlayerLogin extends JFrame implements ActionListener {
     public TCPClient getClient(){
     	return client;
     }
-    
-    public static void main(String []args) {
-    	PlayerLogin newPlayLogin = new PlayerLogin("127.0.0.1", 3);
-    	newPlayLogin.setVisible(true);
-    }
 }

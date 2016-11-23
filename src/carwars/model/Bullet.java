@@ -34,15 +34,14 @@ public class Bullet extends Entity implements Runnable {
 		this.damage = Bullet.rand.nextInt(8) + 8;
 		
 		bullets.add(this);
+		
+		System.out.println(this.toString());
 	}
 	
 	public Bullet(Player p, 
 			float x, float y, int angle, float force, int damage, int front) {
 		
-		super(
-				x + Player.CAR_WIDTH/2 - BULLET_WIDTH/2, 
-				y + Player.CAR_HEIGHT/2 - BULLET_HEIGHT/2
-		);
+		super(x, y);
 		
 		this.player = p;
 		this.force = force;
@@ -51,6 +50,8 @@ public class Bullet extends Entity implements Runnable {
 		this.damage = damage;
 		
 		bullets.add(this);
+		
+		System.out.println(this.toString());
 	}
 	
 	@Override
@@ -60,6 +61,7 @@ public class Bullet extends Entity implements Runnable {
 				(this.front == Player.RIGHT)?
 				(float) Math.floor((float) this.force * Math.sin(Math.toRadians(angle))):
 				(float) Math.floor((float) this.force * Math.sin(Math.toRadians(-1*angle)));
+		int i = 0;
 		
 		while((this.getX() < Config.GAME_WIDTH || this.getX() > 0)
 				&& this.getY() < Config.GAME_HEIGHT
@@ -74,7 +76,9 @@ public class Bullet extends Entity implements Runnable {
 				this.setX(this.getX() + xspeed);
 			}
 			
-			try{
+			i++;
+			
+			try {
 				Thread.sleep(5);
 			} catch(Exception e) {
 				Thread.currentThread().interrupt();
@@ -104,7 +108,9 @@ public class Bullet extends Entity implements Runnable {
 		
 		for(Terrain t : Terrain.terrains) {
 			intersects = this.hitBox().intersects(t.hitBox());
-			if(intersects) break;
+			if(intersects){
+				break;
+			}
 		}
 		
 		return intersects;

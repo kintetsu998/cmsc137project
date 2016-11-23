@@ -286,8 +286,6 @@ public class CarWars extends BasicGame {
 				if(!status.trim().equals("")){
 					String[] tok = status.trim().split(" ");
 					
-					System.out.println(status);
-					
 					if(tok[0].equals(username)) {
 						player = new Player(tok[0], 
 								new Animation(playerSprites.get(i), Config.ANIM_SPEED),

@@ -87,7 +87,6 @@ public class UDPClient extends Thread{
 			);
 			
 			new Thread(b).start();
-			System.out.println("bullet " + msg);
 		}
 	}
 	
