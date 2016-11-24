@@ -3,7 +3,7 @@ package carwars.util;
 import carwars.model.Terrain;
 
 public class Config {
-	static public final boolean DEBUG = false;
+	static public final boolean DEBUG = true;
 	
 	static public final int GAME_WIDTH = 800;
 	static public final int GAME_HEIGHT = 600;
@@ -20,7 +20,7 @@ public class Config {
 	static public final int UDP_SERVER_PORT = 4445;
 	static public final int UDP_CLIENT_PORT = 4446;
 	
-	static public final String UDP_SERVER_IP = "224.0.0.1";
+	static public final String UDP_SERVER_IP = "228.255.255.255";
 	
 	static public final int MAX_PLAYERS = 8;
 	static public final int MIN_PLAYERS = 2;

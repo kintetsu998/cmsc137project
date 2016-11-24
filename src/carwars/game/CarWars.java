@@ -32,7 +32,6 @@ import carwars.util.Resources;
 public class CarWars extends BasicGame {
 	public static final int CLOUDS = 3;
 	
-	private int[][] terrainMap;
 	private SpriteSheet terrain;
 	private TrueTypeFont ttf;
 	
@@ -50,13 +49,13 @@ public class CarWars extends BasicGame {
 	private String username;
 	private Random rand;
 	
-	//private boolean shooting;
-	
-	private boolean chatting;
 	private Point[] cloudPoints;
 	private Point sunPoint;
 	
 	private ArrayList<String> messages;
+	
+	private boolean chatting;
+	private int[][] terrainMap;
 	
 	public CarWars(String title, TCPClient c) {
 		super(title);
@@ -253,7 +252,7 @@ public class CarWars extends BasicGame {
 		int ydist = (int) p.getY()-y;
 		float force = (float) Math.sqrt(xdist*xdist + ydist*ydist);
 		
-		return (force/Config.GAME_WIDTH) * 10.0f;
+		return (force/Config.GAME_WIDTH) * 20.0f;
 	}
 	
 	@Override
@@ -316,25 +315,30 @@ public class CarWars extends BasicGame {
 		
 		try{
 			for(String status : statuses) {
-				if(!status.trim().equals("")){
-					String[] tok = status.trim().split(" ");
-					
-					if(tok[0].equals(username)) {
-						player = new Player(tok[0], 
-								new Animation(playerSprites.get(i), Config.ANIM_SPEED),
-								deadCar,
-								Float.parseFloat(tok[1]),
-								client
-						);
-					} else {
-						new Player(tok[0], 
-								new Animation(playerSprites.get(i), Config.ANIM_SPEED),
-								deadCar,
-								Float.parseFloat(tok[1]),
-								client
-						);
+				try {
+					if(!status.trim().equals("")){
+						String[] tok = status.trim().split(" ");
+						
+						if(tok[0].equals(username)) {
+							player = new Player(tok[0], 
+									new Animation(playerSprites.get(i), Config.ANIM_SPEED),
+									deadCar,
+									Float.parseFloat(tok[1]),
+									client
+							);
+						} else {
+							new Player(tok[0], 
+									new Animation(playerSprites.get(i), Config.ANIM_SPEED),
+									deadCar,
+									Float.parseFloat(tok[1]),
+									client
+							);
+						}
+						i++;
 					}
-					i++;
+				} catch(NumberFormatException e) {
+					e.printStackTrace();
+					System.out.println();
 				}
 			}
 		} catch(IndexOutOfBoundsException e) {

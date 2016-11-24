@@ -160,6 +160,11 @@ public class GameSetup extends JPanel implements ActionListener {
 					app.setAlwaysRender(true);
 					app.start();
 				} catch (SlickException e) {
+					JOptionPane.showMessageDialog(null, 
+							e.getMessage(), 
+							"Exception thrown", 
+							JOptionPane.ERROR_MESSAGE);
+					
 					e.printStackTrace();
 				}
     		}

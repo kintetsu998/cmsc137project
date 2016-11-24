@@ -228,9 +228,11 @@ public class Server extends Thread {
 		try{
 			port = Integer.parseInt(args[0]);
 		} catch (Exception e) {
+			System.out.println("Port number not defined.");
 			port = 8080;
-			return;
 		}
+		
+		System.out.println("Hosting in port " + port);
 
 		try{
 			s = new Server(port);
