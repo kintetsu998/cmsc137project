@@ -11,4 +11,5 @@ public class Resources {
 	public static final String CLOUD		  = ASSETS_DIR + Settings.getInstance().getProperty("assets.cloud");
 	public static final String CAR_SPRITE	  = ASSETS_DIR + Settings.getInstance().getProperty("assets.car_sprite");
 	public static final String PANEL_BG		  = ASSETS_DIR + Settings.getInstance().getProperty("assets.panel_bg");
+	public static final String CONTROL_BG	  = ASSETS_DIR + Settings.getInstance().getProperty("assets.control_bg");
 }
