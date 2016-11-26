@@ -5,9 +5,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -91,8 +92,11 @@ public class Server extends Thread {
 									System.out.println("Game has started.");
 								} else if(message.equals(Code.UDP_STOP_STATUS)) {
 									stop++;
-									if(stop == sockets.size() && !udpSend.isInterrupted() && !Config.DEBUG) {
+									if(stop >= sockets.size() && !udpSend.isInterrupted()) {
+										System.out.println("UDP initial status send interrupted.");
 										udpSend.interrupt();
+									} else {
+										System.out.println("Stop: " + stop);
 									}
 								} else {
 									Server.this.sendToAll(name + ": " + message, server);
@@ -216,8 +220,9 @@ public class Server extends Thread {
 	
 	public void udpSend(String msg) throws Exception {
 		byte[] buf = msg.getBytes();
-		InetAddress group = InetAddress.getByName(Config.UDP_SERVER_IP);
-		DatagramPacket packet = new DatagramPacket(buf, buf.length, group, Config.UDP_CLIENT_PORT);
+		//InetAddress group = InetAddress.getByName(Config.UDP_SERVER_IP);
+		SocketAddress address = new InetSocketAddress(Config.UDP_SERVER_IP, Config.UDP_CLIENT_PORT);
+		DatagramPacket packet = new DatagramPacket(buf, buf.length, address);
 		
 		this.udpSocket.send(packet);
 	}

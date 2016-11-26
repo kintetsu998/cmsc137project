@@ -1,29 +1,27 @@
 package carwars.init;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 
 import carwars.chat.TCPClient;
 import carwars.util.Config;
+import carwars.util.Resources;
 
 public class PlayerLogin extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
@@ -32,64 +30,82 @@ public class PlayerLogin extends JFrame implements ActionListener {
     private String host;
     private JTextField tfHost, tfPort, tfUsername;
     private JButton logButton;
+    private JButton howtoButton;
     private String username;
     private TCPClient client;
     private JLabel errLabel;
     private GameSetup gs;
     private boolean connected;
+    private boolean isOpaque = false;
     
     public PlayerLogin(String h, int p) {
 
         super("Car Wars - Login");
+        JLabel serverLabel = new JLabel("Server Address:  ");
+        JLabel portLabel = new JLabel("Port Number:  ");
+        JLabel usernameLabel = new JLabel("Username: ");
+        Image img = new ImageIcon(Resources.PANEL_BG).getImage();
+        BGPanel mainPanel = new BGPanel(img);
+        
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        
         port = p;
         host = h;
-        Image img = new ImageIcon("assets/misc/login-bg.png").getImage();
-        BGPanel mainPanel = new BGPanel(img);
-        mainPanel.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        
         /* For inputs*/
         JPanel inputToConnect = new JPanel(new GridLayout(3,2,1,3));
-        inputToConnect.setOpaque(false);
+        inputToConnect.setOpaque(isOpaque);
 
+        tfHost = new JTextField(host);
+        tfPort = new JTextField(Integer.toString(port));
         if(Config.DEBUG) {
-	        tfHost = new JTextField(host);
-	        tfPort = new JTextField(Integer.toString(port));
 	        tfUsername = new JTextField("Username");
         } else {
-        	tfHost = new JTextField();
-        	tfPort = new JTextField();
         	tfUsername = new JTextField();
         }
 
-        inputToConnect.add(setLabelCustomLayout(new JLabel("Server Address:  "),FlowLayout.LEFT,"Arial",Font.PLAIN,25));
+        serverLabel.setOpaque(isOpaque);
+        portLabel.setOpaque(isOpaque);
+        usernameLabel.setOpaque(isOpaque);
+        
+        inputToConnect.add(setLabelCustomLayout(serverLabel,FlowLayout.LEFT,"Arial",Font.PLAIN,25));
         inputToConnect.add(setTextFieldCustomLayout(tfHost,"Arial",Font.PLAIN,25));
-        inputToConnect.add(setLabelCustomLayout(new JLabel("Port Number:  "),FlowLayout.LEFT,"Arial",Font.PLAIN,25));
+        inputToConnect.add(setLabelCustomLayout(portLabel,FlowLayout.LEFT,"Arial",Font.PLAIN,25));
         inputToConnect.add(setTextFieldCustomLayout(tfPort,"Arial",Font.PLAIN,25));
-        inputToConnect.add(setLabelCustomLayout(new JLabel("Username: "),FlowLayout.LEFT,"Arial",Font.PLAIN,25));
-        
-        
+        inputToConnect.add(setLabelCustomLayout(usernameLabel,FlowLayout.LEFT,"Arial",Font.PLAIN,25));
         inputToConnect.add(setTextFieldCustomLayout(tfUsername,"Arial",Font.PLAIN,25));
+        
+        
 
-        mainPanel.add(inputToConnect, gbc);
-
-        JPanel b = new JPanel(new GridLayout(2, 1));
+        JPanel b = new JPanel(new GridLayout(1, 3));
         logButton = new JButton("Login");
         logButton.addActionListener(this);
+        logButton.setOpaque(isOpaque);
+        
+        howtoButton = new JButton("How To");
+        howtoButton.addActionListener(this);
+        howtoButton.setOpaque(isOpaque);
+        
         errLabel = new JLabel("");
         errLabel.setVerticalAlignment(JLabel.BOTTOM);
-        b.add(setLabelCustomLayout(errLabel,FlowLayout.CENTER, "Arial",Font.PLAIN,25));
-        b.add(setButtonCustomLayout(logButton,FlowLayout.CENTER, "Arial",Font.PLAIN,25));
-
-        mainPanel.add(b, gbc);
+        errLabel.setOpaque(isOpaque);
+        
+        b.setOpaque(isOpaque);
+        b.add(setButtonCustomLayout(howtoButton, FlowLayout.CENTER, "Arial",Font.PLAIN,25));
+        b.add(setButtonCustomLayout(logButton, FlowLayout.CENTER, "Arial",Font.PLAIN,25));
+        b.add(setLabelCustomLayout(errLabel, FlowLayout.CENTER, "Arial",Font.PLAIN,25));
+        
+        mainPanel.add(Box.createRigidArea(new Dimension(10, 320)));
+        mainPanel.add(inputToConnect);
+        mainPanel.add(b);
+        mainPanel.add(Box.createVerticalGlue());
         
         add(mainPanel);
-        this.getContentPane().add(mainPanel);
+        this.setContentPane(mainPanel);
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(1000, 1000);
+        setSize(1000, 700);
         setLocationRelativeTo(null);
+        setResizable(false);
         setVisible(true);
     }
     
@@ -100,6 +116,8 @@ public class PlayerLogin extends JFrame implements ActionListener {
         JPanel panel = new JPanel(layout);
         Font font = new Font(FONT_NAME, FONT_STYLE, FONT_SIZE);
         component.setFont(font);
+        ((JLabel) component).setForeground(Color.WHITE);
+        panel.setOpaque(isOpaque);
         panel.add(component);
     	return panel;
     }
@@ -113,7 +131,8 @@ public class PlayerLogin extends JFrame implements ActionListener {
         component.setFont(font);
         
         JTextField textField = (JTextField)component;
-        textField.setPreferredSize(new Dimension(350,50));
+        textField.setPreferredSize(new Dimension(500,50));
+        panel.setOpaque(isOpaque);
         panel.add(component);
     	return panel;
     }
@@ -126,7 +145,7 @@ public class PlayerLogin extends JFrame implements ActionListener {
         Font font = new Font(FONT_NAME, FONT_STYLE, FONT_SIZE);
         JButton button = (JButton)component;
         button.setFont(font);
-        button.setPreferredSize(new Dimension(200,50));
+        panel.setOpaque(isOpaque);
         panel.add(component);
     	return panel;
     }
@@ -163,77 +182,85 @@ public class PlayerLogin extends JFrame implements ActionListener {
             return false;
         }
     }
+    
+    public void login() {
+        String t1 = tfUsername.getText().trim();
+        String t2 = tfHost.getText().trim();
+        String t3 = tfPort.getText().trim();
+
+        if(!isEmptyInput(t1)){
+            errLabel.setText("Invalid username");
+            errLabel.setForeground(Color.RED);
+            connected = false;
+            return;
+        }
+        else if(!isEmptyInput(t2)){
+            errLabel.setText("Invalid server address");
+            errLabel.setForeground(Color.RED);
+            connected = false;
+            return;
+        }
+        else if(!isEmptyInput(t3)){
+            errLabel.setText("Invalid port number");
+            errLabel.setForeground(Color.RED);
+            connected = false;
+            return;
+        } else if(t1.contains(" ")) {
+        	errLabel.setText("Username should not contain spaces.");
+            errLabel.setForeground(Color.RED);
+            connected = false;
+            return;
+        } else if(t1.contains("@")) {
+        	errLabel.setText("Username should not contain @ symbol.");
+            errLabel.setForeground(Color.RED);
+            connected = false;
+            return;
+        }
+        else{
+
+        	// validate port number
+        	try{
+            	this.port = Integer.parseInt(t3);
+            }catch(NumberFormatException err){
+            	errLabel.setText("Invalid port number");
+            	errLabel.setForeground(Color.RED);
+            	connected = false;
+            	return;
+            }
+
+        	this.host = t2;
+        	this.username = t1;
+        	this.client = new TCPClient(username, host, port);
+        	this.gs = new GameSetup(this, client);
+        	//client.setChatRoom(new ChatRooms(client, port, host));
+        	client.setGameSetup(gs);
+        	connected = client.connect();
+        	
+        	if(!connected){
+            	errLabel.setText("Server - connection refused");
+            	errLabel.setForeground(Color.RED);
+            	connected = false;
+            	return;
+            }
+        	else{
+            	// launch app
+            	this.dispose();
+            	gs.showWindow();
+        	}
+
+        }
+    }
 
     public void actionPerformed(ActionEvent e) {
-        Object o = e.getSource();
-
-        if(o == logButton) {
-            String t1 = tfUsername.getText().trim();
-            String t2 = tfHost.getText().trim();
-            String t3 = tfPort.getText().trim();
-
-            if(!isEmptyInput(t1)){
-                errLabel.setText("Invalid username");
-                errLabel.setForeground(Color.RED);
-                connected = false;
-                return;
-            }
-            else if(!isEmptyInput(t2)){
-                errLabel.setText("Invalid server address");
-                errLabel.setForeground(Color.RED);
-                connected = false;
-                return;
-            }
-            else if(!isEmptyInput(t3)){
-                errLabel.setText("Invalid port number");
-                errLabel.setForeground(Color.RED);
-                connected = false;
-                return;
-            } else if(t1.contains(" ")) {
-            	errLabel.setText("Username should not contain spaces.");
-                errLabel.setForeground(Color.RED);
-                connected = false;
-                return;
-            } else if(t1.contains("@")) {
-            	errLabel.setText("Username should not contain @ symbol.");
-                errLabel.setForeground(Color.RED);
-                connected = false;
-                return;
-            }
-            else{
-
-            	// validate port number
-            	try{
-                	this.port = Integer.parseInt(t3);
-                }catch(NumberFormatException err){
-                	errLabel.setText("Invalid port number");
-                	errLabel.setForeground(Color.RED);
-                	connected = false;
-                	return;
-                }
-
-            	this.host = t2;
-            	this.username = t1;
-            	this.client = new TCPClient(username, host, port);
-            	this.gs = new GameSetup(this, client);
-            	//client.setChatRoom(new ChatRooms(client, port, host));
-            	client.setGameSetup(gs);
-            	connected = client.connect();
-            	
-            	if(!connected){
-                	errLabel.setText("Server - connection refused");
-                	errLabel.setForeground(Color.RED);
-                	connected = false;
-                	return;
-                }
-            	else{
-                	// launch app
-                	this.dispose();
-                	gs.showWindow();
-            	}
-
-            }
+        if(e.getSource() == logButton) {
+        	login();
+        } else {
+        	showControls();
         }
+    }
+    
+    public void showControls() {
+    	new ControlFrame();
     }
     
     // getters

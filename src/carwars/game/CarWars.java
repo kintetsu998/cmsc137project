@@ -28,9 +28,10 @@ import carwars.model.Terrain;
 import carwars.util.Code;
 import carwars.util.Config;
 import carwars.util.Resources;
+import carwars.util.Settings;
 
 public class CarWars extends BasicGame {
-	public static final int CLOUDS = 3;
+	public static final int CLOUDS = Integer.parseInt(Settings.getInstance().getProperty("game.clouds"));
 	
 	private SpriteSheet terrain;
 	private TrueTypeFont ttf;
@@ -213,11 +214,11 @@ public class CarWars extends BasicGame {
 			String name = getAlive();
 			if(name != null) {
 				JOptionPane.showMessageDialog(null, name + " won the game!");
-				System.exit(0);
 			} else {
 				JOptionPane.showMessageDialog(null, "It is a draw.");
-				System.exit(0);
 			}
+			Settings.getInstance().saveProperty();
+			System.exit(0);
 		}
 	}
 	

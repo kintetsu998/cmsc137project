@@ -3,12 +3,15 @@ package carwars.chat;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 
 import carwars.game.CarWars;
 import carwars.model.Bullet;
 import carwars.model.Player;
 import carwars.util.Code;
 import carwars.util.Config;
+import carwars.util.Settings;
 
 public class UDPClient extends Thread{
 	private MulticastSocket udpSocket;
@@ -22,6 +25,29 @@ public class UDPClient extends Thread{
 			this.game = game;
 			this.udpSocket = new MulticastSocket(Config.UDP_CLIENT_PORT);
 			this.ip = InetAddress.getByName(Config.UDP_SERVER_IP);
+			
+			if(Boolean.parseBoolean(Settings.getInstance().getProperty("os.isLinux"))) {
+				boolean hasInterface = false;
+				while(NetworkInterface.getNetworkInterfaces().hasMoreElements() && !hasInterface) {
+					NetworkInterface ifc = NetworkInterface.getNetworkInterfaces().nextElement();
+					
+					while(ifc.getInetAddresses().hasMoreElements()) {
+						InetAddress iface = ifc.getInetAddresses().nextElement(); 
+						try{
+							this.udpSocket.setInterface(iface);
+							hasInterface = true;
+							break;
+						} catch(SocketException e) {
+							continue;
+						}
+					}
+				}
+				
+				if(!hasInterface) {
+					throw new RuntimeException("No network interface found.");
+				}
+			}
+			
 			this.udpSocket.joinGroup(ip);
 			this.hasUpdated = false;
 		} catch(Exception e) {
