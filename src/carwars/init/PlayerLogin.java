@@ -6,7 +6,11 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -39,21 +43,15 @@ public class PlayerLogin extends JFrame implements ActionListener {
         super("Car Wars - Login");
         port = p;
         host = h;
+        Image img = new ImageIcon("assets/misc/login-bg.png").getImage();
+        BGPanel mainPanel = new BGPanel(img);
+        mainPanel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
         
-        JPanel mainPanel = new JPanel(new GridLayout(3,1));
-        
-        /* For logo */
-        GridLayout layout = new GridLayout(1,2);
-        JPanel logo =  new JPanel(layout);
-        ImageIcon image = new ImageIcon("resource/car.png");
-        JLabel carLogo = new JLabel(image);
-        logo.add(carLogo, SwingConstants.CENTER);
-        JLabel carWarsLabel = new JLabel("CAR WARS");
-        logo.add(setLabelCustomLayout(carWarsLabel,FlowLayout.LEFT,"Arial",Font.ITALIC,55), SwingConstants.CENTER);
-        mainPanel.add(logo);
-
         /* For inputs*/
         JPanel inputToConnect = new JPanel(new GridLayout(3,2,1,3));
+        inputToConnect.setOpaque(false);
 
         if(Config.DEBUG) {
 	        tfHost = new JTextField(host);
@@ -74,7 +72,7 @@ public class PlayerLogin extends JFrame implements ActionListener {
         
         inputToConnect.add(setTextFieldCustomLayout(tfUsername,"Arial",Font.PLAIN,25));
 
-        mainPanel.add(inputToConnect, BorderLayout.CENTER);
+        mainPanel.add(inputToConnect, gbc);
 
         JPanel b = new JPanel(new GridLayout(2, 1));
         logButton = new JButton("Login");
@@ -84,12 +82,13 @@ public class PlayerLogin extends JFrame implements ActionListener {
         b.add(setLabelCustomLayout(errLabel,FlowLayout.CENTER, "Arial",Font.PLAIN,25));
         b.add(setButtonCustomLayout(logButton,FlowLayout.CENTER, "Arial",Font.PLAIN,25));
 
-        mainPanel.add(b);
-
+        mainPanel.add(b, gbc);
+        
         add(mainPanel);
+        this.getContentPane().add(mainPanel);
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(800, 600);
+        setSize(1000, 1000);
         setLocationRelativeTo(null);
         setVisible(true);
     }
