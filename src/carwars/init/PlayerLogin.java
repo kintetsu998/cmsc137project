@@ -1,12 +1,10 @@
 package carwars.init;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -20,10 +18,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 
 import carwars.chat.TCPClient;
 import carwars.util.Config;
+import carwars.util.Resources;
 
 public class PlayerLogin extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
@@ -43,7 +41,7 @@ public class PlayerLogin extends JFrame implements ActionListener {
         super("Car Wars - Login");
         port = p;
         host = h;
-        Image img = new ImageIcon("assets/misc/login-bg.png").getImage();
+        Image img = new ImageIcon(Resources.PANEL_BG).getImage();
         BGPanel mainPanel = new BGPanel(img);
         mainPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -53,13 +51,11 @@ public class PlayerLogin extends JFrame implements ActionListener {
         JPanel inputToConnect = new JPanel(new GridLayout(3,2,1,3));
         inputToConnect.setOpaque(false);
 
+        tfHost = new JTextField(host);
+        tfPort = new JTextField(Integer.toString(port));
         if(Config.DEBUG) {
-	        tfHost = new JTextField(host);
-	        tfPort = new JTextField(Integer.toString(port));
 	        tfUsername = new JTextField("Username");
         } else {
-        	tfHost = new JTextField();
-        	tfPort = new JTextField();
         	tfUsername = new JTextField();
         }
 
@@ -90,6 +86,7 @@ public class PlayerLogin extends JFrame implements ActionListener {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(1000, 1000);
         setLocationRelativeTo(null);
+        setResizable(false);
         setVisible(true);
     }
     
