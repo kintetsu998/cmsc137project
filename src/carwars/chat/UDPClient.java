@@ -11,6 +11,7 @@ import carwars.model.Bullet;
 import carwars.model.Player;
 import carwars.util.Code;
 import carwars.util.Config;
+import carwars.util.Settings;
 
 public class UDPClient extends Thread{
 	private MulticastSocket udpSocket;
@@ -25,24 +26,26 @@ public class UDPClient extends Thread{
 			this.udpSocket = new MulticastSocket(Config.UDP_CLIENT_PORT);
 			this.ip = InetAddress.getByName(Config.UDP_SERVER_IP);
 			
-			boolean hasInterface = false;
-			while(NetworkInterface.getNetworkInterfaces().hasMoreElements() && !hasInterface) {
-				NetworkInterface ifc = NetworkInterface.getNetworkInterfaces().nextElement();
-				
-				while(ifc.getInetAddresses().hasMoreElements()) {
-					InetAddress iface = ifc.getInetAddresses().nextElement(); 
-					try{
-						this.udpSocket.setInterface(iface);
-						hasInterface = true;
-						break;
-					} catch(SocketException e) {
-						continue;
+			if(Boolean.parseBoolean(Settings.getInstance().getProperty("os.isLinux"))) {
+				boolean hasInterface = false;
+				while(NetworkInterface.getNetworkInterfaces().hasMoreElements() && !hasInterface) {
+					NetworkInterface ifc = NetworkInterface.getNetworkInterfaces().nextElement();
+					
+					while(ifc.getInetAddresses().hasMoreElements()) {
+						InetAddress iface = ifc.getInetAddresses().nextElement(); 
+						try{
+							this.udpSocket.setInterface(iface);
+							hasInterface = true;
+							break;
+						} catch(SocketException e) {
+							continue;
+						}
 					}
 				}
-			}
-			
-			if(!hasInterface) {
-				throw new RuntimeException("No network interface found.");
+				
+				if(!hasInterface) {
+					throw new RuntimeException("No network interface found.");
+				}
 			}
 			
 			this.udpSocket.joinGroup(ip);

@@ -90,8 +90,8 @@ public class PlayerLogin extends JFrame implements ActionListener {
         errLabel.setOpaque(isOpaque);
         
         b.setOpaque(isOpaque);
-        b.add(setButtonCustomLayout(logButton, FlowLayout.CENTER, "Arial",Font.PLAIN,25));
         b.add(setButtonCustomLayout(howtoButton, FlowLayout.CENTER, "Arial",Font.PLAIN,25));
+        b.add(setButtonCustomLayout(logButton, FlowLayout.CENTER, "Arial",Font.PLAIN,25));
         b.add(setLabelCustomLayout(errLabel, FlowLayout.CENTER, "Arial",Font.PLAIN,25));
         
         mainPanel.add(Box.createRigidArea(new Dimension(10, 320)));

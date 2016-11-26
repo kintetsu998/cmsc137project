@@ -214,12 +214,11 @@ public class CarWars extends BasicGame {
 			String name = getAlive();
 			if(name != null) {
 				JOptionPane.showMessageDialog(null, name + " won the game!");
-				System.exit(0);
 			} else {
 				JOptionPane.showMessageDialog(null, "It is a draw.");
-				System.exit(0);
 			}
 			Settings.getInstance().saveProperty();
+			System.exit(0);
 		}
 	}
 	

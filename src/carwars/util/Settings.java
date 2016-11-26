@@ -7,7 +7,7 @@ import java.util.Properties;
 
 public class Settings extends Properties {
 	private static final long serialVersionUID = 1L;
-	public static final String CONFIG_NAME = "config/config.cfg";
+	public static final String CONFIG_NAME = "settings/settings.cfg";
 	
 	private static Settings instance;
 	
@@ -32,7 +32,7 @@ public class Settings extends Properties {
 		this.setProperty("game.height", "600");
 		this.setProperty("game.gravity", "3");
 		this.setProperty("game.terminal_speed", "12");
-		this.setProperty("game.anim_speed", "12");
+		this.setProperty("game.anim_speed", "250");
 		this.setProperty("game.max_player", "8");
 		this.setProperty("game.min_player", "2");
 		this.setProperty("game.clouds", "3");
@@ -68,6 +68,8 @@ public class Settings extends Properties {
 		this.setProperty("assets.car_sprite", 		"sprites/carI-sprites.png");
 		this.setProperty("assets.panel_bg", 		"misc/login-bg2.png");
 		this.setProperty("assets.control_bg", 		"misc/howto.png");
+
+		this.setProperty("os.isLinux", "true");
 	}
 	
 	public void saveProperty() {
