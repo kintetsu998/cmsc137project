@@ -16,10 +16,13 @@ public class Bullet extends Entity implements Runnable {
 	
 	private Player player;
 	
-	private float force;
+	
 	private int angle;
 	private int front;
 	private int damage;
+	private int rotate;
+	
+	private float force;
 	
 	public Bullet(Player p) {
 		
@@ -31,6 +34,7 @@ public class Bullet extends Entity implements Runnable {
 		this.player = p;
 		this.force = p.getForce();
 		this.angle = p.getAngle();
+		this.rotate = this.angle;
 		this.front = p.getFront();
 		this.damage = Bullet.rand.nextInt(8) + 8;
 		
@@ -45,6 +49,7 @@ public class Bullet extends Entity implements Runnable {
 		this.player = p;
 		this.force = force;
 		this.angle = angle;
+		this.rotate = this.angle;
 		this.front = front;
 		this.damage = damage;
 		
@@ -70,6 +75,16 @@ public class Bullet extends Entity implements Runnable {
 				this.setX(this.getX() - xspeed);
 			} else {
 				this.setX(this.getX() + xspeed);
+			}
+			
+			if(xspeed != 0) {
+				rotate = (int) Math.floor(Math.toDegrees(Math.atan(yspeed/xspeed)));
+			} else {
+				rotate = (yspeed > 0)? 90: -90;
+			}
+			
+			if(this.front == Player.RIGHT) {
+				rotate *=-1;
 			}
 			
 			try {
@@ -122,5 +137,9 @@ public class Bullet extends Entity implements Runnable {
 	
 	public int getFront() {
 		return this.front;
+	}
+	
+	public int getRotate() {
+		return this.rotate;
 	}
 }

@@ -292,9 +292,14 @@ public class CarWars extends BasicGame {
 	}
 	
 	private void renderBullet() {
+		Image rotatedBullet;
+		
 		for(int i=0; i<Bullet.bullets.size(); i++) {
 			Bullet b = Bullet.bullets.get(i);
-			bullet.draw(b.getX(), b.getY());
+			
+			rotatedBullet = bullet.getFlippedCopy(b.getFront() == Player.LEFT, false);
+			rotatedBullet.rotate(b.getRotate());
+			rotatedBullet.draw(b.getX(), b.getY());
 		}
 	}
 
