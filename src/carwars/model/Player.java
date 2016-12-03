@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.Shape;
 
 import carwars.chat.TCPClient;
 import carwars.chat.UDPClient;
@@ -106,6 +107,7 @@ public class Player extends Entity {
 	public void fall() {
 		while(!this.isDead()) {
 			boolean intersects = this.intersectsTerrain(this.hitBox());
+			boolean bumped = this.intersectsTerrain(this.topHitBox());
 			
 			if(intersects && !goingUp){
 				Player.this.jumping = false;
@@ -113,8 +115,15 @@ public class Player extends Entity {
 				while(this.intersectsTerrain(this.hitBox())) {
 					this.setY(this.getY()-1);
 				}
+				
 				this.setY(this.getY()+1);
 				this.vertSpeed = 0;
+			} else if(bumped && goingUp) {
+				while(this.intersectsTerrain(this.hitBox())) {
+					this.setY(this.getY()+1);
+				}
+				
+				this.vertSpeed = 1;
 			} else if(this.getY() >= Config.GAME_HEIGHT-CAR_HEIGHT) {
 				this.damage(MAX_HP);
 				this.end();
@@ -123,7 +132,7 @@ public class Player extends Entity {
 						this.vertSpeed + Config.GRAVITY/100.0f: 
 						Config.TERMINAL_SPEED;
 				
-				goingUp = !(vertSpeed >= 0);
+				goingUp = vertSpeed <= 0;
 				
 				if(this.getY() <= Config.GAME_HEIGHT-CAR_HEIGHT)
 					this.setY(this.getY() + this.vertSpeed);
@@ -153,7 +162,11 @@ public class Player extends Entity {
 		return new Rectangle(this.getX()+CAR_WIDTH, this.getY(), 5, CAR_HEIGHT-1);
 	}
 	
-	public boolean intersectsTerrain(Rectangle r) {
+	public Rectangle topHitBox() {
+		return new Rectangle(this.getX(), this.getY(), CAR_WIDTH, 5);
+	}
+	
+	public boolean intersectsTerrain(Shape r) {
 		boolean intersects = false;
 		for(Terrain e : Terrain.terrains) {
 			intersects = r.intersects(e.hitBox());
@@ -242,6 +255,7 @@ public class Player extends Entity {
 		return (this.isDead())? this.deadAnim: this.spriteAnim;
 	}
 	
+	@Override
 	public Rectangle hitBox() {
 		return new Rectangle(this.getX(), this.getY(), Player.CAR_WIDTH, Player.CAR_HEIGHT);
 	}

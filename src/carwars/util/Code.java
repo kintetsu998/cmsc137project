@@ -14,6 +14,8 @@ public class Code {
 	
 	public static final String CREATE_BULLET = "@bullet ";
 	
+	public static final String MAP_ID = "@map ";
+	
 	static private ArrayList<String> codes = new ArrayList<>();
 	
 	public static void init() {
@@ -27,6 +29,7 @@ public class Code {
 		codes.add(PLAYER_JOIN);
 		
 		codes.add(CREATE_BULLET);
+		codes.add(MAP_ID);
 	}
 	
 	public static boolean codeExists(String code) {

@@ -1,4 +1,4 @@
-package carwars.chat;
+package carwars;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -26,7 +26,6 @@ public class Server extends Thread {
 	private HashMap<String, Socket> sockets;
 	private ArrayList<Player> pList;
 	
-	private int stop;
 	private boolean hasStarted;
 
 	public Server(int port) throws IOException {
@@ -35,7 +34,6 @@ public class Server extends Thread {
 		sockets 		= new HashMap<>();
 		pList 			= new ArrayList<>();
 		hasStarted 		= false;
-		stop 			= 0;
 	}
 
 	public void run(){
@@ -83,21 +81,12 @@ public class Server extends Thread {
 								message = in.readUTF();
 								if(message.equals(Code.START_CODE)) {
 									hasStarted = (Config.DEBUG)? false: true;
-									//hasStarted = true;
 									
 									initializePList(getNames());
-									Server.this.startUDP();
+									Server.this.startUDP(new Random().nextInt(5));
 									Server.this.startGame();
 									
 									System.out.println("Game has started.");
-								} else if(message.equals(Code.UDP_STOP_STATUS)) {
-									stop++;
-									if(stop >= sockets.size() && !udpSend.isInterrupted()) {
-										System.out.println("UDP initial status send interrupted.");
-										udpSend.interrupt();
-									} else {
-										System.out.println("Stop: " + stop);
-									}
 								} else {
 									Server.this.sendToAll(name + ": " + message, server);
 								}
@@ -191,12 +180,13 @@ public class Server extends Thread {
 		}
 	}
 	
-	public void startUDP() {
+	public void startUDP(int mapid) {
 		udpSend = new Thread() {
 			@Override
 			public void run() {
 				while(!this.isInterrupted()) {
 					try{
+						Server.this.udpSend(Code.MAP_ID + Integer.toString(mapid));
 						Server.this.udpSend(Code.GET_ALL_STATUS + returnStatuses());
 						Thread.sleep(100);
 					} catch(Exception e) {
@@ -234,7 +224,7 @@ public class Server extends Thread {
 			port = Integer.parseInt(args[0]);
 		} catch (Exception e) {
 			System.out.println("Port number not defined.");
-			port = 8080;
+			port = Config.TCP_PORT;
 		}
 		
 		System.out.println("Hosting in port " + port);

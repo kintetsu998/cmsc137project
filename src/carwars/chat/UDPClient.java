@@ -93,6 +93,9 @@ public class UDPClient extends Thread{
 			updatePlayer(reply.replace(Code.UPDATE_STATUS, ""));
 		}else if(reply.startsWith(Code.CREATE_BULLET)) {
 			createBullet(reply.replace(Code.CREATE_BULLET, ""));
+		} else if(reply.startsWith(Code.MAP_ID)) {
+			int mapID = Integer.parseInt(reply.replace(Code.MAP_ID, ""));
+			game.setMapID(mapID);
 		}
 		
 		return reply;
@@ -140,9 +143,7 @@ public class UDPClient extends Thread{
 	}
 	
 	public void sendStatus() {
-		if(!player.isDead()) {
-			this.send(Code.UPDATE_STATUS + player.toString());
-		}
+		this.send(Code.UPDATE_STATUS + player.toString());
 	}
 	
 	public void setPlayer(Player p) {

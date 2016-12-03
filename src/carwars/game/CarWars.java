@@ -56,12 +56,16 @@ public class CarWars extends BasicGame {
 	private ArrayList<String> messages;
 	
 	private boolean chatting;
+	private boolean oneWon;
+	
+	private int mapID;
 	private int[][] terrainMap;
 	
 	public CarWars(String title, TCPClient c) {
 		super(title);
 		this.username = c.getName();
 		this.client = c;
+		this.mapID = -1;
 	}
 	
 	public CarWars(String title) {
@@ -77,7 +81,11 @@ public class CarWars extends BasicGame {
 		rand = new Random();
 		
 		try{
-			String statuses = udpClient.receive();
+			String statuses;
+			do {
+				statuses = udpClient.receive();
+			} while(!statuses.startsWith(Code.GET_ALL_STATUS));
+			
 			initStatuses(statuses, username);
 			udpClient.setPlayer(player);
 		} catch(Exception e) {
@@ -87,7 +95,8 @@ public class CarWars extends BasicGame {
 		udpClient.start();
 		client.setGame(this);
 		
-		terrainMap = Terrain.loadTerrain();
+		while(mapID == -1){};
+		terrainMap = Terrain.loadTerrain(this.mapID);
 		terrain = new SpriteSheet(Resources.TERRAIN_SPRITE, 
 				Terrain.TERR_SIZE, Terrain.TERR_SIZE);
 		ttf = new TrueTypeFont(font, true);
@@ -109,6 +118,7 @@ public class CarWars extends BasicGame {
 		}
 		
 		chatting = false;
+		oneWon = false;
 		
 		new Thread() {
 			@Override
@@ -211,12 +221,42 @@ public class CarWars extends BasicGame {
 		udpClient.sendStatus();
 		
 		if(aliveCount() <= 1) {
+			new Thread() {
+				@Override
+				public void run() {
+					try {
+						Thread.sleep(1000);
+					} catch(Exception e) {
+						return;
+					}
+					
+					if(aliveCount() > 1) {
+						return;
+					} else {
+						oneWon = true;
+					}
+				}
+			}.start();
+		}
+		
+		if(oneWon) {
 			String name = getAlive();
 			if(name != null) {
-				JOptionPane.showMessageDialog(null, name + " won the game!");
+				JOptionPane.showMessageDialog(
+						null, 
+						name + " won the game!", 
+						"Game End", 
+						JOptionPane.DEFAULT_OPTION
+				);
 			} else {
-				JOptionPane.showMessageDialog(null, "It is a draw.");
+				JOptionPane.showMessageDialog(
+						null, 
+						"It is a tie", 
+						"Game End", 
+						JOptionPane.DEFAULT_OPTION
+				);
 			}
+			
 			Settings.getInstance().saveProperty();
 			System.exit(0);
 		}
@@ -261,7 +301,7 @@ public class CarWars extends BasicGame {
 		setFont(g);
 		renderTerrain(g);
 		renderWeather(g);
-		renderBullet();
+		renderBullet(g);
 		
 		for(Player p : Player.players.values()) {
 			renderPlayer(p, g);
@@ -281,6 +321,7 @@ public class CarWars extends BasicGame {
 			g.draw(player.hitBox());
 			g.draw(player.leftHitBox());
 			g.draw(player.rightHitBox());
+			g.draw(player.topHitBox());
 		}
 	}
 	
@@ -291,15 +332,20 @@ public class CarWars extends BasicGame {
 		}
 	}
 	
-	private void renderBullet() {
+	private void renderBullet(Graphics g) {
 		Image rotatedBullet;
 		
+		g.setColor(Color.red);
 		for(int i=0; i<Bullet.bullets.size(); i++) {
 			Bullet b = Bullet.bullets.get(i);
 			
 			rotatedBullet = bullet.getFlippedCopy(b.getFront() == Player.LEFT, false);
 			rotatedBullet.rotate(b.getRotate());
 			rotatedBullet.draw(b.getX(), b.getY());
+			
+			if(Config.DEBUG) {
+				g.draw(b.hitBox());
+			}
 		}
 	}
 
@@ -344,13 +390,11 @@ public class CarWars extends BasicGame {
 					}
 				} catch(NumberFormatException e) {
 					e.printStackTrace();
-					System.out.println();
+					System.out.println(status);
 				}
 			}
 		} catch(IndexOutOfBoundsException e) {
 			e.printStackTrace();
-		} finally {
-			client.stopUDP();
 		}
 	}
 	
@@ -448,5 +492,9 @@ public class CarWars extends BasicGame {
 	
 	private float getBarWidth(float rem, float max, float width) {
 		return Math.max(((float) rem/max)*width, 0);
+	}
+	
+	public void setMapID(int mapID) {
+		this.mapID = mapID;
 	}
 }
