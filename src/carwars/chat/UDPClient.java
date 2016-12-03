@@ -140,9 +140,7 @@ public class UDPClient extends Thread{
 	}
 	
 	public void sendStatus() {
-		if(!player.isDead()) {
-			this.send(Code.UPDATE_STATUS + player.toString());
-		}
+		this.send(Code.UPDATE_STATUS + player.toString());
 	}
 	
 	public void setPlayer(Player p) {

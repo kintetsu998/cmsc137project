@@ -293,7 +293,7 @@ public class CarWars extends BasicGame {
 		setFont(g);
 		renderTerrain(g);
 		renderWeather(g);
-		renderBullet();
+		renderBullet(g);
 		
 		for(Player p : Player.players.values()) {
 			renderPlayer(p, g);
@@ -313,6 +313,7 @@ public class CarWars extends BasicGame {
 			g.draw(player.hitBox());
 			g.draw(player.leftHitBox());
 			g.draw(player.rightHitBox());
+			g.draw(player.topHitBox());
 		}
 	}
 	
@@ -323,15 +324,20 @@ public class CarWars extends BasicGame {
 		}
 	}
 	
-	private void renderBullet() {
+	private void renderBullet(Graphics g) {
 		Image rotatedBullet;
 		
+		g.setColor(Color.red);
 		for(int i=0; i<Bullet.bullets.size(); i++) {
 			Bullet b = Bullet.bullets.get(i);
 			
 			rotatedBullet = bullet.getFlippedCopy(b.getFront() == Player.LEFT, false);
 			rotatedBullet.rotate(b.getRotate());
 			rotatedBullet.draw(b.getX(), b.getY());
+			
+			if(Config.DEBUG) {
+				g.draw(b.hitBox());
+			}
 		}
 	}
 
@@ -376,13 +382,11 @@ public class CarWars extends BasicGame {
 					}
 				} catch(NumberFormatException e) {
 					e.printStackTrace();
-					System.out.println();
+					System.out.println(status);
 				}
 			}
 		} catch(IndexOutOfBoundsException e) {
 			e.printStackTrace();
-		} finally {
-			client.stopUDP();
 		}
 	}
 	

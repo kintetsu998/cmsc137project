@@ -90,12 +90,6 @@ public class Server extends Thread {
 									Server.this.startGame();
 									
 									System.out.println("Game has started.");
-								} else if(message.equals(Code.UDP_STOP_STATUS)) {
-									stop++;
-									if(stop >= sockets.size() && !udpSend.isInterrupted()) {
-										udpSend.interrupt();
-										System.out.println("UDP initial status send interrupted.");
-									}
 								} else {
 									Server.this.sendToAll(name + ": " + message, server);
 								}

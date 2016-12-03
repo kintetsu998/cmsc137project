@@ -29,7 +29,7 @@ public class Terrain extends Entity {
 		try{
 			BufferedReader br = new BufferedReader(
 					new FileReader(
-							Resources.TERRAIN_TXT.replace("I", "0")
+							Resources.TERRAIN_TXT.replace("I", "4")
 						)
 					);
 			
@@ -59,6 +59,7 @@ public class Terrain extends Entity {
 		return this.sprite;
 	}
 	
+	@Override
 	public Rectangle hitBox() {
 		return new Rectangle(this.getX(), this.getY(), Terrain.TERR_SIZE, Terrain.TERR_SIZE);
 	}

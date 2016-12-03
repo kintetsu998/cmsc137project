@@ -164,15 +164,6 @@ public class TCPClient {
         }
     }
 
-    public void stopUDP() {
-    	try {
-            out.writeUTF(Code.UDP_STOP_STATUS);
-        }
-        catch(IOException e) {
-        	e.printStackTrace();
-        }
-    }
-
     public String getName(){
         return this.name;
     }
