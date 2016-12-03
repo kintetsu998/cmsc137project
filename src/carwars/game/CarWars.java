@@ -56,6 +56,7 @@ public class CarWars extends BasicGame {
 	private ArrayList<String> messages;
 	
 	private boolean chatting;
+	private boolean oneWon;
 	private int[][] terrainMap;
 	
 	public CarWars(String title, TCPClient c) {
@@ -109,6 +110,7 @@ public class CarWars extends BasicGame {
 		}
 		
 		chatting = false;
+		oneWon = false;
 		
 		new Thread() {
 			@Override
@@ -211,12 +213,42 @@ public class CarWars extends BasicGame {
 		udpClient.sendStatus();
 		
 		if(aliveCount() <= 1) {
+			new Thread() {
+				@Override
+				public void run() {
+					try {
+						Thread.sleep(1000);
+					} catch(Exception e) {
+						return;
+					}
+					
+					if(aliveCount() > 1) {
+						return;
+					} else {
+						oneWon = true;
+					}
+				}
+			}.start();
+		}
+		
+		if(oneWon) {
 			String name = getAlive();
 			if(name != null) {
-				JOptionPane.showMessageDialog(null, name + " won the game!");
+				JOptionPane.showMessageDialog(
+						null, 
+						name + " won the game!", 
+						"Game End", 
+						JOptionPane.DEFAULT_OPTION
+				);
 			} else {
-				JOptionPane.showMessageDialog(null, "It is a draw.");
+				JOptionPane.showMessageDialog(
+						null, 
+						"It is a tie", 
+						"Game End", 
+						JOptionPane.DEFAULT_OPTION
+				);
 			}
+			
 			Settings.getInstance().saveProperty();
 			System.exit(0);
 		}
