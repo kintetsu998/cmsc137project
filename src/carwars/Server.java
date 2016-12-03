@@ -1,4 +1,4 @@
-package carwars.chat;
+package carwars;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -93,10 +93,8 @@ public class Server extends Thread {
 								} else if(message.equals(Code.UDP_STOP_STATUS)) {
 									stop++;
 									if(stop >= sockets.size() && !udpSend.isInterrupted()) {
-										System.out.println("UDP initial status send interrupted.");
 										udpSend.interrupt();
-									} else {
-										System.out.println("Stop: " + stop);
+										System.out.println("UDP initial status send interrupted.");
 									}
 								} else {
 									Server.this.sendToAll(name + ": " + message, server);
@@ -170,6 +168,7 @@ public class Server extends Thread {
 			if(socket != s && !s.isClosed()) {
 				try{
 					DataOutputStream out = new DataOutputStream(s.getOutputStream());
+					System.out.println(message);
 					out.writeUTF(message);
 				} catch(IOException e) {
 					e.printStackTrace();
@@ -234,7 +233,7 @@ public class Server extends Thread {
 			port = Integer.parseInt(args[0]);
 		} catch (Exception e) {
 			System.out.println("Port number not defined.");
-			port = 8080;
+			port = Config.TCP_PORT;
 		}
 		
 		System.out.println("Hosting in port " + port);

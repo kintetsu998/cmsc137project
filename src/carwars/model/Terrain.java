@@ -27,7 +27,12 @@ public class Terrain extends Entity {
 	public static int[][] loadTerrain() {
 		int[][] terrain = new int[Config.MAP_HEIGHT][Config.MAP_WIDTH];
 		try{
-			BufferedReader br = new BufferedReader(new FileReader(Resources.TERRAIN_TXT));
+			BufferedReader br = new BufferedReader(
+					new FileReader(
+							Resources.TERRAIN_TXT.replace("I", "0")
+						)
+					);
+			
 			String line;
 			int i=0;
 			
