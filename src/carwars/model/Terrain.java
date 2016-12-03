@@ -24,12 +24,12 @@ public class Terrain extends Entity {
 		terrains.add(this);
 	}
 	
-	public static int[][] loadTerrain() {
+	public static int[][] loadTerrain(int mapID) {
 		int[][] terrain = new int[Config.MAP_HEIGHT][Config.MAP_WIDTH];
 		try{
 			BufferedReader br = new BufferedReader(
 					new FileReader(
-							Resources.TERRAIN_TXT.replace("I", "4")
+							Resources.TERRAIN_TXT.replace("I", Integer.toString(mapID))
 						)
 					);
 			

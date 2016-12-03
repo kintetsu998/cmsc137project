@@ -57,12 +57,15 @@ public class CarWars extends BasicGame {
 	
 	private boolean chatting;
 	private boolean oneWon;
+	
+	private int mapID;
 	private int[][] terrainMap;
 	
 	public CarWars(String title, TCPClient c) {
 		super(title);
 		this.username = c.getName();
 		this.client = c;
+		this.mapID = -1;
 	}
 	
 	public CarWars(String title) {
@@ -78,7 +81,11 @@ public class CarWars extends BasicGame {
 		rand = new Random();
 		
 		try{
-			String statuses = udpClient.receive();
+			String statuses;
+			do {
+				statuses = udpClient.receive();
+			} while(!statuses.startsWith(Code.GET_ALL_STATUS));
+			
 			initStatuses(statuses, username);
 			udpClient.setPlayer(player);
 		} catch(Exception e) {
@@ -88,7 +95,8 @@ public class CarWars extends BasicGame {
 		udpClient.start();
 		client.setGame(this);
 		
-		terrainMap = Terrain.loadTerrain();
+		while(mapID == -1){};
+		terrainMap = Terrain.loadTerrain(this.mapID);
 		terrain = new SpriteSheet(Resources.TERRAIN_SPRITE, 
 				Terrain.TERR_SIZE, Terrain.TERR_SIZE);
 		ttf = new TrueTypeFont(font, true);
@@ -484,5 +492,9 @@ public class CarWars extends BasicGame {
 	
 	private float getBarWidth(float rem, float max, float width) {
 		return Math.max(((float) rem/max)*width, 0);
+	}
+	
+	public void setMapID(int mapID) {
+		this.mapID = mapID;
 	}
 }
