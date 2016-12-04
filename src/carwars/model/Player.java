@@ -32,6 +32,7 @@ public class Player extends Entity {
 	
 	private int front;
 	private int hp;
+	private int wind;
 	
 	private int angle;
 	private float force;
@@ -55,6 +56,7 @@ public class Player extends Entity {
 		this.angle = 0;
 		this.force = 0;
 		this.vertSpeed = 0;
+		this.wind = 0;
 		
 		this.turn = false;
 		this.goingUp = false;
@@ -76,6 +78,7 @@ public class Player extends Entity {
 		this.angle = 0;
 		this.force = 0;
 		this.vertSpeed = 0;
+		this.wind = 0;
 		
 		this.turn = false;
 		this.goingUp = false;
@@ -253,6 +256,14 @@ public class Player extends Entity {
 	
 	public Animation getSpriteAnim() {
 		return (this.isDead())? this.deadAnim: this.spriteAnim;
+	}
+	
+	public int getWind() {
+		return this.wind;
+	}
+	
+	public void setWind(int wind) {
+		this.wind = wind;
 	}
 	
 	@Override

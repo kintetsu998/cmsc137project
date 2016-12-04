@@ -13,6 +13,7 @@ public class Code {
 	public static final String PLAYER_JOIN = "@join ";
 	
 	public static final String CREATE_BULLET = "@bullet ";
+	public static final String WIND = "@wind ";
 	
 	public static final String MAP_ID = "@map ";
 	

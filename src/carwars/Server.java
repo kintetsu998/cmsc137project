@@ -26,13 +26,17 @@ public class Server extends Thread {
 	private HashMap<String, Socket> sockets;
 	private ArrayList<Player> pList;
 	
+	private Random rand;
+	
 	private boolean hasStarted;
+	private int wind;
 
 	public Server(int port) throws IOException {
 		serverSocket 	= new ServerSocket(port);
 		udpSocket 		= new DatagramSocket(Config.UDP_SERVER_PORT);
 		sockets 		= new HashMap<>();
 		pList 			= new ArrayList<>();
+		rand			= new Random();
 		hasStarted 		= false;
 	}
 
@@ -83,7 +87,7 @@ public class Server extends Thread {
 									hasStarted = (Config.DEBUG)? false: true;
 									
 									initializePList(getNames());
-									Server.this.startUDP(new Random().nextInt(5));
+									Server.this.startUDP(rand.nextInt(5));
 									Server.this.startGame();
 									
 									System.out.println("Game has started.");
@@ -188,6 +192,7 @@ public class Server extends Thread {
 					try{
 						Server.this.udpSend(Code.MAP_ID + Integer.toString(mapid));
 						Server.this.udpSend(Code.GET_ALL_STATUS + returnStatuses());
+						Server.this.udpSend(Code.WIND + Integer.toString(Server.this.wind));
 						Thread.sleep(100);
 					} catch(Exception e) {
 						Thread.currentThread().interrupt();
@@ -206,6 +211,20 @@ public class Server extends Thread {
 			}
 		};
 		udpSend.start();
+		
+		new Thread() {
+			@Override
+			public void run() {
+				try{
+					while(true) {
+						wind = rand.nextInt(41)-20;
+						Thread.sleep(30000); //30 secs
+					}
+				} catch(InterruptedException e) {
+					return;
+				}
+			}
+		}.start();
 	}
 	
 	public void udpSend(String msg) throws Exception {

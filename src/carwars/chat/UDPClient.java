@@ -96,6 +96,8 @@ public class UDPClient extends Thread{
 		} else if(reply.startsWith(Code.MAP_ID)) {
 			int mapID = Integer.parseInt(reply.replace(Code.MAP_ID, ""));
 			game.setMapID(mapID);
+		} else if(reply.startsWith(Code.WIND)) {
+			game.setWind(Integer.parseInt(reply.replace(Code.WIND, "")));
 		}
 		
 		return reply;

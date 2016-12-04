@@ -315,6 +315,7 @@ public class CarWars extends BasicGame {
 		}
 		
 		renderChat(g);
+		renderWind(g);
 		
 		if(Config.DEBUG) {
 			g.setColor(Color.red);
@@ -481,9 +482,31 @@ public class CarWars extends BasicGame {
 		}
 	}
 	
+	private void renderWind(Graphics g) {
+		String strWind = "WIND: ";
+		
+		if(player.getWind() > 0) {
+			strWind += Integer.toString(Math.abs(player.getWind())) + "E";
+		} else if (player.getWind() < 0) {
+			strWind += Integer.toString(Math.abs(player.getWind())) + "W";
+		} else {
+			strWind += Integer.toString(Math.abs(player.getWind()));
+		}
+		
+		g.setColor(Color.black);
+		g.drawString(strWind, 700, 0);
+	}
+	
 	public void updateChat(String msg) {
 		messages.remove(0);
 		messages.add(msg);
+	}
+	
+	public void setWind(int wind) {
+		player.setWind(wind);
+		for(Bullet b : Bullet.bullets) {
+			b.setWind(wind);
+		}
 	}
 	
 	private float remainingHP(Player p) {
