@@ -59,6 +59,7 @@ public class CarWars extends BasicGame {
 	private boolean oneWon;
 	
 	private int mapID;
+	private int wind;
 	private int[][] terrainMap;
 	
 	public CarWars(String title, TCPClient c) {
@@ -315,6 +316,7 @@ public class CarWars extends BasicGame {
 		}
 		
 		renderChat(g);
+		renderWind(g);
 		
 		if(Config.DEBUG) {
 			g.setColor(Color.red);
@@ -481,9 +483,32 @@ public class CarWars extends BasicGame {
 		}
 	}
 	
+	private void renderWind(Graphics g) {
+		String strWind = "WIND: ";
+		
+		if(this.wind > 0) {
+			strWind += Integer.toString(Math.abs(wind)) + "E";
+		} else if (this.wind < 0) {
+			strWind += Integer.toString(Math.abs(wind)) + "W";
+		} else {
+			strWind += Integer.toString(Math.abs(wind));
+		}
+		
+		g.setColor(Color.black);
+		g.drawString(strWind, 700, 0);
+	}
+	
 	public void updateChat(String msg) {
 		messages.remove(0);
 		messages.add(msg);
+	}
+	
+	public void setWind(int wind) {
+		this.wind = wind;
+	}
+	
+	public int getWind() {
+		return this.wind;
 	}
 	
 	private float remainingHP(Player p) {
