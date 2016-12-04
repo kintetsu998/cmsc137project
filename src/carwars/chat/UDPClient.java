@@ -11,7 +11,6 @@ import carwars.model.Bullet;
 import carwars.model.Player;
 import carwars.util.Code;
 import carwars.util.Config;
-import carwars.util.Settings;
 
 public class UDPClient extends Thread{
 	private MulticastSocket udpSocket;
@@ -26,7 +25,9 @@ public class UDPClient extends Thread{
 			this.udpSocket = new MulticastSocket(Config.UDP_CLIENT_PORT);
 			this.ip = InetAddress.getByName(Config.UDP_SERVER_IP);
 			
-			if(Boolean.parseBoolean(Settings.getInstance().getProperty("os.isLinux"))) {
+			//checking of OS from:
+			//http://stackoverflow.com/questions/228477
+			if(!System.getProperty("os.name").contains("Windows")) {
 				boolean hasInterface = false;
 				while(NetworkInterface.getNetworkInterfaces().hasMoreElements() && !hasInterface) {
 					NetworkInterface ifc = NetworkInterface.getNetworkInterfaces().nextElement();

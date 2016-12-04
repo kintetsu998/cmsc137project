@@ -36,6 +36,7 @@ public class CarWars extends BasicGame {
 	private SpriteSheet terrain;
 	private TrueTypeFont ttf;
 	
+	private Image barrel;
 	private Image marker;
 	private Image sun;
 	private Image cloud;
@@ -102,8 +103,9 @@ public class CarWars extends BasicGame {
 				Terrain.TERR_SIZE, Terrain.TERR_SIZE);
 		ttf = new TrueTypeFont(font, true);
 		
-		marker = new Image(Resources.MARKER);
+		barrel = new Image(Resources.BARREL);
 		bullet = new Image(Resources.BULLET);
+		marker = new Image(Resources.MARKER);
 		
 		initWeather(CLOUDS);
 		
@@ -216,7 +218,6 @@ public class CarWars extends BasicGame {
 			}
 			
 			if(input.isKeyPressed(Input.KEY_ESCAPE)) {
-				//togglePause();
 				udpClient.send(Code.PAUSE_CODE);
 				client.pauseGame(player.getName());
 				
@@ -340,6 +341,8 @@ public class CarWars extends BasicGame {
 			renderPlayer(p, g);
 		}
 		
+		renderMarker();
+		
 		
 		if(chatting){
 			chatBox.render(container, g);
@@ -369,6 +372,13 @@ public class CarWars extends BasicGame {
 		for(Point p : cloudPoints) {
 			cloud.draw(p.getX(), p.getY());
 		}
+	}
+	
+	private void renderMarker() {
+		float y = player.getY() - 20;
+		float x = player.getX() + Player.CAR_WIDTH/2 - 5;
+		
+		marker.draw(x, y);
 	}
 	
 	private void renderBullet(Graphics g) {
@@ -482,21 +492,21 @@ public class CarWars extends BasicGame {
 	}
 
 	private void renderPlayer(Player p, Graphics g) {
-		Image markerCopy;
+		Image barrelCopy;
 		
 		g.setColor(Color.black);
 		if(p.getFront() == Player.RIGHT) {
 			if(!p.isDead()) {
-				markerCopy = marker.copy();
-				markerCopy.rotate(p.getAngle() * -1);
-				markerCopy.draw(p.getX()-Player.CAR_WIDTH*2/3, p.getY() + Player.CAR_HEIGHT/4);
+				barrelCopy = barrel.copy();
+				barrelCopy.rotate(p.getAngle() * -1);
+				barrelCopy.draw(p.getX()-Player.CAR_WIDTH*2/3, p.getY() + Player.CAR_HEIGHT/4);
 			}
 			p.getSpriteAnim().getCurrentFrame().draw(p.getX(), p.getY());
 		} else {
 			if(!p.isDead()) {
-				markerCopy = marker.getFlippedCopy(true,false);
-				markerCopy.rotate(p.getAngle() * -1);
-				markerCopy.draw(p.getX()-Player.CAR_WIDTH, p.getY() + Player.CAR_HEIGHT/4);
+				barrelCopy = barrel.getFlippedCopy(true,false);
+				barrelCopy.rotate(p.getAngle() * -1);
+				barrelCopy.draw(p.getX()-Player.CAR_WIDTH, p.getY() + Player.CAR_HEIGHT/4);
 			}
 			p.getSpriteAnim().getCurrentFrame().getFlippedCopy(true, false).draw(p.getX(), p.getY());
 		}

@@ -30,7 +30,7 @@ public class Settings extends Properties {
 		this.setProperty("game.name", "Car Wars");
 		this.setProperty("game.width", "800");
 		this.setProperty("game.height", "600");
-		this.setProperty("game.gravity", "3");
+		this.setProperty("game.gravity", "30");
 		this.setProperty("game.terminal_speed", "12");
 		this.setProperty("game.anim_speed", "250");
 		this.setProperty("game.max_player", "8");
@@ -45,7 +45,7 @@ public class Settings extends Properties {
 		this.setProperty("car.height", "30");
 		this.setProperty("car.speed", "5");
 		this.setProperty("car.max_hp", "100");
-		this.setProperty("car.jump_speed", "-3");
+		this.setProperty("car.jump_speed", "-10");
 		
 		this.setProperty("terrain.size", "20");
 		
@@ -61,15 +61,14 @@ public class Settings extends Properties {
 		this.setProperty("assets.dead_car", 		"sprites/car-dead.png");
 		this.setProperty("assets.terrain_sprite", 	"terrain/land-rescale.png");
 		this.setProperty("assets.terrain_txt", 		"terrain/maps/terrainI.txt");
-		this.setProperty("assets.marker", 			"misc/angle-rescale.png");
+		this.setProperty("assets.barrel", 			"misc/angle-rescale.png");
+		this.setProperty("assets.marker", 			"misc/marker.png");
 		this.setProperty("assets.bullet", 			"sprites/bullet.png");
 		this.setProperty("assets.sun", 				"weather/sun.png");
 		this.setProperty("assets.cloud", 			"weather/cloud.png");
 		this.setProperty("assets.car_sprite", 		"sprites/carI-sprites.png");
 		this.setProperty("assets.panel_bg", 		"misc/login-bg2.png");
 		this.setProperty("assets.control_bg", 		"misc/howto.png");
-
-		this.setProperty("os.isLinux", "true");
 		
 		this.saveProperty();
 	}

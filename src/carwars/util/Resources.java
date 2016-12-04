@@ -5,6 +5,7 @@ public class Resources {
 	public static final String DEAD_CAR		  = ASSETS_DIR + Settings.getInstance().getProperty("assets.dead_car");
 	public static final String TERRAIN_SPRITE = ASSETS_DIR + Settings.getInstance().getProperty("assets.terrain_sprite");
 	public static final String TERRAIN_TXT	  = ASSETS_DIR + Settings.getInstance().getProperty("assets.terrain_txt");
+	public static final String BARREL		  = ASSETS_DIR + Settings.getInstance().getProperty("assets.barrel");
 	public static final String MARKER		  = ASSETS_DIR + Settings.getInstance().getProperty("assets.marker");
 	public static final String BULLET		  = ASSETS_DIR + Settings.getInstance().getProperty("assets.bullet");
 	public static final String SUN		 	  = ASSETS_DIR + Settings.getInstance().getProperty("assets.sun");
