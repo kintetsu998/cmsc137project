@@ -61,7 +61,8 @@ public class Settings extends Properties {
 		this.setProperty("assets.dead_car", 		"sprites/car-dead.png");
 		this.setProperty("assets.terrain_sprite", 	"terrain/land-rescale.png");
 		this.setProperty("assets.terrain_txt", 		"terrain/maps/terrainI.txt");
-		this.setProperty("assets.marker", 			"misc/angle-rescale.png");
+		this.setProperty("assets.barrel", 			"misc/angle-rescale.png");
+		this.setProperty("assets.marker", 			"misc/marker.png");
 		this.setProperty("assets.bullet", 			"sprites/bullet.png");
 		this.setProperty("assets.sun", 				"weather/sun.png");
 		this.setProperty("assets.cloud", 			"weather/cloud.png");

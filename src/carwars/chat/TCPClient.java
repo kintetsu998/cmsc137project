@@ -104,7 +104,6 @@ public class TCPClient {
                         }
                     } catch(Exception e1) {
                         JOptionPane.showMessageDialog(null, "The server closed.");
-                        e1.printStackTrace();
                         System.exit(1);
                     }
                 }
