@@ -57,6 +57,7 @@ public class CarWars extends BasicGame {
 	
 	private boolean chatting;
 	private boolean oneWon;
+	private boolean isPaused;
 	
 	private int mapID;
 	private int[][] terrainMap;
@@ -119,13 +120,7 @@ public class CarWars extends BasicGame {
 		
 		chatting = false;
 		oneWon = false;
-		
-		new Thread() {
-			@Override
-			public void run() {
-				player.fall();
-			}
-		}.start();
+		isPaused = false;
 	}
 	
 	private void initWeather(int n) throws SlickException{
@@ -149,9 +144,15 @@ public class CarWars extends BasicGame {
 			public void run() {
 				try{
 					while(true) {
-						for(Point p : cloudPoints) {
-							p.setX((p.getX() - 1) % Config.GAME_WIDTH);
-							Thread.sleep(100);
+						if(!CarWars.this.isPaused) {
+							for(Point p : cloudPoints) {
+								if(CarWars.this.player.getWind() > 0) {
+									p.setX((p.getX() + 1) % Config.GAME_WIDTH);
+								} else if(CarWars.this.player.getWind() < 0) {
+									p.setX((p.getX() - 1) % Config.GAME_WIDTH);
+								}
+								Thread.sleep(100);
+							}
 						}
 					}
 				} catch(Exception e) {
@@ -165,10 +166,19 @@ public class CarWars extends BasicGame {
 			public void run() {
 				try{
 					while(true) {
-						sunPoint.setX((sunPoint.getX() - 1) % Config.GAME_WIDTH);
-						Thread.sleep(6000);
+						if(!CarWars.this.isPaused) {
+							if(CarWars.this.player.getWind() > 0) {
+								sunPoint.setX((sunPoint.getX() + 1) % Config.GAME_WIDTH);
+							} else if(CarWars.this.player.getWind() < 0) {
+								sunPoint.setX((sunPoint.getX() - 1) % Config.GAME_WIDTH);
+							}
+							Thread.sleep(6000);
+						} else {
+							System.out.println("paused.");
+						}
 					}
 				} catch(Exception e) {
+					e.printStackTrace();
 					Thread.currentThread().interrupt();
 				}
 			}
@@ -180,24 +190,42 @@ public class CarWars extends BasicGame {
 		Input input = container.getInput();
 		
 		if(!chatting) {
-			if(input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
-				player.moveLeft();
-			} else if(input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
-				player.moveRight();
-			} else if(input.isKeyPressed(Input.KEY_ENTER)) {
+			if(!isPaused) {
+				player.fall();
+				
+				if(input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
+					player.moveLeft();
+				} else if(input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
+					player.moveRight();
+				}
+				
+				if(input.isKeyDown(Input.KEY_UP) || input.isKeyDown(Input.KEY_W)) {
+					player.jump();
+				}
+				
+				if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+					player.shoot(udpClient);
+				}
+				
+				player.setAngle(getPlayerAngle(player, input.getMouseX(), input.getMouseY()));
+				player.setForce(getPlayerForce(player, input.getMouseX(), input.getMouseY()));
+			}
+			
+			if(input.isKeyPressed(Input.KEY_ENTER)) {
 				chatting = true;
 			}
 			
-			if(input.isKeyDown(Input.KEY_UP) || input.isKeyDown(Input.KEY_W)) {
-				player.jump();
+			if(input.isKeyPressed(Input.KEY_ESCAPE)) {
+				//togglePause();
+				udpClient.send(Code.PAUSE_CODE);
+				client.pauseGame(player.getName());
+				
+				if(isPaused) {
+					updateChat("You have paused the game.");
+				} else {
+					updateChat("You have unpaused the game.");
+				}
 			}
-			
-			if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
-				player.shoot(udpClient);
-			}
-			
-			player.setAngle(getPlayerAngle(player, input.getMouseX(), input.getMouseY()));
-			player.setForce(getPlayerForce(player, input.getMouseX(), input.getMouseY()));
 		} else {
 			if(input.isKeyPressed(Input.KEY_ENTER)) {
 				String str = new String(chatBox.getText());
@@ -279,6 +307,11 @@ public class CarWars extends BasicGame {
 		
 		return null;
 	}
+	
+	public void togglePause() {
+		this.isPaused = !this.isPaused;
+		System.out.println(isPaused);
+	}
 
 	private int getPlayerAngle(Player p, int x, int y) {
 		int xdist = (int) p.getX()-x;
@@ -299,8 +332,8 @@ public class CarWars extends BasicGame {
 	@Override
 	public void render(GameContainer container, Graphics g) throws SlickException {
 		setFont(g);
-		renderTerrain(g);
 		renderWeather(g);
+		renderTerrain(g);
 		renderBullet(g);
 		
 		for(Player p : Player.players.values()) {
@@ -316,6 +349,11 @@ public class CarWars extends BasicGame {
 		
 		renderChat(g);
 		renderWind(g);
+		
+		if(isPaused) {
+			g.setColor(Color.red);
+			g.drawString("GAME IS PAUSED.", 360, 10);
+		}
 		
 		if(Config.DEBUG) {
 			g.setColor(Color.red);
@@ -494,7 +532,7 @@ public class CarWars extends BasicGame {
 		}
 		
 		g.setColor(Color.black);
-		g.drawString(strWind, 700, 0);
+		g.drawString(strWind, 725, 10);
 	}
 	
 	public void updateChat(String msg) {

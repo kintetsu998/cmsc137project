@@ -70,7 +70,7 @@ public class Bullet extends Entity implements Runnable {
 				&& this.getY() < Config.GAME_HEIGHT
 				&& !intersectsEntity()) {
 			
-			yspeed -= (float) Config.GRAVITY/100.0f;
+			yspeed -= (float) Config.GRAVITY/500.0f;
 			
 			this.setY(this.getY() - yspeed);
 			if(this.front == Player.LEFT) {

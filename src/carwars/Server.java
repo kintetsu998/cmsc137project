@@ -29,6 +29,7 @@ public class Server extends Thread {
 	private Random rand;
 	
 	private boolean hasStarted;
+	private boolean pause;
 	private int wind;
 
 	public Server(int port) throws IOException {
@@ -38,6 +39,7 @@ public class Server extends Thread {
 		pList 			= new ArrayList<>();
 		rand			= new Random();
 		hasStarted 		= false;
+		pause 			= false;
 	}
 
 	public void run(){
@@ -87,10 +89,23 @@ public class Server extends Thread {
 									hasStarted = (Config.DEBUG)? false: true;
 									
 									initializePList(getNames());
-									Server.this.startUDP(rand.nextInt(5));
+									if(Config.DEBUG) {
+										Server.this.startUDP(0);
+									} else {
+										Server.this.startUDP(rand.nextInt(5));
+									}
 									Server.this.startGame();
 									
 									System.out.println("Game has started.");
+								} else if(message.startsWith(Code.PAUSE_CODE)) {
+									String pName = message.replace(Code.PAUSE_CODE, "");
+									pause = !pause;
+									
+									if(pause) {
+										Server.this.sendToAll(pName + " paused the game.", server);
+									} else {
+										Server.this.sendToAll(pName + " unpaused the game.", server);
+									}
 								} else {
 									Server.this.sendToAll(name + ": " + message, server);
 								}
@@ -98,7 +113,8 @@ public class Server extends Thread {
 						} catch(SocketException e) {
 							Server.this.sendToAll(name + " has disconnected.", server);
 							sockets.remove(name);
-							if(hasStarted && sockets.size() <= 0) {
+							
+							if(sockets.size() <= 0) {
 								System.out.println("All players disconnected. Closing the server...");
 								System.exit(0);
 							}
