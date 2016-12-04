@@ -139,12 +139,6 @@ public class Player extends Entity {
 			if(this.getY() <= Config.GAME_HEIGHT-CAR_HEIGHT)
 				this.setY(this.getY() + this.vertSpeed);
 		}
-
-		try{
-			Thread.sleep(5);
-		} catch(Exception e) {
-			Thread.currentThread().interrupt();
-		}
 	}
 	
 	public void shoot(UDPClient udpClient) {

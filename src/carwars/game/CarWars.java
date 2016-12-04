@@ -121,17 +121,6 @@ public class CarWars extends BasicGame {
 		chatting = false;
 		oneWon = false;
 		isPaused = false;
-		
-		new Thread() {
-			@Override
-			public void run() {
-				while(true) {
-					if(!isPaused) {
-						player.fall();
-					}
-				}
-			}
-		}.start();
 	}
 	
 	private void initWeather(int n) throws SlickException{
@@ -155,9 +144,13 @@ public class CarWars extends BasicGame {
 			public void run() {
 				try{
 					while(true) {
-						if(!isPaused) {
+						if(!CarWars.this.isPaused) {
 							for(Point p : cloudPoints) {
-								p.setX((p.getX() - 1) % Config.GAME_WIDTH);
+								if(CarWars.this.player.getWind() > 0) {
+									p.setX((p.getX() + 1) % Config.GAME_WIDTH);
+								} else if(CarWars.this.player.getWind() < 0) {
+									p.setX((p.getX() - 1) % Config.GAME_WIDTH);
+								}
 								Thread.sleep(100);
 							}
 						}
@@ -173,12 +166,19 @@ public class CarWars extends BasicGame {
 			public void run() {
 				try{
 					while(true) {
-						if(!isPaused) {
-							sunPoint.setX((sunPoint.getX() - 1) % Config.GAME_WIDTH);
+						if(!CarWars.this.isPaused) {
+							if(CarWars.this.player.getWind() > 0) {
+								sunPoint.setX((sunPoint.getX() + 1) % Config.GAME_WIDTH);
+							} else if(CarWars.this.player.getWind() < 0) {
+								sunPoint.setX((sunPoint.getX() - 1) % Config.GAME_WIDTH);
+							}
 							Thread.sleep(6000);
+						} else {
+							System.out.println("paused.");
 						}
 					}
 				} catch(Exception e) {
+					e.printStackTrace();
 					Thread.currentThread().interrupt();
 				}
 			}
@@ -191,6 +191,8 @@ public class CarWars extends BasicGame {
 		
 		if(!chatting) {
 			if(!isPaused) {
+				player.fall();
+				
 				if(input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
 					player.moveLeft();
 				} else if(input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
@@ -217,6 +219,7 @@ public class CarWars extends BasicGame {
 				//togglePause();
 				udpClient.send(Code.PAUSE_CODE);
 				client.pauseGame(player.getName());
+				
 				if(isPaused) {
 					updateChat("You have paused the game.");
 				} else {
@@ -307,6 +310,7 @@ public class CarWars extends BasicGame {
 	
 	public void togglePause() {
 		this.isPaused = !this.isPaused;
+		System.out.println(isPaused);
 	}
 
 	private int getPlayerAngle(Player p, int x, int y) {

@@ -70,6 +70,8 @@ public class Settings extends Properties {
 		this.setProperty("assets.control_bg", 		"misc/howto.png");
 
 		this.setProperty("os.isLinux", "true");
+		
+		this.saveProperty();
 	}
 	
 	public void saveProperty() {

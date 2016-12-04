@@ -89,7 +89,11 @@ public class Server extends Thread {
 									hasStarted = (Config.DEBUG)? false: true;
 									
 									initializePList(getNames());
-									Server.this.startUDP(rand.nextInt(5));
+									if(Config.DEBUG) {
+										Server.this.startUDP(0);
+									} else {
+										Server.this.startUDP(rand.nextInt(5));
+									}
 									Server.this.startGame();
 									
 									System.out.println("Game has started.");
@@ -109,7 +113,8 @@ public class Server extends Thread {
 						} catch(SocketException e) {
 							Server.this.sendToAll(name + " has disconnected.", server);
 							sockets.remove(name);
-							if(hasStarted && sockets.size() <= 0) {
+							
+							if(sockets.size() <= 0) {
 								System.out.println("All players disconnected. Closing the server...");
 								System.exit(0);
 							}
