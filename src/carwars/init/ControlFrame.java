@@ -12,7 +12,7 @@ public class ControlFrame extends JFrame {
 	public ControlFrame() {
 		super();
 		addComponents(getContentPane());
-		setSize(1000, 300);
+		setSize(1000, 425);
 		setResizable(false);
 		setLocationRelativeTo(null);
 		setVisible(true);

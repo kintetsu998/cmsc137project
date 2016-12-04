@@ -67,14 +67,12 @@ public class PlayerLogin extends JFrame implements ActionListener {
         portLabel.setOpaque(isOpaque);
         usernameLabel.setOpaque(isOpaque);
         
-        inputToConnect.add(setLabelCustomLayout(serverLabel,FlowLayout.LEFT,"Arial",Font.PLAIN,25));
+        inputToConnect.add(setLabelCustomLayout(serverLabel,FlowLayout.RIGHT,"Arial",Font.PLAIN,25));
         inputToConnect.add(setTextFieldCustomLayout(tfHost,"Arial",Font.PLAIN,25));
-        inputToConnect.add(setLabelCustomLayout(portLabel,FlowLayout.LEFT,"Arial",Font.PLAIN,25));
+        inputToConnect.add(setLabelCustomLayout(portLabel,FlowLayout.RIGHT,"Arial",Font.PLAIN,25));
         inputToConnect.add(setTextFieldCustomLayout(tfPort,"Arial",Font.PLAIN,25));
-        inputToConnect.add(setLabelCustomLayout(usernameLabel,FlowLayout.LEFT,"Arial",Font.PLAIN,25));
+        inputToConnect.add(setLabelCustomLayout(usernameLabel,FlowLayout.RIGHT,"Arial",Font.PLAIN,25));
         inputToConnect.add(setTextFieldCustomLayout(tfUsername,"Arial",Font.PLAIN,25));
-        
-        
 
         JPanel b = new JPanel(new GridLayout(1, 3));
         logButton = new JButton("Login");
@@ -109,31 +107,33 @@ public class PlayerLogin extends JFrame implements ActionListener {
         setVisible(true);
     }
     
-    private Component setLabelCustomLayout(Component component,int ALIGNMENT,String FONT_NAME,int FONT_STYLE,int FONT_SIZE) {
+    private Component setLabelCustomLayout(JLabel component,int ALIGNMENT,String FONT_NAME,int FONT_STYLE,int FONT_SIZE) {
         FlowLayout layout = new FlowLayout();
-        layout.setAlignment(ALIGNMENT);
-        layout.setHgap(20);
         JPanel panel = new JPanel(layout);
         Font font = new Font(FONT_NAME, FONT_STYLE, FONT_SIZE);
+        
+        layout.setAlignment(ALIGNMENT);
         component.setFont(font);
-        ((JLabel) component).setForeground(Color.WHITE);
+        component.setForeground(Color.BLACK);
         panel.setOpaque(isOpaque);
         panel.add(component);
+        
     	return panel;
     }
     
     private Component setTextFieldCustomLayout(Component component,String FONT_NAME,int FONT_STYLE,int FONT_SIZE) {
         FlowLayout layout = new FlowLayout();
-        layout.setAlignment(FlowLayout.LEFT);
-        layout.setHgap(20);
         JPanel panel = new JPanel(layout);
         Font font = new Font(FONT_NAME, FONT_STYLE, FONT_SIZE);
+        JTextField textField = (JTextField)component;
+        
+        layout.setAlignment(FlowLayout.LEFT);
         component.setFont(font);
         
-        JTextField textField = (JTextField)component;
-        textField.setPreferredSize(new Dimension(500,50));
+        textField.setPreferredSize(new Dimension(300,30));
         panel.setOpaque(isOpaque);
         panel.add(component);
+        
     	return panel;
     }
     
