@@ -206,12 +206,12 @@ public class PlayerLogin extends JFrame implements ActionListener {
             connected = false;
             return;
         } else if(t1.contains(" ")) {
-        	errLabel.setText("Username should not contain spaces.");
+        	errLabel.setText("No spaces.");
             errLabel.setForeground(Color.RED);
             connected = false;
             return;
         } else if(t1.contains("@")) {
-        	errLabel.setText("Username should not contain @ symbol.");
+        	errLabel.setText("No @ symbol.");
             errLabel.setForeground(Color.RED);
             connected = false;
             return;
