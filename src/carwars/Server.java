@@ -217,8 +217,8 @@ public class Server extends Thread {
 			public void run() {
 				try{
 					while(true) {
-						wind = rand.nextInt(40)-20;
-						Thread.sleep(60000); //1 minute
+						wind = rand.nextInt(41)-20;
+						Thread.sleep(30000); //30 secs
 					}
 				} catch(InterruptedException e) {
 					return;

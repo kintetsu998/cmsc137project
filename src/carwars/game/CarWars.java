@@ -59,7 +59,6 @@ public class CarWars extends BasicGame {
 	private boolean oneWon;
 	
 	private int mapID;
-	private int wind;
 	private int[][] terrainMap;
 	
 	public CarWars(String title, TCPClient c) {
@@ -486,12 +485,12 @@ public class CarWars extends BasicGame {
 	private void renderWind(Graphics g) {
 		String strWind = "WIND: ";
 		
-		if(this.wind > 0) {
-			strWind += Integer.toString(Math.abs(wind)) + "E";
-		} else if (this.wind < 0) {
-			strWind += Integer.toString(Math.abs(wind)) + "W";
+		if(player.getWind() > 0) {
+			strWind += Integer.toString(Math.abs(player.getWind())) + "E";
+		} else if (player.getWind() < 0) {
+			strWind += Integer.toString(Math.abs(player.getWind())) + "W";
 		} else {
-			strWind += Integer.toString(Math.abs(wind));
+			strWind += Integer.toString(Math.abs(player.getWind()));
 		}
 		
 		g.setColor(Color.black);
@@ -504,11 +503,10 @@ public class CarWars extends BasicGame {
 	}
 	
 	public void setWind(int wind) {
-		this.wind = wind;
-	}
-	
-	public int getWind() {
-		return this.wind;
+		player.setWind(wind);
+		for(Bullet b : Bullet.bullets) {
+			b.setWind(wind);
+		}
 	}
 	
 	private float remainingHP(Player p) {
