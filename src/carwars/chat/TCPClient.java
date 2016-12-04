@@ -163,6 +163,15 @@ public class TCPClient {
         	e.printStackTrace();
         }
     }
+    
+    public void pauseGame(String pName) {
+    	try {
+            out.writeUTF(Code.PAUSE_CODE + pName);
+        }
+        catch(IOException e) {
+        	e.printStackTrace();
+        }
+    }
 
     public String getName(){
         return this.name;

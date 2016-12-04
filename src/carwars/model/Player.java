@@ -108,44 +108,42 @@ public class Player extends Entity {
 	}
 	
 	public void fall() {
-		while(!this.isDead()) {
-			boolean intersects = this.intersectsTerrain(this.hitBox());
-			boolean bumped = this.intersectsTerrain(this.topHitBox());
+		boolean intersects = this.intersectsTerrain(this.hitBox());
+		boolean bumped = this.intersectsTerrain(this.topHitBox());
+		
+		if(intersects && !goingUp){
+			Player.this.jumping = false;
 			
-			if(intersects && !goingUp){
-				Player.this.jumping = false;
-				
-				while(this.intersectsTerrain(this.hitBox())) {
-					this.setY(this.getY()-1);
-				}
-				
+			while(this.intersectsTerrain(this.hitBox())) {
+				this.setY(this.getY()-1);
+			}
+			
+			this.setY(this.getY()+1);
+			this.vertSpeed = 0;
+		} else if(bumped && goingUp) {
+			while(this.intersectsTerrain(this.hitBox())) {
 				this.setY(this.getY()+1);
-				this.vertSpeed = 0;
-			} else if(bumped && goingUp) {
-				while(this.intersectsTerrain(this.hitBox())) {
-					this.setY(this.getY()+1);
-				}
-				
-				this.vertSpeed = 1;
-			} else if(this.getY() >= Config.GAME_HEIGHT-CAR_HEIGHT) {
-				this.damage(MAX_HP);
-				this.end();
-			} else {
-				this.vertSpeed = (this.vertSpeed < Config.TERMINAL_SPEED)? 
-						this.vertSpeed + Config.GRAVITY/100.0f: 
-						Config.TERMINAL_SPEED;
-				
-				goingUp = vertSpeed <= 0;
-				
-				if(this.getY() <= Config.GAME_HEIGHT-CAR_HEIGHT)
-					this.setY(this.getY() + this.vertSpeed);
 			}
+			
+			this.vertSpeed = 1;
+		} else if(this.getY() >= Config.GAME_HEIGHT-CAR_HEIGHT) {
+			this.damage(MAX_HP);
+			this.end();
+		} else {
+			this.vertSpeed = (this.vertSpeed < Config.TERMINAL_SPEED)? 
+					this.vertSpeed + Config.GRAVITY/100.0f: 
+					Config.TERMINAL_SPEED;
+			
+			goingUp = vertSpeed <= 0;
+			
+			if(this.getY() <= Config.GAME_HEIGHT-CAR_HEIGHT)
+				this.setY(this.getY() + this.vertSpeed);
+		}
 
-			try{
-				Thread.sleep(5);
-			} catch(Exception e) {
-				Thread.currentThread().interrupt();
-			}
+		try{
+			Thread.sleep(5);
+		} catch(Exception e) {
+			Thread.currentThread().interrupt();
 		}
 	}
 	

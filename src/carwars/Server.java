@@ -29,6 +29,7 @@ public class Server extends Thread {
 	private Random rand;
 	
 	private boolean hasStarted;
+	private boolean pause;
 	private int wind;
 
 	public Server(int port) throws IOException {
@@ -38,6 +39,7 @@ public class Server extends Thread {
 		pList 			= new ArrayList<>();
 		rand			= new Random();
 		hasStarted 		= false;
+		pause 			= false;
 	}
 
 	public void run(){
@@ -91,6 +93,15 @@ public class Server extends Thread {
 									Server.this.startGame();
 									
 									System.out.println("Game has started.");
+								} else if(message.startsWith(Code.PAUSE_CODE)) {
+									String pName = message.replace(Code.PAUSE_CODE, "");
+									pause = !pause;
+									
+									if(pause) {
+										Server.this.sendToAll(pName + " paused the game.", server);
+									} else {
+										Server.this.sendToAll(pName + " unpaused the game.", server);
+									}
 								} else {
 									Server.this.sendToAll(name + ": " + message, server);
 								}

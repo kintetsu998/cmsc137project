@@ -98,6 +98,8 @@ public class UDPClient extends Thread{
 			game.setMapID(mapID);
 		} else if(reply.startsWith(Code.WIND)) {
 			game.setWind(Integer.parseInt(reply.replace(Code.WIND, "")));
+		} else if(reply.startsWith(Code.PAUSE_CODE)) {
+			game.togglePause();
 		}
 		
 		return reply;
