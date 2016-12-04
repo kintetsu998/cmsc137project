@@ -30,7 +30,7 @@ public class Settings extends Properties {
 		this.setProperty("game.name", "Car Wars");
 		this.setProperty("game.width", "800");
 		this.setProperty("game.height", "600");
-		this.setProperty("game.gravity", "3");
+		this.setProperty("game.gravity", "30");
 		this.setProperty("game.terminal_speed", "12");
 		this.setProperty("game.anim_speed", "250");
 		this.setProperty("game.max_player", "8");
@@ -45,7 +45,7 @@ public class Settings extends Properties {
 		this.setProperty("car.height", "30");
 		this.setProperty("car.speed", "5");
 		this.setProperty("car.max_hp", "100");
-		this.setProperty("car.jump_speed", "-3");
+		this.setProperty("car.jump_speed", "-10");
 		
 		this.setProperty("terrain.size", "20");
 		
