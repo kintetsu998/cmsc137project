@@ -69,8 +69,6 @@ public class Settings extends Properties {
 		this.setProperty("assets.car_sprite", 		"sprites/carI-sprites.png");
 		this.setProperty("assets.panel_bg", 		"misc/login-bg2.png");
 		this.setProperty("assets.control_bg", 		"misc/howto.png");
-
-		this.setProperty("os.isLinux", "true");
 		
 		this.saveProperty();
 	}

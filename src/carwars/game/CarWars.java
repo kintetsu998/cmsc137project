@@ -341,6 +341,8 @@ public class CarWars extends BasicGame {
 			renderPlayer(p, g);
 		}
 		
+		renderMarker();
+		
 		
 		if(chatting){
 			chatBox.render(container, g);
@@ -370,6 +372,13 @@ public class CarWars extends BasicGame {
 		for(Point p : cloudPoints) {
 			cloud.draw(p.getX(), p.getY());
 		}
+	}
+	
+	private void renderMarker() {
+		float y = player.getY() - 20;
+		float x = player.getX() + Player.CAR_WIDTH/2 - 5;
+		
+		marker.draw(x, y);
 	}
 	
 	private void renderBullet(Graphics g) {
