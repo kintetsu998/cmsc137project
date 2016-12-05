@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 
 import carwars.game.CarWars;
 import carwars.init.GameSetup;
+import carwars.model.Player;
 import carwars.util.Code;
 
 public class TCPClient {
@@ -93,6 +94,11 @@ public class TCPClient {
                             	addPNames(reply.split(" "));
                             	hasList = true;
                             }
+                           //receives a code that updates the last status of the player
+                            else if(reply.startsWith(Code.QUERY_STATUS)) {
+                            	String pName = reply.replace(Code.QUERY_STATUS, "");
+                            	TCPClient.this.sendPlayerStatus(Player.players.get(pName));
+                            }
                             //receives a code that should start the game;
                             else if(reply.equals(Code.START_CODE)) {
                             	gs.startGame();
@@ -125,6 +131,14 @@ public class TCPClient {
             return false;
         }
         return true;
+    }
+    
+    private void sendPlayerStatus(Player p) {
+    	try {
+    		out.writeUTF(Code.PLAYER_STATUS + p.toString());
+    	} catch(IOException e) {
+    		e.printStackTrace();
+    	}
     }
     
     private void showMessage(String message) {
