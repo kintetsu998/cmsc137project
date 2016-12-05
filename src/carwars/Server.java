@@ -31,6 +31,7 @@ public class Server extends Thread {
 	private boolean hasStarted;
 	private boolean pause;
 	private int wind;
+	private int mapID;
 
 	public Server(int port) throws IOException {
 		serverSocket 	= new ServerSocket(port);
@@ -40,6 +41,11 @@ public class Server extends Thread {
 		rand			= new Random();
 		hasStarted 		= false;
 		pause 			= false;
+		if(Config.DEBUG) {
+			mapID		= 0;
+		} else {
+			mapID		= rand.nextInt(5);
+		}
 	}
 
 	public void run(){
@@ -90,9 +96,9 @@ public class Server extends Thread {
 									
 									initializePList(getNames());
 									if(Config.DEBUG) {
-										Server.this.startUDP(0);
+										Server.this.startUDP();
 									} else {
-										Server.this.startUDP(rand.nextInt(5));
+										Server.this.startUDP();
 									}
 									Server.this.startGame();
 									
@@ -200,13 +206,13 @@ public class Server extends Thread {
 		}
 	}
 	
-	public void startUDP(int mapid) {
+	public void startUDP() {
 		udpSend = new Thread() {
 			@Override
 			public void run() {
 				while(!this.isInterrupted()) {
 					try{
-						Server.this.udpSend(Code.MAP_ID + Integer.toString(mapid));
+						Server.this.udpSend(Code.MAP_ID + Integer.toString(Server.this.mapID));
 						Server.this.udpSend(Code.GET_ALL_STATUS + returnStatuses());
 						Server.this.udpSend(Code.WIND + Integer.toString(Server.this.wind));
 						Thread.sleep(100);
