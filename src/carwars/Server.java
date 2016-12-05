@@ -84,6 +84,8 @@ public class Server extends Thread {
 							if(hasStarted) {
 								if(dcNames.contains(name)) {
 									Server.this.sendToAll(name + " has reconnected to the game.", server);
+									Server.this.sendStart(server);
+									hasStarted = true;
 								} else { 
 									out.writeUTF("The game has already started.");
 									return;
@@ -101,7 +103,7 @@ public class Server extends Thread {
 							
 							while(true) {
 								message = in.readUTF();
-								if(message.equals(Code.START_CODE)) {
+								if(message.equals(Code.START_CODE) && !hasStarted) {
 									hasStarted = true;
 									
 									initializePList(getNames());
@@ -110,7 +112,6 @@ public class Server extends Thread {
 									Server.this.startGame();
 									
 									System.out.println("Game has started.");
-									
 								} else if(message.startsWith(Code.PAUSE_CODE)) {
 									String pName = message.replace(Code.PAUSE_CODE, "");
 									pause = !pause;
@@ -209,12 +210,16 @@ public class Server extends Thread {
 		for(String name : sockets.keySet()) {
 			Socket s = sockets.get(name);
 
-			try{
-				DataOutputStream out = new DataOutputStream(s.getOutputStream());
-				out.writeUTF(Code.START_CODE);
-			} catch(IOException e) {
-				e.printStackTrace();
-			}
+			sendStart(s);
+		}
+	}
+	
+	public void sendStart(Socket sock) {
+		try{
+			DataOutputStream out = new DataOutputStream(sock.getOutputStream());
+			out.writeUTF(Code.START_CODE);
+		} catch(IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
