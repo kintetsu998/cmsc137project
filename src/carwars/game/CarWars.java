@@ -175,8 +175,6 @@ public class CarWars extends BasicGame {
 								sunPoint.setX((sunPoint.getX() - 1) % Config.GAME_WIDTH);
 							}
 							Thread.sleep(6000);
-						} else {
-							System.out.println("paused.");
 						}
 					}
 				} catch(Exception e) {
@@ -427,6 +425,12 @@ public class CarWars extends BasicGame {
 									Float.parseFloat(tok[1]),
 									client
 							);
+							
+							player.update(Float.parseFloat(tok[1]),
+									 Float.parseFloat(tok[2]),
+									 Integer.parseInt(tok[3]),
+									 Integer.parseInt(tok[4]),
+									 Integer.parseInt(tok[5]));
 						} else {
 							new Player(tok[0], 
 									new Animation(playerSprites.get(i), Config.ANIM_SPEED),

@@ -6,11 +6,11 @@ import java.util.Random;
 import org.newdawn.slick.geom.Rectangle;
 
 import carwars.util.Config;
-import carwars.util.Settings;
 
 public class Bullet extends Entity implements Runnable {
-	public static final int BULLET_WIDTH = Integer.parseInt(Settings.getInstance().getProperty("bullet.width"));
-	public static final int BULLET_HEIGHT = Integer.parseInt(Settings.getInstance().getProperty("bullet.height"));
+	public static final int BULLET_WIDTH = 15;
+	public static final int BULLET_HEIGHT = 10;
+	
 	public static final ArrayList<Bullet> bullets = new ArrayList<>();
 	public static final Random rand = new Random();
 	

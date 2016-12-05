@@ -18,6 +18,9 @@ public class Code {
 	
 	public static final String MAP_ID = "@map ";
 	
+	public static final String QUERY_STATUS = "@query ";
+	public static final String PLAYER_STATUS = "@playerStatus ";
+	
 	static private ArrayList<String> codes = new ArrayList<>();
 	
 	public static void init() {
@@ -33,6 +36,9 @@ public class Code {
 		
 		codes.add(CREATE_BULLET);
 		codes.add(MAP_ID);
+		
+		codes.add(QUERY_STATUS);
+		codes.add(PLAYER_STATUS);
 	}
 	
 	public static boolean codeExists(String code) {

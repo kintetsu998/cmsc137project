@@ -28,26 +28,10 @@ public class Settings extends Properties {
 	
 	private void loadDefault() {
 		this.setProperty("game.name", "Car Wars");
-		this.setProperty("game.width", "800");
-		this.setProperty("game.height", "600");
-		this.setProperty("game.gravity", "30");
-		this.setProperty("game.terminal_speed", "12");
 		this.setProperty("game.anim_speed", "250");
-		this.setProperty("game.max_player", "8");
 		this.setProperty("game.min_player", "2");
 		this.setProperty("game.clouds", "3");
 		this.setProperty("game.debug", "false");
-		
-		this.setProperty("bullet.width", "15");
-		this.setProperty("bullet.height", "10");
-		
-		this.setProperty("car.width", "40");
-		this.setProperty("car.height", "30");
-		this.setProperty("car.speed", "5");
-		this.setProperty("car.max_hp", "100");
-		this.setProperty("car.jump_speed", "-10");
-		
-		this.setProperty("terrain.size", "20");
 		
 		this.setProperty("udp.buffer_size", "1024");
 		this.setProperty("udp.server_port", "4445");

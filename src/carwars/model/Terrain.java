@@ -10,11 +10,10 @@ import org.newdawn.slick.geom.Rectangle;
 
 import carwars.util.Config;
 import carwars.util.Resources;
-import carwars.util.Settings;
 
 public class Terrain extends Entity {
 	public static final ArrayList<Terrain> terrains = new ArrayList<>();
-	static public final int TERR_SIZE = Integer.parseInt(Settings.getInstance().getProperty("terrain.size"));
+	static public final int TERR_SIZE = 20;
 	
 	private Image sprite;
 	
