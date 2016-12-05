@@ -10,20 +10,23 @@ import carwars.chat.TCPClient;
 import carwars.chat.UDPClient;
 import carwars.util.Code;
 import carwars.util.Config;
-import carwars.util.Settings;
 
 public class Player extends Entity {
 	public static final HashMap<String, Player> players = new HashMap<>();
 	public static final int RIGHT = 0;
 	public static final int LEFT = 1;
 	
-	static public final int CAR_WIDTH = Integer.parseInt(Settings.getInstance().getProperty("car.width"));
-	static public final int CAR_HEIGHT = Integer.parseInt(Settings.getInstance().getProperty("car.height"));
-	static public final int CAR_SPEED = Integer.parseInt(Settings.getInstance().getProperty("car.speed"));
+	static public final int CAR_WIDTH = 40;
+	static public final int CAR_HEIGHT = 30;
 	
-	static public final int MAX_HP = Integer.parseInt(Settings.getInstance().getProperty("car.max_hp"));
+	static public final int CAR_SPEED = 5;
 	
-	static public final float JUMP_SPEED = Float.parseFloat(Settings.getInstance().getProperty("car.jump_speed"));
+	public static final int HITBOX_WIDTH = 40;
+	public static final int HITBOX_HEIGHT = 30;
+	
+	static public final int MAX_HP = 100;
+	
+	static public final float JUMP_SPEED = -10;
 	
 	
 	private String name;
@@ -260,6 +263,6 @@ public class Player extends Entity {
 	
 	@Override
 	public Rectangle hitBox() {
-		return new Rectangle(this.getX(), this.getY(), Player.CAR_WIDTH, Player.CAR_HEIGHT);
+		return new Rectangle(this.getX(), this.getY(), Player.HITBOX_WIDTH, Player.HITBOX_HEIGHT);
 	}
 }

@@ -25,6 +25,7 @@ public class Server extends Thread {
 	
 	private HashMap<String, Socket> sockets;
 	private ArrayList<Player> pList;
+	private ArrayList<String> dcNames;
 	
 	private Random rand;
 	
@@ -33,14 +34,17 @@ public class Server extends Thread {
 	private int wind;
 	private int mapID;
 
-	public Server(int port) throws IOException {
+	private Server(int port) throws IOException {
 		serverSocket 	= new ServerSocket(port);
 		udpSocket 		= new DatagramSocket(Config.UDP_SERVER_PORT);
 		sockets 		= new HashMap<>();
 		pList 			= new ArrayList<>();
+		dcNames			= new ArrayList<>();
 		rand			= new Random();
+		
 		hasStarted 		= false;
 		pause 			= false;
+		
 		if(Config.DEBUG) {
 			mapID		= 0;
 		} else {
@@ -55,10 +59,7 @@ public class Server extends Thread {
 			while(true){
 				Socket server = serverSocket.accept();
 				
-				if(hasStarted) {
-					DataOutputStream out = new DataOutputStream(server.getOutputStream());
-					out.writeUTF("The game has already started.");
-				} else if(sockets.size() > Config.MAX_PLAYERS) {
+				if(sockets.size() > Config.MAX_PLAYERS) {
 					DataOutputStream out = new DataOutputStream(server.getOutputStream());
 					out.writeUTF("The server's max players reached. Cannot accept anymore players.");
 				}
@@ -80,6 +81,15 @@ public class Server extends Thread {
 
 							out = new DataOutputStream(server.getOutputStream());
 							
+							if(hasStarted) {
+								if(dcNames.contains(name)) {
+									Server.this.sendToAll(name + " has reconnected to the game.", server);
+								} else { 
+									out.writeUTF("The game has already started.");
+									return;
+								}
+							} 
+							
 							//sends a list of names for the newly joined player
 							out.writeUTF(Code.PLAYER_LIST + getNames());
 							
@@ -92,17 +102,15 @@ public class Server extends Thread {
 							while(true) {
 								message = in.readUTF();
 								if(message.equals(Code.START_CODE)) {
-									hasStarted = (Config.DEBUG)? false: true;
+									hasStarted = true;
 									
 									initializePList(getNames());
-									if(Config.DEBUG) {
-										Server.this.startUDP();
-									} else {
-										Server.this.startUDP();
-									}
+									
+									Server.this.startUDP();
 									Server.this.startGame();
 									
 									System.out.println("Game has started.");
+									
 								} else if(message.startsWith(Code.PAUSE_CODE)) {
 									String pName = message.replace(Code.PAUSE_CODE, "");
 									pause = !pause;
@@ -120,9 +128,13 @@ public class Server extends Thread {
 							Server.this.sendToAll(name + " has disconnected.", server);
 							sockets.remove(name);
 							
-							if(sockets.size() <= 0) {
-								System.out.println("All players disconnected. Closing the server...");
-								System.exit(0);
+							if(hasStarted) {
+								dcNames.add(name);
+								
+								if(sockets.size() <= 0) {
+									System.out.println("All players disconnected. Closing the server...");
+									System.exit(0);
+								}
 							}
 						} catch (Exception e) {
 							e.printStackTrace();
