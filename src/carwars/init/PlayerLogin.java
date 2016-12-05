@@ -22,6 +22,7 @@ import javax.swing.JTextField;
 import carwars.chat.TCPClient;
 import carwars.util.Config;
 import carwars.util.Resources;
+import carwars.util.Settings;
 
 public class PlayerLogin extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
@@ -245,6 +246,9 @@ public class PlayerLogin extends JFrame implements ActionListener {
         	else{
             	// launch app
             	this.dispose();
+            	Settings.getInstance().setProperty("tcp.port", Integer.toString(port));
+            	Settings.getInstance().setProperty("tcp.server_ip", host);
+            	
             	gs.showWindow();
         	}
 
