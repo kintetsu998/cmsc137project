@@ -29,7 +29,7 @@ public class Settings extends Properties {
 	private void loadDefault() {
 		this.setProperty("game.name", "Car Wars");
 		this.setProperty("game.anim_speed", "250");
-		this.setProperty("game.min_player", "2");
+		this.setProperty("game.max_player", "8");
 		this.setProperty("game.clouds", "3");
 		this.setProperty("game.debug", "false");
 		
@@ -53,6 +53,8 @@ public class Settings extends Properties {
 		this.setProperty("assets.car_sprite", 		"sprites/carI-sprites.png");
 		this.setProperty("assets.panel_bg", 		"misc/login-bg2.png");
 		this.setProperty("assets.control_bg", 		"misc/howto.png");
+		
+		this.setProperty("map.mapid_debug",			"0");
 		
 		this.saveProperty();
 	}

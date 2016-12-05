@@ -17,6 +17,7 @@ import java.util.Random;
 import carwars.model.Player;
 import carwars.util.Code;
 import carwars.util.Config;
+import carwars.util.Settings;
 
 public class Server extends Thread {
 	private ServerSocket serverSocket;
@@ -46,7 +47,9 @@ public class Server extends Thread {
 		pause 			= false;
 		
 		if(Config.DEBUG) {
-			mapID		= 0;
+			mapID		= Integer.parseInt(
+				Settings.getInstance().getProperty("map.mapid_debug")
+			);
 		} else {
 			mapID		= rand.nextInt(5);
 		}
@@ -104,16 +107,16 @@ public class Server extends Thread {
 									out.writeUTF("The game has already started.");
 									return;
 								}
-							} 
+							} else {
+								//sends to all that someone will join the game
+								Server.this.sendToAll(Code.PLAYER_JOIN + name, server);
+							}
 							
 							//sends a list of names for the newly joined player
 							out.writeUTF(Code.PLAYER_LIST + getNames());
 							
 							//sends the new name in case there are duplicates
 							out.writeUTF(Code.PLAYER_NAME + name);
-							
-							//sends to all that someone will join the game
-							Server.this.sendToAll(Code.PLAYER_JOIN + name, server);
 							
 							while(true) {
 								message = in.readUTF();
@@ -181,7 +184,6 @@ public class Server extends Thread {
 							 Integer.parseInt(tok[4]),
 							 Integer.parseInt(tok[5]));
 					
-					System.out.println("Updated " + tok[0]);
 					break;
 				}
 			}
@@ -193,7 +195,6 @@ public class Server extends Thread {
 		try {
 			DataOutputStream out = new DataOutputStream(sock.getOutputStream());
 			out.writeUTF(Code.QUERY_STATUS + name);
-			System.out.println("Querying for " + name);
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
