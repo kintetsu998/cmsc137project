@@ -190,9 +190,7 @@ public class CarWars extends BasicGame {
 		Input input = container.getInput();
 		
 		if(!chatting) {
-			if(!isPaused) {
-				player.fall();
-				
+			if(!isPaused) {				
 				if(input.isKeyDown(Input.KEY_LEFT) || input.isKeyDown(Input.KEY_A)) {
 					player.moveLeft();
 				} else if(input.isKeyDown(Input.KEY_RIGHT) || input.isKeyDown(Input.KEY_D)) {
@@ -238,6 +236,10 @@ public class CarWars extends BasicGame {
 				chatting = false;
 				chatBox.setText("");
 			}
+		}
+		
+		if(!isPaused) {
+			player.fall();
 		}
 		
 		for(Player p : Player.players.values()) {

@@ -337,6 +337,7 @@ public class Server extends Thread {
 	public static void main(String[] args) {
 		int port;
 		Server s = null;
+		
 		try{
 			port = Integer.parseInt(args[0]);
 		} catch (Exception e) {
@@ -348,6 +349,12 @@ public class Server extends Thread {
 
 		try{
 			s = new Server(port);
+			
+			if(Config.DEBUG) {
+				System.out.println("Running in debug mode");
+				System.out.println("Loading map ID: " + s.mapID);
+			}
+			
 			s.start();
 		} catch (IOException e) {
 			e.printStackTrace();
