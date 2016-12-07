@@ -60,29 +60,25 @@ public class Server extends Thread {
 
 		try{
 			while(true){
-				Socket server = serverSocket.accept();
+				final Socket server = serverSocket.accept();
 				
 				if(sockets.size() > Config.MAX_PLAYERS) {
 					DataOutputStream out = new DataOutputStream(server.getOutputStream());
 					out.writeUTF("The server's max players reached. Cannot accept anymore players.");
 				}
-				
 
 				new Thread(){
 					@Override
 					public void run(){
-						DataInputStream in;
-						DataOutputStream out;
 						String message;
 						String name = null;
 						
 						try {
-							in = new DataInputStream(server.getInputStream());
-							name = Server.this.checkDuplicate(in.readUTF());
+							final DataInputStream in = new DataInputStream(server.getInputStream());
+							final DataOutputStream out = new DataOutputStream(server.getOutputStream());
 							
+							name = Server.this.checkDuplicate(in.readUTF());
 							sockets.put(name, server);
-
-							out = new DataOutputStream(server.getOutputStream());
 							
 							if(hasStarted) {
 								if(dcNames.contains(name)) {
