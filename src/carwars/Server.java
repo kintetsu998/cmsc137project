@@ -65,6 +65,8 @@ public class Server extends Thread {
 				if(sockets.size() > Config.MAX_PLAYERS) {
 					DataOutputStream out = new DataOutputStream(server.getOutputStream());
 					out.writeUTF("The server's max players reached. Cannot accept anymore players.");
+					server.close();
+					return;
 				}
 
 				new Thread(){
